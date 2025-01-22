@@ -3,7 +3,11 @@ const {Schema}=mongoose
 
 
 const userSchema= new Schema({
-    Name:{
+    FirstName:{
+        type:String,
+        required:true
+    },
+    LastName:{
         type:String,
         required:true
     },
@@ -26,7 +30,11 @@ const userSchema= new Schema({
     },  
     Password:{
         type:String,
-        required:false,  
+        required:true,  
+    },
+    ConfirmPassword:{
+        type:String,
+        // required:true,  
     },
     isBlocked:{
         type:Boolean,
@@ -58,14 +66,17 @@ const userSchema= new Schema({
      },
      ReferralCode:{
         type:String,
+        // required:true
         
      },
      Redeemed:{
-        type:Boolean
+        type:Boolean,
+        // default:false
      },
      RedeemedUsers:[{
         type:Schema.Types.ObjectId,
-        ref:"User"
+        ref:"User",
+        // required:true
      }],
      SearchHistory:[{
     Category:{

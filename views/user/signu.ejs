@@ -87,12 +87,6 @@
             border-radius: 4px;
         }
 
-        .error-message {
-            color: red;
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
-        }
-
         .login-form button {
             width: 100%;
             padding: 0.75rem;
@@ -192,6 +186,8 @@
         .shake {
             animation: shake 0.5s ease-in-out;
         }
+
+        
     </style>
 </head>
 <body>
@@ -212,13 +208,13 @@
                 <div class="form-group">
                     <div>
                         <label for="first-name">First Name</label>
-                        <input name="FirstName" type="text" id="first-name">
+                        <input name="FirstName" type="text" id="first-name" >
                         <div id="error1" class="error-message"></div>
                     </div>
 
                     <div>
                         <label for="last-name">Last Name</label>
-                        <input name="LastName" type="text" id="last-name">
+                        <input name="LastName" type="text" id="last-name" >
                         <div id="error2" class="error-message"></div>
                     </div>
                 </div>
@@ -226,13 +222,13 @@
                 <div class="form-group">
                     <div>
                         <label for="email">Email</label>
-                        <input name="Email" type="email" id="email">
+                        <input name="Email" type="email" id="email" >
                         <div id="error3" class="error-message"></div>
                     </div>
 
                     <div>
                         <label for="phone-number">Phone Number</label>
-                        <input name="PhoneNumber" type="text" id="phone-number">
+                        <input name="PhoneNumber" type="text" id="phone-number" >
                         <div id="error4" class="error-message"></div>
                     </div>
                 </div>
@@ -240,13 +236,13 @@
                 <div class="form-group">
                     <div>
                         <label for="password">Password</label>
-                        <input name="Password" type="password" id="password">
+                        <input name="Password" type="password" id="password" >
                         <div id="error5" class="error-message"></div>
                     </div>
 
                     <div>
                         <label for="confirm-password">Confirm Password</label>
-                        <input name="ConfirmPassword" type="password" id="confirm-password">
+                        <input name="ConfirmPassword"  type="password" id="confirm-password" >
                         <div id="error6" class="error-message"></div>
                     </div>
                 </div>
@@ -259,127 +255,169 @@
         </div>
     </div>
 
+  
     <!-- Add this script before the closing </body> tag -->
-        <!-- Add this script before the closing </body> tag -->
-        <script>
-            const FirstNameId = document.getElementById('first-name');
-            const LastNameId = document.getElementById('last-name');
-            const EmailId = document.getElementById('email');
-            const PhoneNumberId = document.getElementById('phone-number');
-            const PasswordId = document.getElementById('password');
-            const ConfirmPasswordId = document.getElementById('confirm-password');
-            const error1 = document.getElementById('error1');
-            const error2 = document.getElementById('error2');
-            const error3 = document.getElementById('error3');
-            const error4 = document.getElementById('error4');
-            const error5 = document.getElementById('error5');
-            const error6 = document.getElementById('error6');
-            const signForm = document.getElementById('signForm');
-    
-            function firstNameValidateChecking() {
-                const firstNameVal = FirstNameId.value;
-                const firstNamePattern = /^[A-Za-z ]+$/;
-    
-                if (firstNameVal.trim() ==="") {
-                    error1.style.display = "block";
-                    error1.innerHTML = "Please Enter a Valid Name";
-                } else if (!firstNamePattern.test(firstNameVal)) {
-                    error1.style.display = "block";
-                    error1.innerHTML = "Name Can Only Contain Alphabets And Space";
-                } else {
-                    error1.style.display = "none";
-                    error1.innerHTML = "";
-                }
+    <script>
+        document.querySelector('button[type="submit"]').addEventListener('click', function(event) {
+            // Ensure the form submits properly by commenting out the preventDefault line
+            // event.preventDefault();
+            const form = document.querySelector('.login-form');
+            form.classList.add('shake');
+            setTimeout(() => {
+                form.classList.remove('shake');
+            }, 500); // Duration of the animation
+        });
+
+
+        const FirstNameId=document.getElementById('first-name')
+        const LastNameId=document.getElementById('last-name')
+        const EmailId=document.getElementById('email')
+        const PhoneNumberId=document.getElementById('phone-number')
+        const PasswordId=document.getElementById('password')
+        const ConfirmPasswordId=document.getElementById('confirm-password')
+        const error1=document.getElementById('error1')
+        const error2=document.getElementById('error2')
+        const error3=document.getElementById('error3')
+        const error4=document.getElementById('error4')
+        const error5=document.getElementById('error5')
+        const error6=document.getElementById('error6')
+        const signForm=document.getElementById('signForm')
+
+        function firstNameValidateChecking(e){
+            const firstNameVal=FirstNameId.value
+            const firstNamePattern = /^[A-Za-z ]+$/;
+
+
+
+            if(firstNameVal.trim()===""){
+                error1.style.display="block"
+                error1.innerHTML="Please Enter a Valid Name"
+            }else if(!firstNamePattern.test(firstNameVal)){
+                error1.style.display="block"
+                error1.innerHTML="Name Can Only Contain Alphabets And Space"
+            }else{
+                error1.style.display="none"
+                error1.innerHTML=""
             }
-    
-            function lastNameValidateChecking() {
-                const lastNameVal = LastNameId.value;
-                const lastNamePattern = /^[A-Za-z ]+$/;
-    
-                if (lastNameVal.trim() === "") {
-                    error2.style.display = "block";
-                    error2.innerHTML = "Please Enter a Valid Name";
-                } else if (!lastNamePattern.test(lastNameVal)) {
-                    error2.style.display = "block";
-                    error2.innerHTML = "Name Can Only Contain Alphabets And Space";
-                } else {
-                    error2.style.display = "none";
-                    error2.innerHTML = "";
-                }
+
+        }
+
+        function lastNameValidateChecking(e){
+            const lastNameVal=LastNameId.value
+            const lastNamePattern = /^[A-Za-z ]+$/;
+
+
+
+            if(lastNameVal.trim()===""){
+                error2.style.display="block"
+                error2.innerHTML="Please Enter a Valid Name"
+            }else if(!lastNamePattern.test(lastNameVal)){
+                error2.style.display="block"
+                error2.innerHTML="Name Can Only Contain Alphabets And Space"
+            }else{
+                error2.style.display="none"
+                error2.innerHTML=""
             }
-    
-            function emailValidateChecking() {
-                const emailVal = EmailId.value;
-                const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    
-                if (!emailPattern.test(emailVal)) {
-                    error3.style.display = "block";
-                    error3.innerHTML = "Invalid Email Format";
-                } else {
-                    error3.style.display = "none";
-                    error3.innerHTML = "";
-                }
+
+        }
+
+        function firstNameValidateChecking(e){
+            const emailVal=EmailId.value
+            const emailPattern=/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+            if(!emailPattern.test(emailVal)){
+                error3.style.display="block"
+                error3.innerHTML="Invalid Format"
+            }else{
+                error3.style.display="none"
+                error3.innerHTML=""
             }
-    
-            function phoneValidateChecking() {
-                const phoneVal = PhoneNumberId.value;
-    
-                if (phoneVal.trim() === "") {
-                    error4.style.display = "block";
-                    error4.innerHTML = "Enter a Valid Phone Number";
-                } else if (phoneVal.length !== 10) {
-                    error4.style.display = "block";
-                    error4.innerHTML = "Enter 10 Digits";
-                } else {
-                    error4.style.display = "none";
-                    error4.innerHTML = "";
-                }
+
+        }
+
+        function phoneValidateChecking(e){
+            const phoneVal=PhoneNumberId.value
+
+            if(!phoneVal.trim()===""){
+                error4.style.display="block"
+                error4.innerHTML="Enter a Valid Phone Number"
+            }else if(phoneVal.length<10 || phoneVal.length>10){
+                error4.style.display="block"
+                error4.innerHTML="Enter 10 Digit"
+            }else{
+                error4.style.display="none"
+                error4.innerHTML=""
             }
-    
-            function passwordValidateChecking() {
-                const passVal = PasswordId.value;
-                const cPassVal = ConfirmPasswordId.value;
-                const alpha = /[a-zA-Z]/;
-                const digit = /\d/;
-    
-                if (passVal.length < 8) {
-                    error5.style.display = "block";
-                    error5.innerHTML = "Should Contain At Least 8 Characters";
-                } else if (!alpha.test(passVal) || !digit.test(passVal)) {
-                    error5.style.display = "block";
-                    error5.innerHTML = "Should Contain Alphabets And Numbers";
-                } else {
-                    error5.style.display = "none";
-                    error5.innerHTML = "";
-                }
-    
-                if (passVal !== cPassVal) {
-                    error6.style.display = "block";
-                    error6.innerHTML = "Passwords Do Not Match";
-                } else {
-                    error6.style.display = "none";
-                    error6.innerHTML = "";
-                }
+
+        }
+
+        function passwordValidateChecking(e){
+            const passVal=PasswordId.value
+            const cPassVal=ConfirmPasswordId.value
+            const alpha=/[a-zA-Z]/
+            const digit=/\d/
+
+            if(passVal.length<8){
+                error5.style.display="block"
+                error5.innerHTML="Should Contain Atleast 8 Characters"
+            }else if(!alpha.test(passVal)|| !digit.test(passVal)){
+                error5.style.display="block"
+                error5.innerHTML="Should Contain Alphabets And Numbers "
+            }else{
+                error5.style.display="none"
+                error5.innerHTML=""
             }
-    
-            document.addEventListener("DOMContentLoaded", () => {
-                signForm.addEventListener("submit", (e) => {
-                    firstNameValidateChecking();
-                    lastNameValidateChecking();
-                    emailValidateChecking();
-                    phoneValidateChecking();
-                    passwordValidateChecking();
-    
-                    if (!FirstNameId.value.trim() || !LastNameId.value.trim() || !EmailId.value.trim() || !PhoneNumberId.value.trim() || !PasswordId.value.trim()) {
-                        console.log("Please Fill All The Blanks");
-                    }
-    
-                    if (error1.innerHTML || error2.innerHTML || error3.innerHTML || error4.innerHTML || error5.innerHTML || error6.innerHTML) {
-                        e.preventDefault();
-                    }
-                });
-            });
-        </script>
-    </body>
-    </html>
-    
+
+            if(passVal !==cPassVal){
+                error6.style.display="block"
+                error6.innerHTML="Password Do Not Match"
+            }else{
+                error6.style.display="none"
+                error6.innerHTML=""
+            }
+
+        }
+
+
+        document,addEventListener("DOMContentLoaded",()=>{
+            signForm.addEventListener("submit",(e)=>{
+
+                firstNameValidateChecking()
+                lastNameValidateChecking()
+                emailValidateChecking()
+                phoneValidateChecking()
+                passwordValidateChecking()
+
+                if(!FirstNameId ||
+                !LastNameId ||
+                !EmailId ||
+                !PhoneNumberId ||
+                !PasswordId ||
+                !error1 ||
+                !error2 ||
+                !error3 ||
+                !error4 ||
+                !error5 ||
+                !error6 ||
+                !signForm
+                ){
+                    console.log("Please Fill All The Blanks");
+                }
+                if( error1.innerHTML ||
+                error2.innerHTML ||
+                error3.innerHTML ||
+                error4.innerHTML ||
+                error5.innerHTML ||
+                error6.innerHTML 
+
+                ){
+                     e.preventDefault()
+                }
+                
+
+            })
+        })
+
+    </script>
+</body>
+</html>
