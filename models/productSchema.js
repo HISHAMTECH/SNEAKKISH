@@ -10,14 +10,16 @@ const productSchema=new Schema({
         type:String,
         required:true
     },
-    Brand:{
+    Brands:{
         type:String,
         required:true
     },
-    Category:{
+    Categorys:{
         type:Schema.Types.ObjectId,
-        ref:"category",
+        ref:"Category",
         required:true
+        // type:String,
+        // required:true
 
     },  
     RegularPrice:{
@@ -36,6 +38,10 @@ const productSchema=new Schema({
         type:Number,
         default:true
     }],
+    Size:{
+        type:String,
+        enum:[4,5,6,7,8,9,10,11,12,13,14,15]
+      },
     Colour:{
         type:String,
         required:true
@@ -57,6 +63,6 @@ const productSchema=new Schema({
 
 },{timestamps:true})
 
-const Product=mongoose.Model("Product",productSchema)
+const Product=mongoose.model("Product",productSchema)
 
 module.exports=Product;

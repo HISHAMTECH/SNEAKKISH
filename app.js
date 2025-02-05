@@ -4,15 +4,18 @@ const path=require('path')
 const db=require('./config/db')
 const ejs=require('ejs')
 const session=require('express-session')
+const passport=require('./config/passport')
 
 const userRoute=require("./routes/userRoutes")
+const adminRoute=require("./routes/adminRoutes")
 const app=express()
 
 db()
 
 //bodyparser middleware
-app.use(express.json());
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({ extended: true })); 
+app.use(express.json()); 
+
 app.use(session({
     secret:process.env.SESSION_SECRET,
     resave:false,
@@ -24,7 +27,16 @@ app.use(session({
     }
     
 }))
+
+app.use(passport.initialize())
+app.use(passport.session())
+
+app.use((req,res,next)=>{
+    res.set('cache-control','no-store')
+    next()
+})
 app.use('/', userRoute);
+app.use('/admin',adminRoute)
 
 //viewengine
 app.set("view engine","ejs")

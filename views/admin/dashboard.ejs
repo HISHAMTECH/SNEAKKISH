@@ -1,0 +1,200 @@
+<%- include("../../views/partials/admin/header") %>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="breadcrumbs">
+            Admin <span>></span> <span id="currentPage">Dashboard</span>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Total Sales</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Customers</h3>  
+                </div>
+                <div class="chart-container">
+                    <canvas id="customersChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Total Orders</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card recent-orders">
+            <div class="card-header">
+                <h3 class="card-title">Recent Orders</h3>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Luxury Watch X1</td>
+                        <td>Jan 20, 2025</td>
+                        <td>$599.99</td>
+                        <td><span class="status completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Classic Watch Y2</td>
+                        <td>Jan 19, 2025</td>
+                        <td>$399.99</td>
+                        <td><span class="status pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>Smart Watch Z3</td>
+                        <td>Jan 19, 2025</td>
+                        <td>$299.99</td>
+                        <td><span class="status completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Diamond Watch A4</td>
+                        <td>Jan 18, 2025</td>
+                        <td>$899.99</td>
+                        <td><span class="status completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Sports Watch B5</td>
+                        <td>Jan 18, 2025</td>
+                        <td>$199.99</td>
+                        <td><span class="status pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>Gold Watch C6</td>
+                        <td>Jan 17, 2025</td>
+                        <td>$799.99</td>
+                        <td><span class="status completed">Completed</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card best-selling">
+            <div class="card-header">
+                <h3 class="card-title">Best Selling This Month</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="bestSellingChart"></canvas>
+            </div>
+        </div>
+    </main>
+    <script>
+        // Sales Chart
+new Chart(document.getElementById('salesChart'), {
+   type: 'line',
+   data: {
+       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+       datasets: [{
+           label: 'Sales ($)',
+           data: [12000, 19000, 15000, 25000, 22000, 30000],
+           borderColor: '#3b82f6',
+           tension: 0.4
+       }]
+   },
+   options: {
+       responsive: true,
+       maintainAspectRatio: false
+   }
+});
+
+// Customers Chart
+new Chart(document.getElementById('customersChart'), {
+   type: 'bar',
+   data: {
+       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+       datasets: [{
+           label: 'New Customers',
+           data: [50, 65, 75, 85, 95, 100],
+           backgroundColor: '#3b82f6'
+       }]
+   },
+   options: {
+       responsive: true,
+       maintainAspectRatio: false
+   }
+});
+
+// Orders Chart
+new Chart(document.getElementById('ordersChart'), {
+   type: 'line',
+   data: {
+       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+       datasets: [{
+           label: 'Orders',
+           data: [150, 200, 175, 250, 220, 300],
+           borderColor: '#3b82f6',
+           tension: 0.4
+       }]
+   },
+   options: {
+       responsive: true,
+       maintainAspectRatio: false
+   }
+});
+
+// Best Selling Chart (Doughnut)
+new Chart(document.getElementById('bestSellingChart'), {
+   type: 'doughnut',
+   data: {
+       labels: ['Men\'s Watches', 'Women\'s Watches'],
+       datasets: [{
+           data: [60, 40],
+           backgroundColor: ['#3b82f6', '#ec4899']
+       }]
+   },
+   options: {
+       responsive: true,
+       maintainAspectRatio: false,
+       plugins: {
+           legend: {
+               position: 'right'
+           }
+       }
+   }
+});
+
+// Handle sidebar navigation and breadcrumbs
+document.addEventListener('DOMContentLoaded', function() {
+   // Get all nav items
+   const navItems = document.querySelectorAll('.nav-item');
+   const breadcrumbPage = document.getElementById('currentPage');
+   
+   // Set initial active state
+   navItems[0].classList.add('active');
+
+   // Add click event to each nav item
+   navItems.forEach(item => {
+       item.addEventListener('click', function(e) {
+        //    e.preventDefault();
+           
+           // Remove active class from all items
+           navItems.forEach(nav => nav.classList.remove('active'));
+           
+           // Add active class to clicked item
+           this.classList.add('active');
+           
+           // Update breadcrumbs
+           const pageName = this.getAttribute('data-page');
+           breadcrumbPage.textContent = pageName;
+       });
+   });
+});
+    </script>
+    <%- include("../../views/partials/admin/footer") %>

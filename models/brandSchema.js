@@ -5,7 +5,7 @@ const {Schema}=mongoose
 const BrandSchema=new mongoose.Schema({
     BrandName:{
         type:String,
-        required:true
+        required:false
     },
     BrandImage:{
         type:[String],

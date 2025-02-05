@@ -9,13 +9,96 @@
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title -->
-    <title>One Music - Modern Music HTML5 Template</title>
+    <title>Sneakkish-Step Into Success</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="img/core-img/favicon.ico">
+    <link rel="icon" href="images/IMG_6513.PNG">
 
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        .dropdown{
+            position: relative;
+            display: inline-block;
+            
+           
+        }
+
+        .dropdown a{
+            position: relative;
+            display: inline-block;
+            font-size: large;
+            padding-left: 20px;
+            color: white;
+           
+        }
+        
+
+
+        .dropdown-content{
+            display: none;
+            position: absolute;
+            background-color:black;
+            min-width: 190px;
+            box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2) ;
+            z-index: 1000;
+            right: 0;
+        }
+
+        .dropdown-content a{
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+
+        }
+
+        .dropdown-content a:hover{
+            background-color: #716f6f;
+
+        }
+        .dropdown:hover .dropdown-content{
+            display: block;
+        }
+
+        .header{
+            position: relative;
+            z-index: 500
+
+        }
+
+        /* Hover effect for the album thumb */
+        .single-album-area .album-thumb {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .single-album-area .album-thumb img {
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        /* Hover effect */
+        .single-album-area:hover .album-thumb img {
+            transform: scale(1.1);
+        }
+
+        .single-album-area:hover .album-thumb {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Optionally add hover effect for the album title */
+        .single-album-area:hover .album-info h5 {
+            color: #ff6600; /* Change color on hover */
+        }
+
+
+
+    </style>
 
 </head>
 
@@ -40,7 +123,7 @@
                     <nav class="classy-navbar justify-content-between" id="oneMusicNav">
 
                         <!-- Nav brand -->
-                        <a href="index.html" class="nav-brand"><img src="img/core-img/logo.png" alt=""></a>
+                        <a href="/" class="nav-brand"><img src="images/IMG_6513.PNG" alt=""></a>
 
                         <!-- Navbar Toggler -->
                         <div class="classy-navbar-toggler">
@@ -58,40 +141,50 @@
                             <!-- Nav Start -->
                             <div class="classynav">
                                 <ul>
-                                    <li><a href="index.html">Home</a></li>
-                                    <li><a href="albums-store.html">Albums</a></li>
-                                    <li><a href="#">Pages</a>
+                                    <li><a href="/">Home</a></li>
+                                    
+                                    <li><a href="#">Category</a>
                                         <ul class="dropdown">
-                                            <li><a href="index.html">Home</a></li>
-                                            <li><a href="albums-store.html">Albums</a></li>
-                                            <li><a href="event.html">Events</a></li>
-                                            <li><a href="blog.html">News</a></li>
-                                            <li><a href="contact.html">Contact</a></li>
-                                            <li><a href="elements.html">Elements</a></li>
-                                            <li><a href="login.html">Login</a></li>
-                                            <li><a href="#">Dropdown</a>
-                                                <ul class="dropdown">
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                    <li><a href="#">Even Dropdown</a>
-                                                        <ul class="dropdown">
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                </ul>
-                                            </li>
+                                            <li><a href="index.html">Mens</a></li>                                      
+                                            <li><a href="event.html">Womens</a></li>
+                                            <li><a href="blog.html">Kids</a></li>
+                                            
+                                               
                                         </ul>
                                     </li>
-                                    <li><a href="event.html">Events</a></li>
-                                    <li><a href="blog.html">News</a></li>
+                                    <li><a href="#">Brands</a>
+                                        <ul class="dropdown">
+                                            <li><a href="index.html">Nike</a></li>                                      
+                                            <li><a href="event.html">Adiddas</a></li>
+                                            <li><a href="blog.html">Puma</a></li>
+                                            <li><a href="blog.html">Vans</a></li>
+                                            <li><a href="blog.html">New Balnce</a></li>
+                                            <li><a href="blog.html">Converse</a></li>
+                                            <li><a href="blog.html">Reebok</a></li>
+                                            <li><a href="blog.html">DC</a></li>
+
+                                            
+                                               
+                                        </ul>
+                                    </li>
+                                    <li><a href="blog.html">About</a></li>
                                     <li><a href="contact.html">Contact</a></li>
                                 </ul>
+
+
+                                <%if(locals.user){%>
+                                    <div class="dropdown">
+                                        <a href="#" class="sign-in-link"><%=locals.user.FirstName%></a>
+                                        <div class="dropdown-content">
+                                            <a href="/userProfile">Profile</a>
+                                            <a href="/logout">Logout</a>
+                                            
+                                        </div>
+
+                                    </div>
+
+                                <%}else{%>
+
 
                                 <!-- Login/Register & Cart Button -->
                                 <div class="login-register-cart-button d-flex align-items-center">
@@ -99,11 +192,9 @@
                                     <div class="login-register-btn mr-50">
                                         <a href="/login" id="loginBtn">Login/Register</a>
                                     </div>
+                                    <%}%>
 
-                                    <!-- Cart Button -->
-                                    <div class="cart-btn">
-                                        <p><span class="icon-shopping-cart"></span> <span class="quantity">1</span></p>
-                                    </div>
+                                
                                 </div>
                             </div>
                             <!-- Nav End -->
