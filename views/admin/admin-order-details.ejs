@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNEAKKISH Admin | Order Details - <%= order.OrderId || order._id %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        :root {
+            --sidebar-width: 290px;
+            --primary-color: #6366f1;
+            --secondary-color: #4f46e5;
+            --background-dark: #0f172a;
+            --card-dark: #1e293b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --success-color: #22c55e;
+            --warning-color: #eab308;
+            --danger-color: #ef4444;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            min-height: calc(100vh - 40px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .order-details-container {
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .order-details-container h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .order-info, .items, .totals {
+            margin-bottom: 20px;
+        }
+
+        .order-info p, .items p, .totals p {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin: 10px 0;
+        }
+
+        .order-info p strong, .items p strong, .totals p strong {
+            color: var(--text-secondary);
+        }
+
+        .status-select {
+            padding: 8px 12px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: var(--card-dark);
+            color: var(--text-primary);
+            font-size: 14px;
+            width: 200px;
+        }
+
+        .update-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .update-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .return-btn {
+            background: var(--danger-color);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .return-btn:hover {
+            background: #cc3333;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../../views/partials/admin/header') %>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="order-details-container">
+                <h1>Order Details - <%= order.OrderId || order._id %></h1>
+
+                <div class="order-info">
+                    <p><strong>Customer:</strong> <%= (order.userId && order.userId.name) ? order.userId.name : 'N/A' %> (<%= (order.userId && order.userId.email) ? order.userId.email : 'N/A' %>)</p>
+                    <p><strong>Date:</strong> <%= new Date(order.CreatedOn || '').toLocaleDateString() || 'N/A' %></p>
+                    <% if (order.Address) { %>
+                        <p><strong>Address:</strong> 
+                            <%= order.Address.addressType || 'N/A' %>, 
+                            <%= order.Address.City || 'N/A' %>, 
+                            <%= order.Address.State || 'N/A' %>, 
+                            <%= order.Address.Pincode || 'N/A' %>
+                        </p>
+                    <% } %>
+                    <p><strong>Status:</strong> 
+                        <select class="status-select" id="orderStatus" onchange="updateStatus('<%= order.OrderId || order._id %>')">
+                            <option value="Pending" <%= (order.Status || 'Pending') === 'Pending' ? 'selected' : '' %>>Pending</option>
+                            <option value="Shipped" <%= (order.Status || 'Pending') === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                            <option value="Out for Delivery" <%= (order.Status || 'Pending') === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                            <option value="Delivered" <%= (order.Status || 'Pending') === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                            <option value="Cancelled" <%= (order.Status || 'Pending') === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                        </select>
+                    </p>
+                    <% if (order.CancellationReason && order.CancellationReason !== 'none') { %>
+                        <p><strong>Cancel Reason:</strong> <%= order.CancellationReason || 'N/A' %></p>
+                    <% } %>
+                    <% if (order.ReturnReason) { %>
+                        <p><strong>Return Reason:</strong> <%= order.ReturnReason || 'N/A' %></p>
+                    <% } %>
+                </div>
+
+                <div class="items">
+                    <h3>Ordered Items</h3>
+                    <% if (order.OrderedItems && order.OrderedItems.length > 0) { %>
+                        <% order.OrderedItems.forEach(item => { %>
+                            <p><strong>Product:</strong> <%= (item.Product && item.Product.ProductName) ? item.Product.ProductName : 'N/A' %> (Size: <%= item.Size || 'N/A' %>) - 
+                                <%= item.Quantity || 'N/A' %> x $<%= (item.Price || 0).toFixed(2) %></p>
+                        <% }) %>
+                    <% } else { %>
+                        <p>No items found.</p>
+                    <% } %>
+                </div>
+
+                <div class="totals">
+                    <p><strong>Total:</strong> $<%= (order.TotalPrice || 0).toFixed(2) %></p>
+                    <p><strong>Final Amount:</strong> $<%= (order.FinalAmount || 0).toFixed(2) %></p>
+                </div>
+
+                <% if ((order.Status || 'Pending') === 'Delivered') { %>
+                    <button class="return-btn" onclick="verifyReturn('<%= order.OrderId || order._id %>')">Verify Return</button>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../../views/partials/admin/footer') %>
+
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+      function updateStatus(orderId) {
+    const status = document.getElementById('orderStatus').value;
+    fetch(`/admin/orders/${orderId}/status`, {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Bearer ' + localStorage.getItem('adminToken') || '',
+            'Cookie': document.cookie
+        },
+        body: `status=${encodeURIComponent(status)}`,
+        credentials: 'include'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: data.message,
+                confirmButtonColor: '#6366f1'
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Failed to update order status.',
+                confirmButtonColor: '#6366f1'
+            });
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'An error occurred while updating the status. Please try again. ' + error.message,
+            confirmButtonColor: '#6366f1'
+        });
+        console.error('Error updating status:', error);
+    });
+}
+
+function verifyReturn(orderId) {
+    Swal.fire({
+        title: 'Verify Return',
+        text: 'Are you sure you want to verify this return and refund the amount to the wallet?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#6366f1',
+        cancelButtonColor: '#ef4444',
+        confirmButtonText: 'Yes, verify!',
+        cancelButtonText: 'No, cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/orders/${orderId}/return`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer ' + localStorage.getItem('adminToken') || '',
+                    'Cookie': document.cookie
+                },
+                credentials: 'include'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        confirmButtonColor: '#6366f1'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to verify return.',
+                        confirmButtonColor: '#6366f1'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'An error occurred while verifying the return. Please try again. ' + error.message,
+                    confirmButtonColor: '#6366f1'
+                });
+                console.error('Error verifying return:', error);
+            });
+        }
+    });
+}
+
+        function verifyReturn(orderId) {
+            Swal.fire({
+                title: 'Verify Return',
+                text: 'Are you sure you want to verify this return and refund the amount to the wallet?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#6366f1',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'Yes, verify!',
+                cancelButtonText: 'No, cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/orders/${orderId}/return`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: data.message,
+                                confirmButtonColor: '#6366f1'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'Failed to verify return.',
+                                confirmButtonColor: '#6366f1'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'An error occurred while verifying the return. Please try again. ' + error.message,
+                            confirmButtonColor: '#6366f1'
+                        });
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

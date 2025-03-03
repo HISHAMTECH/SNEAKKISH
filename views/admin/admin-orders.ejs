@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNEAKKISH Admin | Orders</title>
+    <!-- Load jQuery first -->
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        :root {
+            --sidebar-width: 290px; /* Updated to match your requirement */
+            --primary-color: #6366f1;
+            --secondary-color: #4f46e5;
+            --background-dark: #0f172a;
+            --card-dark: #1e293b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --success-color: #22c55e;
+            --warning-color: #eab308;
+            --danger-color: #ef4444;
+        }
+
+        /* Main content wrapper to center content */
+        .main-content {
+            margin-left: var(--sidebar-width); /* Leave space for sidebar */
+            padding: 20px;
+            min-height: calc(100vh - 40px); /* Adjust for padding */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Changed to align items at the top */
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%; /* Full width of remaining space */
+            padding: 0 20px;
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .order-table th, .order-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        .order-table th {
+            background: rgba(0, 0, 0, 0.9);
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .order-table td {
+            color: var(--text-primary);
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status.pending { background: rgba(234, 179, 8, 0.1); color: var(--warning-color); }
+        .status.shipped { background: rgba(99, 102, 241, 0.1); color: var(--primary-color); }
+        .status.out-for-delivery { background: rgba(34, 197, 94, 0.1); color: var(--success-color); }
+        .status.delivered { background: rgba(34, 197, 94, 0.1); color: var(--success-color); }
+        .status.cancelled { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+        .status.return-request { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+
+        .action-btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .view-btn { background: var(--primary-color); color: white; }
+        .view-btn:hover { background: var(--secondary-color); }
+
+        /* Search, Sort, Filter */
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-start; /* Align to left */
+        }
+
+        .controls input, .controls select, .controls button {
+            padding: 8px 12px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: var(--card-dark);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .controls button {
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+        }
+
+        .controls button:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Pagination */
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            margin: 0 5px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            text-decoration: none;
+            color: var(--text-primary);
+            background: var(--card-dark);
+            display: inline-block; /* Ensure clickable area */
+            cursor: pointer;
+        }
+
+        .pagination a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Loading State */
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+        
+        /* Error message */
+        .error-message {
+            color: var(--danger-color);
+            background-color: rgba(239, 68, 68, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/admin/header') %>
+
+    <div class="main-content">
+        <div class="container">
+            <h1>Orders</h1>
+            
+            <!-- Error message container -->
+            <div id="errorMessage" class="error-message"></div>
+
+            <!-- Loading Indicator -->
+            <div id="loading">Loading orders...</div>
+
+            <!-- Search, Sort, Filter Controls -->
+            <div class="controls">
+                <input type="text" id="searchQuery" placeholder="Search by Order ID or Customer Name" value="<%= query %>">
+                <select id="sortBy">
+                    <option value="CreatedOn" <%= sortBy === 'CreatedOn' ? 'selected' : '' %>>Date</option>
+                    <option value="TotalPrice" <%= sortBy === 'TotalPrice' ? 'selected' : '' %>>Amount</option>
+                </select>
+                <select id="sortOrder">
+                    <option value="desc" <%= sortOrder === 'desc' ? 'selected' : '' %>>Desc</option>
+                    <option value="asc" <%= sortOrder === 'asc' ? 'selected' : '' %>>Asc</option>
+                </select>
+                <select id="filterStatus">
+                    <option value="" <%= status === '' ? 'selected' : '' %>>All Statuses</option>
+                    <option value="Pending" <%= status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="Shipped" <%= status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                    <option value="Out for Delivery" <%= status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                    <option value="Delivered" <%= status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                    <option value="Cancelled" <%= status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                    <option value="Return Request" <%= status === 'Return Request' ? 'selected' : '' %>>Return Request</option>
+                </select>
+                <button id="searchBtn">Search</button>
+                <button id="refreshBtn">Refresh</button>
+            </div>
+
+            <!-- Orders Table -->
+            <table class="order-table" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody">
+                    <% if (orders && orders.length > 0) { %>
+                        <% orders.forEach(function(order) { %>
+                            <tr>
+                                <td><%= order.OrderId || order._id %></td>
+                                <td><%= new Date(order.CreatedOn).toLocaleDateString() %></td>
+                                <td>
+                                    <%= order.userId && order.userId.name ? order.userId.name : 'N/A' %>
+                                    (<%= order.userId && order.userId.email ? order.userId.email : 'N/A' %>)
+                                </td>
+                                <td>$<%= order.TotalPrice ? order.TotalPrice.toFixed(2) : '0.00' %></td>
+                                <td>
+                                    <span class="status <%= order.Status ? order.Status.toLowerCase().replace(/\s+/g, '-') : 'pending' %>">
+                                        <%= order.Status || 'Pending' %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/admin/orders/<%= order.OrderId || order._id %>" class="action-btn view-btn">View</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No orders found.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                    <a href="javascript:void(0)" class="<%= currentPage === i ? 'active' : '' %>" onclick="fetchOrders(<%= i %>)"><%= i %></a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/admin/footer') %>
+
+    <script>
+        // Initialize variables with default values
+        let currentPage = <%= currentPage %>;
+        let query = '<%= query %>';
+        let sortBy = '<%= sortBy %>';
+        let sortOrder = '<%= sortOrder %>';
+        let status = '<%= status %>';
+
+        // Fetch orders dynamically
+        async function fetchOrders(page = 1) {
+            try {
+                // Show loading indicator and hide error message
+                $('#loading').show();
+                $('#errorMessage').hide();
+                
+                // Get current filter values
+                query = $('#searchQuery').val() || '';
+                sortBy = $('#sortBy').val() || 'CreatedOn';
+                sortOrder = $('#sortOrder').val() || 'desc';
+                status = $('#filterStatus').val() || '';
+                
+                console.log('Fetching orders with:', { page, query, sortBy, sortOrder, status });
+                
+                // Build URL with parameters
+                const url = `/admin/orders/paginate?page=${page}&q=${encodeURIComponent(query)}&sortBy=${sortBy}&sortOrder=${sortOrder}&status=${status}`;
+                
+                // Fetch data with error handling
+                const response = await fetch(url);
+                
+                // Check for HTTP errors
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server error (${response.status}): ${errorText}`);
+                }
+                
+                // Parse JSON response
+                const data = await response.json();
+                console.log("Response data:", data);
+                
+                // Check for API success flag
+                if (data.success) {
+                    // Update current page
+                    currentPage = data.currentPage;
+                    
+                    // Render orders and pagination
+                    renderOrders(data.orders, data.currentPage, data.totalPages);
+                } else {
+                    // Handle API error
+                    throw new Error(data.message || 'Failed to fetch orders');
+                }
+            } catch (error) {
+                // Display error message
+                console.error('Fetch error:', error);
+                $('#errorMessage').text(`Error: ${error.message}`).show();
+                
+                // Also show empty table
+                $('#ordersBody').html('<tr><td colspan="6" style="text-align: center;">No orders available due to an error.</td></tr>');
+                $('#pagination').empty();
+            } finally {
+                // Always hide loading indicator
+                $('#loading').hide();
+            }
+        }
+
+        // Render orders in the table
+        function renderOrders(orders, currentPage, totalPages) {
+            const tbody = $('#ordersBody');
+            tbody.empty();
+            
+            if (!orders || orders.length === 0) {
+                tbody.append('<tr><td colspan="6" style="text-align: center;">No orders found.</td></tr>');
+            } else {
+                orders.forEach(order => {
+                    // Safe access to nested properties with defaults
+                    const orderId = order.OrderId || order._id || 'Unknown';
+                    const orderDate = order.CreatedOn ? new Date(order.CreatedOn).toLocaleDateString() : 'Unknown';
+                    const userName = order.userId && order.userId.name ? order.userId.name : 'N/A';
+                    const userEmail = order.userId && order.userId.email ? order.userId.email : 'N/A';
+                    const totalPrice = order.TotalPrice ? parseFloat(order.TotalPrice).toFixed(2) : '0.00';
+                    const status = order.Status || 'Pending';
+                    const statusClass = status.toLowerCase().replace(/\s+/g, '-');
+                    
+                    tbody.append(`
+                        <tr>
+                            <td>${orderId}</td>
+                            <td>${orderDate}</td>
+                            <td>${userName} (<${userEmail}>)</td>
+                            <td>$${totalPrice}</td>
+                            <td><span class="status ${statusClass}">${status}</span></td>
+                            <td><a href="/admin/orders/${orderId}" class="action-btn view-btn">View</a></td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // Render pagination
+            const pagination = $('#pagination');
+            pagination.empty();
+            
+            for (let i = 1; i <= totalPages; i++) {
+                pagination.append(`
+                    <a href="javascript:void(0)" class="${currentPage === i ? 'active' : ''}" onclick="fetchOrders(${i})">${i}</a>
+                `);
+            }
+        }
+
+        // When document is ready
+        $(document).ready(function() {
+            // Add click handler for search button
+            $('#searchBtn').on('click', function() {
+                fetchOrders(1);
+            });
+            
+            // Add click handler for refresh button
+            $('#refreshBtn').on('click', function() {
+                // Reset all filters to default
+                $('#searchQuery').val('');
+                $('#sortBy').val('CreatedOn');
+                $('#sortOrder').val('desc');
+                $('#filterStatus').val('');
+                
+                // Fetch orders with reset filters
+                fetchOrders(1);
+            });
+            
+            // Allow pressing Enter in search field
+            $('#searchQuery').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    fetchOrders(1);
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

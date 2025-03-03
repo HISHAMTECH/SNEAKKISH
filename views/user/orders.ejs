@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Male_Fashion Template">
+    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Male-Fashion | Your Orders</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="/css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <style>
+        /* General Layout */
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .orders-section {
+            padding: 50px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .breadcrumb-option {
+            background: #fff;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .breadcrumb__text h4 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .breadcrumb__links a, .breadcrumb__links span {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .breadcrumb__links a:hover {
+            color: #007bff;
+        }
+
+        .orders-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .orders-container h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #333;
+        }
+
+        .order-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .order-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s ease;
+        }
+
+        .order-item:hover {
+            background: #f8f9fa;
+        }
+
+        .order-details {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .order-details strong {
+            color: #333;
+        }
+
+        .order-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .order-actions a, .order-actions button {
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .order-actions a {
+            background: #007bff;
+            color: #fff;
+        }
+
+        .order-actions a:hover {
+            background: #0056b3;
+            color: #fff;
+        }
+
+        .order-actions form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .order-actions input[type="text"] {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 200px;
+        }
+
+        .order-actions button {
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .order-actions button:hover {
+            background: #cc3333;
+        }
+
+        .error-message {
+            text-align: center;
+            color: #ff4444;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 767px) {
+            .orders-container {
+                padding: 20px;
+            }
+            .orders-container h1 {
+                font-size: 24px;
+            }
+            .order-details {
+                font-size: 14px;
+            }
+            .order-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .order-actions input[type="text"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Breadcrumb Section -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Your Orders</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <span>Orders</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Orders Section -->
+    <section class="orders-section">
+        <div class="container">
+            <div class="orders-container">
+                <h1>Your Orders</h1>
+                <ul class="order-list">
+                    <% if (orders && orders.length > 0) { %>
+                        <% orders.forEach(order => { %>
+                            <li class="order-item">
+                                <div class="order-details">
+                                    Order ID: <strong><%= order.OrderId || order._id %></strong> - 
+                                    Status: <strong><%= order.Status %></strong> - 
+                                    Date: <strong><%= order.CreatedOn ? new Date(order.CreatedOn).toLocaleDateString() : 'N/A' %></strong>
+                                    <% if (order.Address) { %>
+                                        <br>Address: <strong>
+                                            <%= order.Address.addressType || 'N/A' %>, 
+                                            <%= order.Address.City || 'N/A' %>, 
+                                            <%= order.Address.State || 'N/A' %>, 
+                                            <%= order.Address.Pincode || 'N/A' %>
+                                        </strong>
+                                    <% } else { %>
+                                        <br>Address: <strong>No address provided</strong>
+                                    <% } %>
+                                </div>
+                                <div class="order-actions">
+                                    <a href="/orders/<%= order.OrderId || order._id %>">View Details</a>
+                                    <% if (order.Status === 'Pending') { %>
+                                        <form action="/orders/cancel/<%= order.OrderId || order._id %>" method="POST">
+                                            <input type="text" name="reason" placeholder="Cancel reason (optional)">
+                                            <button type="submit">Cancel Order</button>
+                                        </form>
+                                    <% } %>
+                                    <% if (order.Status === 'Delivered') { %>
+                                        <form action="/orders/return/<%= order.OrderId || order._id %>" method="POST">
+                                            <input type="text" name="reason" placeholder="Return reason (required)" required>
+                                            <button type="submit">Return Order</button>
+                                        </form>
+                                    <% } %>
+                                    <a href="/orders/invoice/<%= order.OrderId || order._id %>">Download Invoice</a>
+                                </div>
+                            </li>
+                        <% }) %>
+                    <% } else { %>
+                        <li class="order-item">
+                            <p style="text-align: center; color: #666;">No orders found.</p>
+                        </li>
+                    <% } %>
+                </ul>
+                <% if (typeof error !== 'undefined') { %>
+                    <p class="error-message"><%= error %></p>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Js Plugins -->
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.nice-select.min.js"></script>
+    <script src="/js/jquery.nicescroll.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/jquery.countdown.min.js"></script>
+    <script src="/js/jquery.slicknav.js"></script>
+    <script src="/js/mixitup.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>

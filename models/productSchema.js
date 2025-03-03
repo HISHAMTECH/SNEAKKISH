@@ -34,35 +34,56 @@ const productSchema=new Schema({
         type:Number,
         default:0
     },
-    Quantity:[{
-        type:Number,
-        default:true
+    Variants: [{
+       
+        Size: {
+            type: Number,
+            required: true,
+        },
+        Quantity: {
+            type: Number,
+            default: 1, 
+        }
+        
     }],
-    Size:{
-        type:String,
-        enum:[4,5,6,7,8,9,10,11,12,13,14,15]
-      },
+
     Colour:{
         type:String,
         required:true
     },
-    ProductImage:{
-        type:[String],
-        required:true
-    },
+    ProductImage: [{
+        type: String // Array of image URLs or paths
+    }],
     isBlocked:{
         type:Boolean,
         default:false
     },
-    Status:{
-        type:String,
-        enum:["Available","Out Of Stock","Discontinued"],
-        required:true,
-        default:"Available"
+    Status: {
+        type: String,
+        enum: ["Available", "out of stock", "Discontinued"],
+        required: true,
+        default: "Available",
     },
+    timestamps: {
+        type: Date,
+        default: Date.now
+    },
+    isOnSale: {
+        type: Boolean,
+        default: false // For "SALE" badge
+    },
+    rating: {
+        type: Number,
+        default: 0, // Rating out of 5 (0-5)
+        min: 0,
+        max: 5
+    },
+   
 
-},{timestamps:true})
+},)
 
 const Product=mongoose.model("Product",productSchema)
 
 module.exports=Product;
+
+

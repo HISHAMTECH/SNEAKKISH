@@ -2,6 +2,7 @@ const User=require('../../models/userSchema')
 
 const customerInfo= async (req,res)=>{
 try {
+    
     let search="";
     if(req.query.search){
         search=req.query.search;
@@ -51,10 +52,10 @@ try {
 const customerBlocked= async (req,res)=>{
 try {
     
-    let id=req.query._id;
-    console.log("Unblocking user with ID:", id); 
-    await User.updateOne({_id:id},{$set:{isBlocked:true}})
-    res.redirect('/admin/users')
+    const { id, page } = req.query; 
+    console.log("blocking user with ID:", id); 
+    await User.updateOne({ _id: id }, { isBlocked: true });
+    res.redirect(`/admin/users?page=${page || 1}`);
 } catch (error) {
     res.redirect('/pageError')
 }
@@ -63,10 +64,10 @@ try {
 const customerUnBlocked= async (req,res)=>{
     try {
         
-        let id=req.query._id;
-        console.log("Blocking user with ID:", id);
-        await User.updateOne({_id:id},{$set:{isBlocked:false}})
-        res.redirect('/admin/users')
+        const { id, page } = req.query; 
+        console.log("Unblocking user with ID:", id); 
+        await User.updateOne({ _id: id }, { isBlocked:false });
+        res.redirect(`/admin/users?page=${page || 1}`);
     } catch (error) {
         res.redirect('/pageError')
     }

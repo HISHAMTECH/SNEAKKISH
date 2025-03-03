@@ -344,7 +344,62 @@
     </div>
 
     <script>
-        // JavaScript remains unchanged
+        document.getElementById("signForm").addEventListener("submit", function(event) {
+    let isValid = true;
+
+    // Get input values
+    let firstName = document.getElementById("first-name").value.trim();
+    let lastName = document.getElementById("last-name").value.trim();
+    let email = document.getElementById("email").value.trim();
+    let phoneNumber = document.getElementById("phone-number").value.trim();
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("confirm-password").value;
+
+    // Reset previous error messages
+    document.querySelectorAll(".error-message").forEach(el => el.textContent = "");
+
+    // Validate first name
+    if (firstName === "") {
+        document.getElementById("error1").textContent = "First name is required.";
+        isValid = false;
+    }
+
+    // Validate last name
+    if (lastName === "") {
+        document.getElementById("error2").textContent = "Last name is required.";
+        isValid = false;
+    }
+
+    // Validate email
+    let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+        document.getElementById("error3").textContent = "Invalid email format.";
+        isValid = false;
+    }
+
+    // Validate phone number (must be 10 digits)
+    let phonePattern = /^\d{10}$/;
+    if (!phonePattern.test(phoneNumber)) {
+        document.getElementById("error4").textContent = "Phone number must be 10 digits.";
+        isValid = false;
+    }
+
+    // Validate password (minimum 6 characters)
+    if (password.length < 6) {
+        document.getElementById("error5").textContent = "Password must be at least 6 characters.";
+        isValid = false;
+    }
+
+    // Validate confirm password
+    if (password !== confirmPassword) {
+        document.getElementById("error6").textContent = "Passwords do not match.";
+        isValid = false;
+    }
+
+    if (!isValid) {
+        event.preventDefault(); // Prevent form submission if validation fails
+    }
+});
     </script>
 </body>
 </html>

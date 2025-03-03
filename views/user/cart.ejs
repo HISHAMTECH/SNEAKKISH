@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Male_Fashion Template">
+    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Male-Fashion | Your Cart</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="/css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <style>
+        /* General Layout */
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .cart-section {
+            padding: 50px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-option {
+            background: #fff;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .breadcrumb__text h4 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .breadcrumb__links a, .breadcrumb__links span {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .breadcrumb__links a:hover {
+            color: #007bff;
+        }
+
+        /* Cart Items */
+        .cart-items {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .cart-items h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .cart-empty {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .cart-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s ease;
+        }
+
+        .cart-item:hover {
+            background: #f8f9fa;
+        }
+
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-details h5 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 5px;
+            color: #333;
+        }
+
+        .cart-item-details p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-item-actions form {
+            display: inline;
+        }
+
+        .cart-item-actions button {
+            padding: 5px 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cart-item-actions button:hover:not(:disabled) {
+            background: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        .cart-item-actions button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .cart-item-actions .quantity {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 10px;
+        }
+
+        .cart-item-actions .total-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #007bff;
+            margin-right: 15px;
+        }
+
+        .out-of-stock {
+            color: #ff4444;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        /* Error Message */
+        .error-message {
+            text-align: center;
+            color: #ff4444;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        /* Checkout Button */
+        .checkout-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto 0;
+            padding: 12px 20px;
+            background: #007bff;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            background: #0056b3;
+            color: #fff;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 767px) {
+            .cart-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .cart-item img {
+                margin: 0 0 15px;
+            }
+            .cart-item-actions {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Breadcrumb Section -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Your Cart</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <span>Cart</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section class="cart-section">
+        <div class="container">
+            <div class="cart-items">
+                <h1>Your Shopping Cart</h1>
+                <% if (cart.Items.length === 0) { %>
+                    <div class="cart-empty">
+                        <p>Your cart is empty</p>
+                        <a href="/product-page" class="checkout-btn" style="background: #666;">Continue Shopping</a>
+                    </div>
+                <% } else { %>
+                    <ul class="cart-list">
+                        <% cart.Items.forEach(item => { %>
+                            <li class="cart-item">
+                                <img src="/uploads/re-image/<%= item.ProductId.ProductImage[0] || 'default-image.jpg' %>" 
+                                     alt="<%= item.ProductId.ProductName || 'Product Image' %>">
+                                <div class="cart-item-details">
+                                    <h5><%= item.ProductId.ProductName || 'Unnamed Product' %> (Size: <%= item.Size %>)</h5>
+                                    <p>Price: $<%= item.Price.toFixed(2) %></p>
+                                </div>
+                                <div class="cart-item-actions">
+                                    <form action="/cart/decrement/<%= item.ProductId._id %>" method="POST">
+                                        <input type="hidden" name="size" value="<%= item.Size %>">
+                                        <button>-</button>
+                                    </form>
+                                    <span class="quantity"><%= item.Quantity %></span>
+                                    <form action="/cart/increment/<%= item.ProductId._id %>" method="POST">
+                                        <input type="hidden" name="size" value="<%= item.Size %>">
+                                        <button <%= item.Quantity >= item.ProductId.Variants.find(v => v.Size === parseInt(item.Size)).Quantity || item.Quantity >= 7 ? 'disabled' : '' %>>+</button>
+                                    </form>
+                                    <span class="total-price">$<%= item.TotalPrice.toFixed(2) %></span>
+                                    <form action="/cart/remove/<%= item.ProductId._id %>" method="POST">
+                                        <input type="hidden" name="size" value="<%= item.Size %>">
+                                        <button>Remove</button>
+                                    </form>
+                                    <% if (item.ProductId.Variants.find(v => v.Size === parseInt(item.Size)).Quantity <= 0) { %>
+                                        <span class="out-of-stock">(Out of stock)</span>
+                                    <% } %>
+                                </div>
+                            </li>
+                        <% }) %>
+                    </ul>
+                    <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>
+                <% } %>
+                <% if (typeof error !== 'undefined') { %>
+                    <p class="error-message"><%= error %></p>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Js Plugins -->
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.nice-select.min.js"></script>
+    <script src="/js/jquery.nicescroll.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/jquery.countdown.min.js"></script>
+    <script src="/js/jquery.slicknav.js"></script>
+    <script src="/js/mixitup.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>

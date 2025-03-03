@@ -230,11 +230,9 @@
             <label for="password">Enter Your Password:</label>
             <input name="Password" type="password" id="password">
             
-            <% if (locals.message && message.length > 0) { %>
-                <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-                    <%= message %>
-                </div>
-            <% } %>
+            <% if(typeof message !== 'undefined'){ %>
+                <p style="color: red; text-align: center;" ><%= message %></p>
+            <% } %>
             
             <div>  
                 <div class="social-btns">
@@ -248,7 +246,7 @@
             <button type="submit">Login</button>
         </form>
         <br>
-        <a href="#">Forgot Your Password?</a>
+        <a href="/forgot-password">Forgot Your Password?</a>
     </div>
 
     <div class="login-image">

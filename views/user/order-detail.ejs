@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Male_Fashion Template">
+    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Male-Fashion | Order Details - <%= order.OrderId || order._id %></title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="/css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <style>
+        /* General Layout */
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background: #f8f9fa; /* Light gray background consistent with shop.ejs */
+            color: #2c2c2c;
+            margin: 0;
+        }
+
+        /* Order Details Section */
+        .order-details-section {
+            padding: 50px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-option {
+            background: #fff;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .breadcrumb__text h4 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .breadcrumb__links a, .breadcrumb__links span {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .breadcrumb__links a:hover {
+            color: #007bff;
+        }
+
+        /* Order Details Container */
+        .order-details-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .order-details-container h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #007bff; /* Blue to match shop.ejs accents */
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Order Info */
+        .order-info {
+            margin-bottom: 30px;
+        }
+
+        .order-info p {
+            font-size: 16px;
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .order-info p strong {
+            color: #333;
+        }
+
+        .order-info .highlight {
+            color: #007bff;
+            font-weight: 600;
+        }
+
+        /* Ordered Items */
+        .ordered-items {
+            margin-bottom: 30px;
+        }
+
+        .ordered-items h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        /* Totals */
+        .totals {
+            text-align: right;
+        }
+
+        .totals p {
+            font-size: 16px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .totals p strong {
+            color: #333;
+        }
+
+        .totals .final-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 767px) {
+            .order-details-container {
+                padding: 20px;
+                margin: 20px;
+            }
+            .order-details-container h1 {
+                font-size: 24px;
+            }
+            .order-info p, .item, .totals p {
+                font-size: 14px;
+            }
+            .ordered-items h2 {
+                font-size: 20px;
+            }
+            .totals {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Breadcrumb Section -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Order Details</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <a href="/orders">Orders</a>
+                            <span>Order <%= order.OrderId || order._id %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Details Section -->
+    <section class="order-details-section">
+        <div class="container">
+            <div class="order-details-container">
+                <h1>Order Details - <%= order.OrderId || order._id %></h1>
+                <div class="order-info">
+                    <p>Status: <strong class="highlight"><%= order.Status %></strong></p>
+                    <p>Date: <strong><%= order.CreatedOn ? new Date(order.CreatedOn).toLocaleDateString() : 'N/A' %></strong></p>
+                    <% if (order.Address) { %>
+                        <p>Address: <strong><%= order.Address.addressLine %>, <%= order.Address.city %>, <%= order.Address.state %>, <%= order.Address.pincode %></strong></p>
+                    <% } %>
+                    <% if (order.CancellationReason && order.CancellationReason !== 'none') { %>
+                        <p>Cancel Reason: <strong><%= order.CancellationReason %></strong></p>
+                    <% } %>
+                    <% if (order.ReturnReason) { %>
+                        <p>Return Reason: <strong><%= order.ReturnReason %></strong></p>
+                    <% } %>
+                </div>
+
+                <div class="ordered-items">
+                    <h2>Ordered Items</h2>
+                    <ul class="item-list">
+                        <% order.OrderedItems.forEach(item => { %>
+                            <li class="item">
+                                <%= item.Product.ProductName || 'Unnamed Product' %> (Size: <%= item.Size %>) - 
+                                <%= item.Quantity %> x $<%= item.Price.toFixed(2) %>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
+
+                <div class="totals">
+                    <p>Total: <strong>$<%= order.TotalPrice.toFixed(2) %></strong></p>
+                    <p>Final Amount: <strong class="final-amount">$<%= order.FinalAmount.toFixed(2) %></strong></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Js Plugins -->
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.nice-select.min.js"></script>
+    <script src="/js/jquery.nicescroll.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/jquery.countdown.min.js"></script>
+    <script src="/js/jquery.slicknav.js"></script>
+    <script src="/js/mixitup.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>

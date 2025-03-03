@@ -11,6 +11,13 @@ const adminRoute=require("./routes/adminRoutes")
 const app=express()
 
 db()
+//cache management
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+  });
 
 //bodyparser middleware
 app.use(express.urlencoded({ extended: true })); 

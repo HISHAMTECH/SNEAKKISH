@@ -1,4 +1,7 @@
 const User=require('../../models/userSchema')
+const Category=require("../../models/CategorySchema")
+const Product=require('../../models/productSchema')
+const Brand=require('../../models/brandSchema')
 const nodemailer=require('nodemailer')
 const env=require('dotenv').config()
 const bcrypt=require('bcrypt')
@@ -16,25 +19,21 @@ const pageNotFound=async (req,res)=>{
 }
 
 
-
-
-
-const loadLogin= async (req,res)=>{
-
+const loadLogin = async (req, res) => {
     try {
-        if(!req.session.user){
-            return res.render('login')
-        }else{
-            res.redirect('/')
+        const message = req.session.loginError;
+        req.session.loginError = null;
+        if (!req.session.User) {
+            const loginError = req.session?.userLoginError;
+            req.session.userLoginError = null;
+            return res.render('login', { message: loginError });
+        } else {
+            return res.redirect('/');
         }
-        
-
     } catch (error) {
-        res.redirect('/PageNotFound')
-          
+        res.redirect('/PageNotFound');
     }
-
-}
+};
 
 const loadSignup= async (req,res)=>{
     try {
@@ -106,7 +105,10 @@ const signUp = async (req, res) => {
 
         console.log("OTP Sent");
 
-        return res.render('verify-otp'); 
+        return res.render('verify-otp',{
+            email:Email
+
+        }); 
     } catch (error) {
         console.log('Signup Error:', error.message);
         res.redirect('/pageNotFound');
@@ -127,47 +129,69 @@ const securePassword =async (password)=>{
 }
 
 
-const verifyOTP= async (req,res)=>{
-try {
-    const {otp}=req.body
-    console.log(otp);
-    if(otp===req.session.userOtp){
-        const user=req.session.userData
-        
-        
-        const  passwordHash=await securePassword(user.Password)
+const verifyOTP = async (req, res) => {
+    try {
+        const { otp } = req.body;
+        console.log('OTP received:', otp);
 
-    
-        
-        const saveUserData =new User({
-            FirstName:user.FirstName,
-            LastName:user.LastName,
-            Email:user.Email,
-            PhoneNumber:user.PhoneNumber,
-            Password:passwordHash,
+        // Check if OTP exists in session
+        if (!otp || !req.session.userOtp) {
+            return res.json({ success: false, message: 'OTP not found or expired' });
+        }
 
-        })
-        
-        await saveUserData.save();
-        
-        
-        req.session.User =saveUserData._id;
-       
-        res.json({success:true,redirectUrl:"/login"})
-        
+        // Verify OTP
+        if (otp === req.session.userOtp) {
+            const user = req.session.userData;
 
-    }else{
-        res.render('verify-otp',{message:"Invalid OTP Please Try Again"})
-       
+            if (!user || !user.Email) {
+                return res.json({ success: false, message: 'User data or email is missing' });
+            }
+
+            // Hash the password
+            const passwordHash = await securePassword(user.Password);
+
+            // Check if the user already exists by Email to avoid duplicates
+            const existingUser = await User.findOne({ Email: user.Email });
+            if (existingUser) {
+                return res.json({ success: false, message: 'User with this email already exists' });
+            }
+
+            // Create a new user with GoogleId explicitly set to null for non-Google users
+            const saveUserData = new User({
+                FirstName: user.FirstName,
+                LastName: user.LastName,
+                Email: user.Email,
+                PhoneNumber: user.PhoneNumber,
+                Password: passwordHash,
+                GoogleId: null, // Explicitly set GoogleId to null for non-Google users
+            });
+
+            try {
+                await saveUserData.save();
+                // Do not set req.session.User here to avoid auto-login
+                // Clear session data related to signup
+                delete req.session.userOtp;
+                delete req.session.userData;
+                res.json({ success: true, redirectUrl: "/login" });
+            } catch (error) {
+                if (error.code === 11000) {
+                    console.error("Duplicate key error on GoogleId:", error);
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: "A duplicate key error occurred. Please contact support or try again later." 
+                    });
+                } else {
+                    throw error; // Re-throw other errors for general handling
+                }
+            }
+        } else {
+            res.json({ success: false, message: "Invalid OTP. Please try again." });
+        }
+    } catch (error) {
+        console.error("Error Verifying OTP", error);
+        res.status(500).json({ success: false, message: "An Error Occurred" });
     }
-    
-    
-} catch (error) {
-    console.error("Error Verifying OTP",error);
-    res.status(500).json({success:false,message:"An Error Occured"})
-}
-
-}
+};
 
 
 
@@ -211,27 +235,34 @@ const resendOtp = async (req, res) => {
 
 const login= async(req,res)=>{
     try {
-        
+      
         const {Email,Password}=req.body
         
         if (!Email || !Password) {
-            return res.render("login",{ message: "Email and password are required" });
+            req.session.userLoginError= "Email and password are required"
+            // return res.render("login",{ message: "Email and password are required" });
+            return res.redirect('/login')
         }
         
         const findUser=await User.findOne({isAdmin:false,Email:Email})
        
         
         if(!findUser){
-            return res.render('login',{message:"User not found"})
+            req.session.userLoginError= "User not found"
+    return res.redirect('/login')
+            // return res.render('login',{message:"User not found"})
         }
 
         if(findUser.isBlocked){
-            return res.render('login',{message:"User Blocked By The Admin"})
+            req.session.userLoginError= "User Blocked By The Admin"
+    return res.redirect('/login')
+            // return res.render('login',{message:"User Blocked By The Admin"})
         }
 const passwordMatch=await bcrypt.compare(Password,findUser.Password)
 
 if(!passwordMatch){
-    return res.render('login',{message:"Password Does Not Match"})
+    req.session.userLoginError= "Password Does Not Match"
+    return res.redirect('/login')
 }
        
         // req.session.user=findUser._id
@@ -250,16 +281,35 @@ const loadHome=async (req,res)=>{
     try {
 
         const user=req.session.User
+        
+        
+        const category = await Category.find({isListed:true})
+        let productData=await Product.find({isBlocked:false,
+            Categorys:{$in:category.map(category=>category._id)}
+        })
+        // const brandData = await Brand.find({isBlocked:false})
+
+        productData.sort((a,b)=>new Date(b.timestamps)-new Date(a.timestamps))
+        productData = productData.slice(0,4)
+
+       
+
+      
+        
         if(user){
-           
-            
             const userData= await User.findOne({_id:user._id})
-            console.log(userData);
-            
-            
-            res.render('home',{user:userData})
+            res.render('home',{
+                user:userData,
+                products:productData,
+                // brands:brandData,
+                category:category
+            })
         }else{
-            return res.render('home')
+            return res.render('home',{
+                products:productData,
+                // brands:brandData,
+                category:category
+            })
         }
         
       
@@ -273,13 +323,9 @@ const loadHome=async (req,res)=>{
 
     const logout= async(req,res)=>{
     try {
-        req.session.destroy((err)=>{
-            if(err){
-                console.log("Session Destruction Error",err.message);
-                return res.redirect('/PageNotFound')
-            }
-            return res.redirect('/')
-        })
+        req.session.User = null
+        delete  req.session.User
+        res.redirect('/')
     
     } catch (error) {
         console.log("Logout Error",error.message);
@@ -287,6 +333,8 @@ const loadHome=async (req,res)=>{
         
     }
     }
+
+   
 
 
 
@@ -301,6 +349,7 @@ module.exports={
     resendOtp,
     login,
     loadHome,
-    logout
+    logout,
+  
     
 }

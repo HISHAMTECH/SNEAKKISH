@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+
+        /* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Content wrapper for flex layout */
+.content-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar styles */
+.sidebar {
+    width: 250px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-right: 1px solid #e0e4e8;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-section {
+    margin-bottom: 30px;
+}
+
+.sidebar-title {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 5px;
+}
+
+.sidebar-menu {
+    list-style: none;
+}
+
+.sidebar-menu li {
+    margin: 10px 0;
+}
+
+.sidebar-menu a {
+    text-decoration: none;
+    color: #7f8c8d;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    padding: 8px 15px;
+    display: block;
+    border-radius: 5px;
+}
+
+.sidebar-menu a:hover {
+    color: #3498db;
+    background-color: #f8f9fa;
+}
+
+.sidebar-menu a.active {
+    color: #3498db;
+    background-color: #eef2f7;
+    font-weight: bold;
+}
+
+.sidebar-menu strong {
+    color: #2c3e50;
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    display: block;
+}
+
+/* Main content styles */
+.main-content {
+    flex: 1;
+    padding: 40px;
+    background-color: #f5f7fa;
+}
+
+.profile-section {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.profile-section h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 25px;
+}
+
+/* Form styles */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+label {
+    font-size: 1rem;
+    color: #34495e;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+}
+
+input[readonly] {
+    background-color: #f8f9fa;
+    color: #7f8c8d;
+    cursor: not-allowed;
+}
+
+button {
+    padding: 12px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .content-wrapper {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e0e4e8;
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+
+    .profile-section {
+        margin: 20px auto;
+    }
+}
+    </style>
+    
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <ul class="sidebar-menu">
+                    <li><strong>ACCOUNT</strong></li>
+                    <li><a href="/userProfile" class="active">HOME</a></li>
+                  
+                </ul>
+            </div>
+        </div>
+    
+        <!-- Edit Profile Form -->
+        <div class="main-content">
+            <div class="profile-section">
+                <h2>Edit Your Profile</h2>
+                <form action="/update-profile" method="POST">
+                    <label>First Name</label>
+                    <input type="text" name="FirstName" value="<%= user.FirstName %>">
+                    
+                    <label>Last Name</label>
+                    <input type="text" name="LastName" value="<%= user.LastName %>">
+                    
+                    <label>Email</label>
+                    <input type="email" name="Email" value="<%= user.Email %>" readonly>
+                    
+                    <button type="submit">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

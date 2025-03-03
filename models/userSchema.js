@@ -31,6 +31,7 @@ const userSchema= new Schema({
         type:String,
         unique:true,
         
+        
     },
       
     Password:{
@@ -65,7 +66,7 @@ const userSchema= new Schema({
         type:Schema.Types.ObjectId,
         ref:"Order"
      }],
-     CreatedOn:{
+     CreatedOn:{ //timestam
         type:Date,
         default:Date.now
      },

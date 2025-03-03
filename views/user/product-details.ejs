@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Male_Fashion Template">
+    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Male-Fashion | Product Details</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="/css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    <!-- SweetAlert2 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+    <!-- Custom Styles -->
+    <style>
+        /* Image Zoom and Thumbnails */
+        .zoom {
+            transition: transform 0.3s ease;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 10px;
+        }
+        .zoom:hover {
+            transform: scale(1.1);
+        }
+        .thumbnails {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .thumbnails img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border 0.3s, transform 0.3s;
+            border-radius: 5px;
+        }
+        .thumbnails img:hover {
+            border: 2px solid #333;
+            transform: scale(1.1);
+        }
+
+        /* Size Selection Styling */
+        .product__details__option__size {
+            margin: 20px 0;
+        }
+        .product__details__option__size span {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .product__details__option__size label {
+            display: inline-block;
+            margin: 0 5px;
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        .product__details__option__size label.active {
+            background: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+        .product__details__option__size label:hover {
+            background: #e9ecef;
+        }
+        .product__details__option__size input[type="radio"] {
+            display: none;
+        }
+
+        /* Cart Button Styling */
+        .product__details__cart__option .primary-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .product__details__cart__option .pro-qty {
+            margin-right: 15px;
+        }
+
+        /* Similar Products (unchanged) */
+        .similar-products {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .similar-products h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        .product-item {
+            flex: 0 0 calc(25% - 22.5px);
+            background: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 15px;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #007bff;
+        }
+        .product-item:hover {
+            transform: translateY(-5px);
+        }
+        .product-item:hover .card-body h3 {
+            display: none;
+        }
+        .product-item:hover .add-to-cart {
+            display: block;
+        }
+        .card-content { padding: 10px; }
+        .card-body h3 {
+            font-size: 20px;
+            color: #000;
+            margin: 10px 0;
+            font-weight: bold;
+            transition: opacity 0.3s ease;
+        }
+        .card-body p {
+            font-size: 14px;
+            color: #333;
+            margin: 5px 0;
+        }
+        .size-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #27ae60;
+            color: white;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .rating { font-size: 18px; color: #ffd700; margin: 10px 0; }
+        .product-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: block;
+        }
+        .add-to-cart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 12px 24px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+            display: none;
+        }
+        .product-item a { text-decoration: none; color: inherit; display: block; }
+        @media (max-width: 991px) { .product-item { flex: 0 0 calc(33.33% - 20px); } }
+        @media (max-width: 767px) { .product-item { flex: 0 0 calc(50% - 15px); } }
+        @media (max-width: 575px) { .product-item { flex: 0 0 100%; } }
+    </style>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header__top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-md-7">
+                        <div class="header__top__left">
+                            <p>Free shipping, 30-day return or refund guarantee.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-5">
+                        <div class="header__top__right">
+                            <div class="header__top__links">
+                                <% if (user) { %>
+                                    <a href="/profile">My Account</a>
+                                    <a href="/logout">Logout</a>
+                                <% } else { %>
+                                    <a href="/login">Sign in</a>
+                                <% } %>
+                                <a href="#">FAQs</a>
+                            </div>
+                            <div class="header__top__hover">
+                                <span>USD <i class="arrow_carrot-down"></i></span>
+                                <ul>
+                                    <li>USD</li>
+                                    <li>EUR</li>
+                                    <li>INR</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3">
+                    <div class="header__logo">
+                        <a href="/"><img src="/img/logo.png" alt=""></a>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <nav class="header__menu mobile-menu">
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li class="active"><a href="/shop">Shop</a></li>
+                            <li><a href="#">Pages</a>
+                                <ul class="dropdown">
+                                    <li><a href="/about">About Us</a></li>
+                                    <li><a href="/shop-details">Shop Details</a></li>
+                                    <li><a href="/cart">Shopping Cart</a></li>
+                                    <li><a href="/checkout">Check Out</a></li>
+                                    <li><a href="/blog-details">Blog Details</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="/blog">Blog</a></li>
+                            <li><a href="/contact">Contacts</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <div class="header__nav__option">
+                        <a href="#" class="search-switch"><img src="/img/icon/search.png" alt=""></a>
+                        <a href="/wishlist"><img src="/img/icon/heart.png" alt=""></a>
+                        <a href="/cart"><img src="/img/icon/cart.png" alt=""> <span id="cart-count">0</span></a>
+                        <div class="price" id="cart-total">$0.00</div>
+                    </div>
+                </div>
+            </div>
+            <div class="canvas__open"><i class="fa fa-bars"></i></div>
+        </div>
+    </header>
+
+    <!-- Shop Details Section -->
+    <section class="shop-details">
+        <div class="product__details__pic">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="product__details__breadcrumb">
+                            <a href="/">Home</a>
+                            <a href="/shop">Shop</a>
+                            <span>Product Details</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-md-3">
+                        <div class="thumbnails" id="thumbnailList">
+                            <% if (product.ProductImage && product.ProductImage.length > 0) { %>
+                                <% product.ProductImage.forEach((image, index) => { %>
+                                    <img src="/uploads/re-image/<%= image || '/img/shop-details/thumb-1.png' %>" 
+                                         alt="Thumbnail <%= index + 1 %>" 
+                                         class="thumbnail" 
+                                         onclick="changeMainImage('<%= image %>', this)">
+                                <% }); %>
+                            <% } else { %>
+                                <img src="/img/shop-details/thumb-1.png" 
+                                     alt="Default Thumbnail" 
+                                     class="thumbnail" 
+                                     onclick="changeMainImage('/img/shop-details/thumb-1.png', this)">
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-9">
+                        <div class="product__details__pic__item">
+                            <img src="<%= product.ProductImage && product.ProductImage.length > 0 ? '/uploads/re-image/' + product.ProductImage[0] : '/img/shop-details/product-big-2.png' %>" 
+                                 alt="<%= product.ProductName || 'Product Image' %>" 
+                                 id="mainImage" 
+                                 class="zoom">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="product__details__content">
+            <div class="container">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="product__details__text">
+                            <h4><%= product.ProductName || 'Product Name' %></h4>
+                            <div class="rating">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                    <% if (i <= Math.floor(product.rating || 0)) { %>
+                                        <i class="fa fa-star"></i>
+                                    <% } else if (i - (product.rating || 0) < 1 && i - (product.rating || 0) > 0) { %>
+                                        <i class="fa fa-star-half-o"></i>
+                                    <% } else { %>
+                                        <i class="fa fa-star-o"></i>
+                                    <% } %>
+                                <% } %>
+                                <span> - <%= (product.rating || 0).toFixed(1) %> Rating</span>
+                            </div>
+                            <% if (totalOffer > 0) { %>
+                                <h3>$<%= (product.SalePrice || 0).toFixed(2) %> 
+                                    <span>$<%= (product.RegularPrice || 0).toFixed(2) %></span>
+                                    <span class="discount-label"><%= totalOffer %>% OFF</span>
+                                </h3>
+                            <% } else { %>
+                                <h3>$<%= (product.SalePrice || 0).toFixed(2) %></h3>
+                            <% } %>
+                            <p><%= product.Description || 'No description available' %></p>
+                            <div class="product__details__option">
+                                <div class="product__details__option__size">
+                                    <span>Size:</span>
+                                    <% if (product.Variants && product.Variants.length > 0) { %>
+                                        <% product.Variants.forEach((variant, idx) => { %>
+                                            <label for="size-<%= variant.Size %>">
+                                                <%= variant.Size %>
+                                                <input type="radio" id="size-<%= variant.Size %>" name="size" value="<%= variant.Size %>" 
+                                                    <%= idx === 0 ? 'checked' : '' %> data-quantity="<%= variant.Quantity || 0 %>">
+                                            </label>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <label>Not Available</label>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="product__details__cart__option">
+                                <div class="quantity">
+                                    <div class="pro-qty">
+                                        <input type="text" value="1" id="qty" min="1" 
+                                               max="<%= product.Variants && product.Variants.length > 0 ? Math.min(product.Variants[0].Quantity, 7) : 0 %>">
+                                    </div>
+                                </div>
+                                <% if (product.Status === "Available" && !product.isBlocked && product.Variants && product.Variants.some(v => v.Quantity > 0)) { %>
+                                    <a href="javascript:void(0)" onclick="addToCart('<%= product._id %>')" class="primary-btn">Add to Cart</a>
+                                <% } else { %>
+                                    <button class="primary-btn" disabled>Out of Stock</button>
+                                <% } %>
+                            </div>
+                            <div class="product__details__btns__option">
+                                <a href="javascript:void(0)" onclick="addToWishlist('<%= product._id %>')">
+                                    <i class="fa fa-heart"></i> Add to Wishlist
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="product__details__tab">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#tabs-desc" role="tab">Description</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#tabs-reviews" role="tab">Customer Reviews</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#tabs-info" role="tab">Additional information</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="tabs-desc" role="tabpanel">
+                                    <div class="product__details__tab__content">
+                                        <p class="note"><%= product.Description || 'No description available' %></p>
+                                        <div class="product__details__tab__content__item">
+                                            <h5>Product Information</h5>
+                                            <p>Brand: <%= product.Brands || 'N/A' %></p>
+                                            <p>Color: <%= product.Colour || 'N/A' %></p>
+                                            <p>Category: <%= (category ? category.Name : 'Not Available') || 'N/A' %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="tabs-reviews" role="tabpanel">
+                                    <div class="product__details__tab__content">
+                                        <div class="product__details__tab__content__item">
+                                            <h5>Customer Reviews</h5>
+                                            <p>No reviews yet. Be the first to review this product.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="tabs-info" role="tabpanel">
+                                    <div class="product__details__tab__content">
+                                        <div class="product__details__tab__content__item">
+                                            <h5>Specifications</h5>
+                                            <p>Brand: <%= product.Brands || 'N/A' %></p>
+                                            <p>Color: <%= product.Colour || 'N/A' %></p>
+                                            <p>Available Sizes: 
+                                                <% if (product.Variants && product.Variants.length > 0) { %>
+                                                    <%= product.Variants.map(v => v.Size).join(', ') || 'Not Available' %>
+                                                <% } else { %>
+                                                    Not Available
+                                                <% } %>
+                                            </p>
+                                            <p>Status: <%= product.Status || 'N/A' %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Section -->
+    <div class="similar-products">
+        <h2>Similar Products</h2>
+        <div class="product-list">
+            <% for (let i = 0; i < similarProducts.length; i++) { %>
+                <a href="/productDetails?id=<%= similarProducts[i]._id%>">
+                    <div class="product-item">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <h3><%= similarProducts[i].ProductName || 'RAZO' %></h3>
+                                <p>$<%= (similarProducts[i].SalePrice || 14000).toFixed(2) %></p>
+                                <p>Available Sizes:</p>
+                                <div class="size-button">6</div>
+                                <div class="rating">★★★★★</div>
+                            </div>
+                        </div>
+                        <img src="/uploads/re-image/<%= similarProducts[i].ProductImage[0] %>" alt="Similar Product">
+                        <button class="add-to-cart">Add to Cart</button>
+                    </div>
+                </a>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="footer__about">
+                        <div class="footer__logo">
+                            <a href="#"><img src="/img/footer-logo.png" alt=""></a>
+                        </div>
+                        <p>The customer is at the heart of our unique business model, which includes design.</p>
+                        <a href="#"><img src="/img/payment.png" alt=""></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 offset-lg-1 col-md-3 col-sm-6">
+                    <div class="footer__widget">
+                        <h6>Shopping</h6>
+                        <ul>
+                            <li><a href="#">Clothing Store</a></li>
+                            <li><a href="#">Trending Shoes</a></li>
+                            <li><a href="#">Accessories</a></li>
+                            <li><a href="#">Sale</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6">
+                    <div class="footer__widget">
+                        <h6>Shopping</h6>
+                        <ul>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Payment Methods</a></li>
+                            <li><a href="#">Delivery</a></li>
+                            <li><a href="#">Return & Exchanges</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3 offset-lg-1 col-md-6 col-sm-6">
+                    <div class="footer__widget">
+                        <h6>Newsletter</h6>
+                        <div class="footer__newslatter">
+                            <p>Be the first to know about new arrivals, look books, sales & promos!</p>
+                            <form action="#">
+                                <input type="text" placeholder="Your email">
+                                <button type="submit"><span class="icon_mail_alt"></span></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="footer__copyright__text">
+                        <p>Copyright ©
+                            <script>document.write(new Date().getFullYear());</script>
+                            All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Js Plugins -->
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.nice-select.min.js"></script>
+    <script src="/js/jquery.nicescroll.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/jquery.countdown.min.js"></script>
+    <script src="/js/jquery.slicknav.js"></script>
+    <script src="/js/mixitup.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+
+    <!-- JavaScript Logic -->
+    <script>
+        $(document).ready(function() {
+            // Initialize Size Selection
+            $('input[name="size"]').change(function() {
+                const quantity = $(this).data('quantity');
+                $('#qty').attr('max', Math.min(quantity, 7));
+                const currentQty = parseInt($('#qty').val());
+                if (currentQty > Math.min(quantity, 7)) {
+                    $('#qty').val(Math.min(quantity, 7));
+                }
+                // Update active class
+                $('.product__details__option__size label').removeClass('active');
+                $(this).parent('label').addClass('active');
+            });
+
+            // Ensure initial active state
+            $('input[name="size"]:checked').parent('label').addClass('active');
+        });
+
+        // Change Main Image
+        function changeMainImage(imageSrc, thumbnailElement) {
+            const mainImage = document.getElementById('mainImage');
+            const currentMainSrc = mainImage.src.split('/uploads/re-image/')[1] || mainImage.src.split('/img/shop-details/')[1];
+            mainImage.src = '/uploads/re-image/' + imageSrc;
+            thumbnailElement.src = '/uploads/re-image/' + currentMainSrc || '/img/shop-details/thumb-1.png';
+            const thumbnails = document.getElementById('thumbnailList');
+            thumbnails.prepend(thumbnailElement);
+        }
+
+        // Add to Cart Function with SweetAlert2
+       // Add to Cart Function with SweetAlert2
+function addToCart(productId) {
+    const quantity = parseInt($('#qty').val());
+    const selectedSize = $('input[name="size"]:checked').val();
+
+    if (!selectedSize) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Size Required',
+            text: 'Please select a size before adding to cart.',
+            confirmButtonColor: '#007bff'
+        });
+        return;
+    }
+
+    $.ajax({
+        url: '/cart/add/' + productId,
+        method: 'POST',
+        data: {
+            quantity: quantity,
+            size: selectedSize
+        },
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Product added to cart successfully!',
+                    confirmButtonColor: '#007bff'
+                }).then(() => {
+                    // Redirect to /productDetails with productId
+                    window.location.href = '/productDetails?id=' + productId;
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message || 'Failed to add product to cart',
+                    confirmButtonColor: '#007bff'
+                });
+            }
+        },
+        error: function(err) {
+            console.error(err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong. Please try again.',
+                confirmButtonColor: '#007bff'
+            });
+        }
+    });
+}
+
+        // Add to Wishlist Function with SweetAlert2
+        function addToWishlist(productId) {
+            $.ajax({
+                url: '/add-to-wishlist',
+                method: 'POST',
+                data: { productId: productId },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Product added to wishlist successfully!',
+                            confirmButtonColor: '#007bff'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message || 'Failed to add product to wishlist',
+                            confirmButtonColor: '#007bff'
+                        });
+                    }
+                },
+                error: function(err) {
+                    console.error(err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong. Please try again.',
+                        confirmButtonColor: '#007bff'
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

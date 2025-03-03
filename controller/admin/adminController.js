@@ -6,10 +6,12 @@ const bcrypt=require('bcrypt')
 const loadLogin= async (req,res)=>{
 
     try {
+        
+        
         if(req.session.admin){
-            return res.redirect('/admin/dashboard')
+            return res.redirect('/admin/')
         }else{
-            res.render('admin-login',{message:null})
+            res.render('admin-login',{message:null,})
         }
     } catch (error) {
         res.redirect('/PageError')
@@ -20,6 +22,8 @@ const loadLogin= async (req,res)=>{
 
 const login = async (req, res) => {
     try {
+        
+        
         const { Email, Password } = req.body;
         const admin = await User.findOne({ Email, isAdmin: true });
 
@@ -27,7 +31,8 @@ const login = async (req, res) => {
             const passwordMatch = await bcrypt.compare(Password, admin.Password);
             if (passwordMatch) {
                 req.session.admin = true; 
-                return res.redirect("/admin"); 
+                console.log(req.session.admin);
+                return res.redirect("/admin/"); 
             } else {
                 return res.render("admin-login",{message:"Incorrect Password"}); 
             }
@@ -59,13 +64,11 @@ const pageError=async (req,res)=>{
 
 const logout= async(req,res)=>{
 try {
-    req.session.destroy((err)=>{
-        if(err){
-        console.log("Error Destroying Session ",err);
-        return res.redirect('/pageError')
-        }
+   
+        delete  req.session.admin
+        
         res.redirect('/admin/login')
-    })
+
     
 } catch (error) {
     console.log("Unexpected Error During Logout",error);

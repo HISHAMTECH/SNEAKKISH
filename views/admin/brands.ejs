@@ -1,333 +1,394 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Brands</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <style>
-      .pagination-container {
-        text-align: center;
-        margin-top: 20px;
-      }
 
-      .pagination {
-        display: inline-block;
-        list-style: none;
-        padding-left: 0;
-      }
 
-      .pagination a,
-      .pagination .current-page {
-        display: inline-block;
-        padding: 8px 15px;
-        margin: 0 4px;
-        border: 1px solid #ddd;
-        text-decoration: none;
-        color: #333;
-        border-radius: 5px;
-      }
 
-      .pagination a:hover {
-        background-color: #f5f5f5;
-      }
 
-      .error-message {
-        color: red;
-      }
+<%- include("../../views/partials/admin/header") %>
 
-      .toggle-sidebar {
-        display: block;
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        background: #007bff;
-        color: white;
-        border: none;
-        padding: 10px;
-        border-radius: 5px;
-      }
-
-      /* Sidebar */
-      .sidebar {
-        width: 250px;
-        background: #343a40;
-        color: white;
-        height: 100vh;
-        padding: 20px;
-        position: fixed;
-        transition: all 0.3s;
-      }
-
-      .sidebar nav {
+<style>
+     body {
+        font-family: 'Poppins', sans-serif;
+        background: url('/images/SHOES/background.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        margin: 0;
+        padding: 0;
         display: flex;
-        flex-direction: column;
-      }
-
-      .sidebar .nav-item {
-        color: white;
-        text-decoration: none;
-        padding: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition: 0.3s;
-      }
-
-      .sidebar .nav-item:hover,
-      .sidebar .nav-item.active {
-        background: #007bff;
-        border-radius: 5px;
-      }
-
-      /* Main Content */
-      .content-main {
-  margin-left: 250px; /* Changed from 260px */
-  padding: 20px;
-}
-
-      .content-header {
-        margin-bottom: 20px;
-      }
-
-      .content-title {
-        font-size: 24px;
-        font-weight: bold;
-      }
-
-      .card {
-        margin-bottom: 20px;
-      }
-
-      .card-body {
-        padding: 20px;
-      }
-
-      .form-control {
-        border-radius: 5px;
-      }
-
-      .input-upload {
-        margin-top: 10px;
-      }
-
-      .table-responsive {
-        margin-top: 30px;
-      }
-
-      .table th, .table td {
-        vertical-align: middle;
-      }
-
-      .table td img {
-        width: 40px;
-        height: 40px;
-        object-fit: cover;
-      }
-
-      .badge {
-        padding: 5px 10px;
-        font-size: 0.9rem;
-      }
-
-      .pagination-container {
-  display: flex; /* Added */
-  justify-content: center; /* Added */
-  margin-top: 20px;
-}
-    
-    </style>
-</head>
-<body>
-
-  <!-- Sidebar Toggle Button -->
-  <button class="toggle-sidebar d-lg-none">
-    <i class="fas fa-bars"></i>
-  </button>
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <nav>
-        <a href="/admin/" class="nav-item" data-page="Dashboard">
-            <i class="fas fa-chart-line"></i> Dashboard
-        </a>
-        <a href="/admin/products" class="nav-item" data-page="Products">
-            <i class="fas fa-box"></i> Products
-        </a>
-        <a href="/admin/addProducts" class="nav-item" data-page="Add Products">
-            <i class="fas fa-box"></i> Add Products
-        </a>
-        <a href="#" class="nav-item" data-page="Orders">
-            <i class="fas fa-shopping-cart"></i> Orders
-        </a>
-        <a href="/admin/users" class="nav-item" data-page="Customers">
-            <i class="fas fa-users"></i> Customers
-        </a>
-        <a href="#" class="nav-item" data-page="Reviews">
-            <i class="fas fa-star"></i> Reviews
-        </a>
-        <a href="#" class="nav-item" data-page="Offers">
-            <i class="fas fa-gift"></i> Offers
-        </a>
-        <a href="#" class="nav-item" data-page="Coupon Management">
-            <i class="fas fa-ticket-alt"></i> Coupon Management
-        </a>
-        <a href="#" class="nav-item" data-page="Banner Management">
-            <i class="fas fa-image"></i> Banner Management
-        </a>
-        <a href="/admin/category" class="nav-item active" data-page="Categories">
-            <i class="fas fa-list"></i> Categories
-        </a>
-    </nav>
-  </div>
-
-  <!-- Main Content -->
-  <div class="content-main">
-    <!-- Header -->
-    <header class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/admin">Admin Panel</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/admin/dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/brands">Brands</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/logout">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </header>
-
-    <!-- Content -->
-    <section class="content-main">
-      <div class="content-header">
-        <h2 class="content-title card-title">Manage Brands</h2>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-3">
-              <form method="post" action="/admin/addBrand" enctype="multipart/form-data" >
-                <div class="mb-4">
-                  <label class="form-label">Brand Name</label>
-                  <input type="text" name="name" placeholder="Type here" class="form-control" />
-                </div>
-                <label class="form-label">Brand Image</label>
-                <div class="input-upload">
-                  <input class="form-control border" name="image" type="file" />
-                </div>
-                <div class="d-grid">
-                  <button class="btn btn-primary mt-3" type="submit">Add Brand</button>
-                </div>
-              </form>
-            </div>
-
-            <div class="col-md-7 offset-md-1">
-              <div class="table-responsive">
-                <table class="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>Brand</th>
-                      <th>Logo</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <%data.reverse().forEach((brand,index)=>{%>
-                    <tr>
-                      <td class="text-start" style="color: black;"><%=brand.BrandName%></td>
-                      <td class="text-start">
-                        <div class="d-flex align-items-center justify-content-center" 
-                        style="width: 40px; 
-                        height: 40px; 
-                        border-radius: 50%; 
-                        overflow: hidden;">
-
-                          <img src="/uploads/re-image/<%= brand.BrandImage[0]%>" 
-                          alt="<%=brand.brandName%>"
-                          style="width: 40px; height: 40px;">
-                        </div>
-                      </td>
-                      <td class="text-start">
-                        <%if(brand.isBlocked===true){%>
-                        <span class="badge rounded-pill alert-danger" style="color: black;">Blocked</span>
-                        <%}else{%>
-                        <span class="badge rounded-pill alert-success" style="color: black;">Active</span>
-                        <%}%>
-                      </td>
-                      <td class="text-start">
-                        <%if(brand.isBlocked===false){%>
-                        <button class="btn btn-danger btn-sm" style="width: 90px;;">
-                          <a href="/admin/blockBrand?id=<%=brand._id%>" class="text-white" >Block</a>
-                        </button>
-                        <%}else{%>
-                        <button class="btn btn-success btn-sm" style="width: 90px;">
-                          <a href="/admin/unBlockBrand?id=<%=brand._id%>" class="text-white" >Unblock</a>
-                          </button>
-                          <%}%>
-
-                        <button class="btn btn-danger btn-sm" 
-                        style="width: 90px;"
-                        onclick="return confirmDelete()">
-                        <a href="/admin/deleteBrand?id=<%=brand._id%>" class="text-white" >Delete</a>
-                      </button>
-
-
-                      </td>
-                    </tr>
-                    <%})%>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pagination -->
-      <div class="pagination-container">
-        <ul class="pagination">
-          <li><a href="#">«</a></li>
-          <li><a href="#">1</a></li>
-          <li class="current-page"><a href="#">2</a></li>
-          <li><a href="#">3</a></li>
-          <li><a href="#">»</a></li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-light text-center py-3 mt-5 border-top">
-        <div class="container">
-            <p class="mb-0">&copy; 2025 Admin Panel. All Rights Reserved.</p>
-        </div>
-    </footer>
-  </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    function confirmDelete(){
-      return confirm("Are You Sure You Want To Delete This Brand ?")
     }
 
+    .content-container {
+        margin-left: 270px;
+        margin-right: px;
+        width: calc(100% - 270px);
+        min-height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+    }
 
+    .content-header {
+      text-align: center;
+        padding: 20px;
+      
+    }
 
+    .content-header h2 {
+        margin: 0;
+        color: white;
+        font-size: 24px;
+    }
 
+    .main-content {
+      margin-left: 30px;
+        padding: 30px;
+    }
 
+    .form-container {
+      background: rgba(0, 0, 0, 0.8);
+        border-radius: 8px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
 
-  </script>
+    .form-group {
+        margin-bottom: 25px;
+    }
 
-</body>
-</html>
+    .form-label {
+        display: block;
+        color: white;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .btn-add-brand {
+        width: 100%;
+        padding: 12px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .btn-add-brand:hover {
+        background: #218838;
+    }
+
+    .table-container {
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .brands-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .brands-table th {
+        background: rgba(47, 79, 107, 0.9);
+        color: white;
+        padding: 15px;
+        text-align: left;
+    }
+
+    .brands-table td {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .brand-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .action-btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-right: 5px;
+        text-decoration: none;
+    }
+
+    .btn-block {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .page-link {
+        padding: 8px 12px;
+        margin: 0 5px;
+        background: rgba(47, 79, 107, 0.9);
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+    }
+
+    .page-link.active {
+        background: #28a745;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .pagination a {
+        color: #fff;
+        background: #334155;
+        padding: 8px 12px;
+        margin: 0 5px;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+    .pagination a:hover {
+        background: #475569;
+    }
+    
+
+    .pagination .active {
+        background: black;
+        font-weight: bold;
+    }
+</style>
+
+<div class="content-container">
+    <div class="content-header">
+        <h2>MANAGE BRANDS</h2>
+    </div>
+
+    <div class="main-content">
+        <div class="form-container">
+            <form id="brandForm" method="post" action="/admin/addBrand" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Brand Name</label>
+                    <input type="text" name="name" id="brandName" placeholder="Enter brand name" class="form-control"  />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Brand Image</label>
+                    <input type="file" name="image" id="brandImage" class="form-control" accept="image/*"  />
+                </div>
+                <button type="submit" class="btn-add-brand">Add Brand</button>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table class="brands-table">
+                <thead>
+                    <tr>
+                        <th>Brand</th>
+                        <th>Logo</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% data.reverse().forEach((brand) => { %>
+                    <tr>
+                        <td><%= brand.BrandName %></td>
+                        <td>
+                            <img src="/uploads/re-image/<%= brand.BrandImage[0] %>" 
+                                 alt="<%= brand.BrandName %>" 
+                                 class="brand-logo">
+                        </td>
+                        <td>
+                            <% if(brand.isBlocked) { %>
+                                <span style="color: #dc3545">Blocked</span>
+                            <% } else { %>
+                                <span style="color: #28a745">Active</span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if(!brand.isBlocked) { %>
+                                <a href="/admin/blockBrand?id=<%= brand._id %>" class="action-btn btn-block">Block</a>
+                            <% } else { %>
+                                <a href="/admin/unBlockBrand?id=<%= brand._id %>" class="action-btn" style="background: #28a745;color: white;">Unblock</a>
+                            <% } %>
+                            <a href="/admin/deleteBrand?id=<%= brand._id %>" 
+                               class="action-btn btn-delete" 
+                               onclick="return confirmDelete()">Delete</a>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        
+       
+        <div class="pagination">
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="?page=<%= i %>" class="<%=(i === currentPage) ? 'active' : '' %>"><%= i %></a>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById("brandForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        // Get form elements
+        const brandName = document.getElementById("brandName").value.trim();
+        const brandImage = document.getElementById("brandImage").files[0];
+
+        // Basic validation
+        if (!brandName) {
+            Swal.fire({
+                icon: "warning",
+                title: "Brand Name Required",
+                text: "Please enter a brand name.",
+                confirmButtonColor: "#28a745"
+            });
+            return;
+        }
+
+        // Brand name format validation
+        if (!/^[A-Za-z0-9\s-]{2,50}$/.test(brandName)) {
+            Swal.fire({
+                icon: "warning",
+                title: "Invalid Brand Name",
+                text: "Brand name should be 2-50 characters long and can only contain letters, numbers, spaces, and hyphens.",
+                confirmButtonColor: "#28a745"
+            });
+            return;
+        }
+
+        // Image validation
+        if (!brandImage) {
+            Swal.fire({
+                icon: "warning",
+                title: "Brand Image Required",
+                text: "Please select an image for the brand.",
+                confirmButtonColor: "#28a745"
+            });
+            return;
+        }
+
+        // Image type validation
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(brandImage.type)) {
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Image Format",
+                text: "Please upload an image in JPEG, PNG, or GIF format.",
+                confirmButtonColor: "#28a745"
+            });
+            return;
+        }
+
+        // Image size validation (max 5MB)
+        if (brandImage.size > 5 * 1024 * 1024) {
+            Swal.fire({
+                icon: "error",
+                title: "Image Too Large",
+                text: "Image size should not exceed 5MB.",
+                confirmButtonColor: "#28a745"
+            });
+            return;
+        }
+
+        // Check for duplicate brand
+        try {
+            const response = await fetch("/admin/checkBrand?name=" + encodeURIComponent(brandName));
+            const result = await response.json();
+
+            if (result.exists) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Brand Already Exists",
+                    text: "A brand with this name already exists. Please choose a different name.",
+                    confirmButtonColor: "#28a745"
+                });
+                return;
+            }
+
+            // Show loading state
+            Swal.fire({
+                title: "Adding Brand",
+                text: "Please wait...",
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Submit the form
+            const formData = new FormData(this);
+            const submitResponse = await fetch("/admin/addBrand", {
+                method: "POST",
+                body: formData
+            });
+
+            if (submitResponse.ok) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: "Brand has been added successfully.",
+                    confirmButtonColor: "#28a745"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.reload();
+                    }
+                });
+            } else {
+                throw new Error('Failed to add brand');
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Something went wrong. Please try again.",
+                confirmButtonColor: "#28a745"
+            });
+        }
+    });
+
+    // Function to confirm brand deletion
+    function confirmDelete() {
+        return Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            return result.isConfirmed;
+        });
+    }
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

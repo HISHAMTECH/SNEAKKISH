@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Account Profile</title>
+  <style>
+    /* Global styles and reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f9fafb;
+      color: #333;
+    }
+    
+    /* Main container styles */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    
+    /* Breadcrumb styles */
+    .breadcrumb {
+      margin-bottom: 25px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    .breadcrumb a {
+      color: #6b7280;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    .breadcrumb a:hover {
+      color: #00c4a7;
+    }
+    
+    /* Account header styles */
+    .account-header {
+      margin-bottom: 30px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 15px;
+    }
+    
+    .account-header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+    
+    .account-email {
+      color: #6b7280;
+      font-size: 15px;
+    }
+    
+    /* Main content layout */
+    .content-wrapper {
+      display: flex;
+      gap: 40px;
+    }
+    
+    /* Sidebar styles */
+    .sidebar {
+      width: 250px;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-section {
+      margin-bottom: 35px;
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .sidebar-title {
+      color: #00c4a7;
+      margin-bottom: 15px;
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .sidebar-menu li {
+      margin-bottom: 12px;
+      padding: 2px 0;
+    }
+    
+    .sidebar-menu li strong {
+      color: #6b7280;
+      font-size: 14px;
+      display: block;
+      margin-top: 8px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+    
+    .sidebar-menu a {
+      color: #4b5563;
+      text-decoration: none;
+      display: block;
+      padding: 8px 10px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      font-size: 15px;
+    }
+    
+    .sidebar-menu a:hover {
+      background-color: #f3f4f6;
+      color: #00c4a7;
+    }
+    
+    .sidebar-menu a.active {
+      background-color: #e6f7f5;
+      color: #00c4a7;
+      font-weight: 500;
+    }
+    
+    /* Main content area */
+    .main-content {
+      flex: 1;
+    }
+    
+    .profile-section {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .profile-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+    
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+    }
+    
+    .profile-image {
+      width: 120px;
+      height: 120px;
+      background: #e5e7eb;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      border: 4px solid #f3f4f6;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .profile-image::after {
+      content: "👤";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 60px;
+    }
+    
+    .profile-info h2 {
+      font-size: 24px;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+    
+    .profile-info p {
+      color: #6b7280;
+      font-size: 15px;
+    }
+    
+    .edit-profile-btn {
+      padding: 10px 18px;
+      border: none;
+      background-color: #00c4a7;
+      color: white;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      text-decoration: none;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+    }
+    
+    .edit-profile-btn:hover {
+      background-color: #00a38e;
+    }
+    
+    /* Grid layout for feature boxes */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+      margin-bottom: 35px;
+    }
+    
+    .feature-box {
+      border: 1px solid #e5e7eb;
+      padding: 25px 20px;
+      text-align: center;
+      text-decoration: none;
+      color: #4b5563;
+      border-radius: 8px;
+      background-color: white;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .feature-box:hover {
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      transform: translateY(-5px);
+      border-color: #00c4a7;
+    }
+    
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 15px;
+      background-color: #f3f4f6;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      color: #00c4a7;
+      transition: all 0.3s;
+    }
+    
+    .feature-box:hover .feature-icon {
+      background-color: #00c4a7;
+      color: white;
+    }
+    
+    .feature-box h3 {
+      font-size: 18px;
+      font-weight: 500;
+      margin-top: 5px;
+      color: #1f2937;
+    }
+    
+    /* Logout button */
+    .logout-btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background: #f43f5e;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .logout-btn:hover {
+      background: #e11d48;
+    }
+    /* Update modal-content styles */
+.modal-content {
+  background: white;
+  margin: 50px auto;
+  padding: 30px;
+  width: 600px;
+  max-width: 90%;
+  border-radius: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+  max-height: 80vh; /* Set maximum height relative to viewport */
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+/* Optional: Add some padding at the bottom of the form to prevent content from being cut off */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: flex-end;
+  padding-bottom: 20px; /* Added padding */
+}
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .content-wrapper {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="/">Home</a> > ACCOUNT
+    </div>
+
+    <!-- Account header -->
+    <div class="account-header">
+      <h1>My Account</h1>
+    </div>
+
+    <!-- Main content wrapper -->
+    <div class="content-wrapper">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <h2 class="sidebar-title">Overview</h2>
+          <ul class="sidebar-menu">
+            <li><strong>ACCOUNT</strong></li>
+            <li><a href="/userProfile" class="active">Profile</a></li>
+            <li><a href="/change-password">Change Password</a></li>
+            <li><a href="/address">Address</a></li>
+            <li><a href="/wishlist">Wishlist</a></li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-section">
+          <h2 class="sidebar-title">Orders</h2>
+          <ul class="sidebar-menu">
+            <li><a href="/orders">Order History</a></li>
+            <li><a href="/credits">Credits</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="main-content">
+        <!-- Profile section -->
+        <div class="profile-section">
+          <div class="profile-header">
+            <div class="profile-info">
+              <div class="profile-image"></div>
+              <div>
+                <h2><%= user.FirstName %> <%= user.LastName %></h2>
+                <p><%=user.Email%></p>
+              </div>
+            </div>
+            <a href="/profile" class="edit-profile-btn">EDIT PROFILE</a>
+          </div>
+        </div>
+
+        <!-- Features grid -->
+        <div class="features-grid">
+          <a href="/orders" class="feature-box">
+            <div class="feature-icon">📦</div>
+            <h3>Orders</h3>
+          </a>
+          <a href="/wishlist" class="feature-box">
+            <div class="feature-icon">❤️</div>
+            <h3>Wishlist</h3>
+          </a>
+          <a href="/address" class="feature-box">
+            <div class="feature-icon">📍</div>
+            <h3>Addresses</h3>
+          </a>
+          <a href="/profile" class="feature-box">
+            <div class="feature-icon">👤</div>
+            <h3>Profile</h3>
+          </a>
+          <a href="/credits" class="feature-box">
+            <div class="feature-icon">💳</div>
+            <h3>Credits</h3>
+          </a>
+          <a href="/change-password" class="feature-box">
+            <div class="feature-icon">🔑</div>
+            <h3>Change Password</h3>
+          </a>
+        </div>
+
+        <!-- Logout button -->
+        <a href="/logout" class="logout-btn">LOGOUT</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

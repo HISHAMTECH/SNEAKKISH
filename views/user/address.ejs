@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Address</title>
+  <!-- Your existing CSS remains unchanged -->
+  <style>
+    /* Global styles and reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f9fafb;
+      color: #333;
+    }
+    
+    /* Main container styles */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    
+    /* Breadcrumb styles */
+    .breadcrumb {
+      margin-bottom: 25px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    .breadcrumb a {
+      color: #6b7280;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    .breadcrumb a:hover {
+      color: #00c4a7;
+    }
+    
+    /* Account header styles */
+    .account-header {
+      margin-bottom: 30px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 15px;
+    }
+    
+    .account-header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+    
+    .account-email {
+      color: #6b7280;
+      font-size: 15px;
+    }
+    
+    /* Main content layout */
+    .content-wrapper {
+      display: flex;
+      gap: 40px;
+    }
+    
+    /* Sidebar styles */
+    .sidebar {
+      width: 250px;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-section {
+      margin-bottom: 35px;
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .sidebar-title {
+      color: #00c4a7;
+      margin-bottom: 15px;
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .sidebar-menu li {
+      margin-bottom: 12px;
+      padding: 2px 0;
+    }
+    
+    .sidebar-menu li strong {
+      color: #6b7280;
+      font-size: 14px;
+      display: block;
+      margin-top: 8px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+    
+    .sidebar-menu a {
+      color: #4b5563;
+      text-decoration: none;
+      display: block;
+      padding: 8px 10px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      font-size: 15px;
+    }
+    
+    .sidebar-menu a:hover {
+      background-color: #f3f4f6;
+      color: #00c4a7;
+    }
+    
+    .sidebar-menu a.active {
+      background-color: #e6f7f5;
+      color: #00c4a7;
+      font-weight: 500;
+    }
+    
+    /* Main content area */
+    .main-content {
+      flex: 1;
+    }
+    
+    /* Address container styles */
+    .address-container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .address-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .address-header h2 {
+      font-size: 22px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+    
+    .add-address-btn {
+      padding: 10px 18px;
+      background: #00c4a7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      transition: background-color 0.2s;
+    }
+    
+    .add-address-btn:hover {
+      background: #00a38e;
+    }
+    
+    .address-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+    }
+    
+    .address-card {
+      border: 1px solid #e5e7eb;
+      padding: 20px;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .address-card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      border-color: #00c4a7;
+    }
+    
+    .address-type {
+      color: #00c4a7;
+      font-weight: 600;
+      margin-bottom: 15px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .address-type-icon {
+      width: 24px;
+      height: 24px;
+      background-color: #e6f7f5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #00c4a7;
+    }
+    
+    .address-details {
+      margin-bottom: 15px;
+      color: #4b5563;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    
+    .address-details p {
+      margin-bottom: 8px;
+    }
+    
+    .address-details strong {
+      color: #1f2937;
+    }
+    
+    .address-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .edit-btn, .delete-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+    
+    .edit-btn {
+      border: 1px solid #d1d5db;
+      background: transparent;
+      color: #4b5563;
+    }
+    
+    .edit-btn:hover {
+      background: #f3f4f6;
+      color: #1f2937;
+      border-color: #9ca3af;
+    }
+    
+    .delete-btn {
+      border: 1px solid #fecaca;
+      background: transparent;
+      color: #ef4444;
+    }
+    
+    .delete-btn:hover {
+      background: #fef2f2;
+      border-color: #f87171;
+    }
+    
+    /* Default address badge */
+    .default-badge {
+      position: absolute;
+      top: -10px;
+      right: 10px;
+      background: #00c4a7;
+      color: white;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background: white;
+      margin: 50px auto;
+      padding: 30px;
+      width: 600px;
+      max-width: 90%;
+      border-radius: 8px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      /* Add these lines to enable scrolling */
+      max-height: 80vh; /* Limits the modal height to 80% of the viewport height */
+      overflow-y: auto; /* Adds a vertical scrollbar when content overflows */
+    }
+    
+    .modal-content h2 {
+      margin-bottom: 20px;
+      color: #1f2937;
+      font-size: 22px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #4b5563;
+      font-weight: 500;
+      font-size: 15px;
+    }
+    
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #00c4a7;
+      box-shadow: 0 0 0 3px rgba(0,196,167,0.2);
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      justify-content: flex-end;
+    }
+    
+    .save-btn {
+      padding: 10px 20px;
+      background: #00c4a7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 15px;
+      transition: background-color 0.2s;
+    }
+    
+    .save-btn:hover {
+      background: #00a38e;
+    }
+    
+    .cancel-btn {
+      padding: 10px 20px;
+      background: #6b7280;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 15px;
+      transition: background-color 0.2s;
+    }
+    
+    .cancel-btn:hover {
+      background: #4b5563;
+    }
+    
+    /* No addresses message */
+    .no-addresses {
+      text-align: center;
+      padding: 40px 20px;
+      background-color: #f3f4f6;
+      border-radius: 8px;
+      color: #6b7280;
+    }
+    
+    .no-addresses p {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+    
+
+    /* Edit button style for anchor tags */
+.edit-btn {
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  background: transparent;
+  color: #4b5563;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none; /* Remove default underline */
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex; /* Use inline-flex to maintain inline behavior but allow flex properties */
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.edit-btn:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+  border-color: #9ca3af;
+}
+
+/* Delete button style for anchor tags */
+.delete-btn {
+  padding: 8px 16px;
+  border: 1px solid #fecaca;
+  background: transparent;
+  color: #ef4444;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none; /* Remove default underline */
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex; /* Use inline-flex to maintain inline behavior but allow flex properties */
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.delete-btn:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+}
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .content-wrapper {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      
+      .address-list {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-group.full-width {
+        grid-column: span 1;
+      }
+    }
+
+    /* Error styling for invalid fields */
+    .form-group.error input, .form-group.error select {
+      border-color: #ef4444;
+    }
+    .form-group .error-message {
+      color: #ef4444;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+    .form-group.error .error-message {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="/">Home</a> > <a href="/userProfile">Account</a> > Address
+    </div>
+
+    <!-- Account header -->
+    <div class="account-header">
+      <h1>My Address</h1>
+    </div>
+
+    <!-- Main content wrapper -->
+    <div class="content-wrapper">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <h2 class="sidebar-title">Overview</h2>
+          <ul class="sidebar-menu">
+            <li><strong>ACCOUNT</strong></li>
+            <li><a href="/userProfile">Profile</a></li>
+            <li><a href="/change-password">Change Password</a></li>
+            <li><a href="/address" class="active">Address</a></li>
+            <li><a href="/wishlist">Wishlist</a></li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-section">
+          <h2 class="sidebar-title">Orders</h2>
+          <ul class="sidebar-menu">
+            <li><a href="/order-history">Order History</a></li>
+            <li><a href="/credits">Credits</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="main-content">
+        <div class="address-container">
+          <div class="address-header">
+            <h2>Saved Address</h2>
+            <button class="add-address-btn" onclick="openModal('add')">+ Add New Address</button>
+          </div>
+          <%if(userAddress){%>
+            <%userAddress.Address.forEach((address)=>{%>
+          <div class="address-list" id="addressList">
+            <!-- Sample address cards - This would be dynamically populated -->
+            <div class="address-card">
+              <div class="address-type">
+                address Type: <%=address.addressType%>
+              </div>
+              <div class="address-details">
+                <p><strong>Name:<%=address.Name%></strong></p>
+                <p>City:<%=address.City%></p>
+                <p>Landmark:<%=address.Landmark%></p>
+                <p>State:<%=address.State%></p>
+                <p>Pincode:<%=address.Pincode%></p>
+
+                <p>Phone Number:<%=address.Phone%></p> 
+                <p>Alternate Phone Number:<%=address.AltPhone%></p>   
+              </div>
+              <div class="address-actions"> 
+                <a href="javascript:void(0)" class="edit-btn" onclick="openEditModal('<%= address._id %>')">✎ Edit</a>   
+                <a href="/deleteAddress?id=<%=address._id%>" class="delete-btn" onclick="return confirm('Are You Sure ')">🗑️ Delete</a>   
+              </div>
+            </div>
+            <%})%><%}else{%>
+              <div>
+                <h1>No Address</h1>
+              </div>
+
+              <%}%> 
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="addressModal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Add New Address</h2>
+      <form id="addressForm" method="POST" action="/addAddress">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Address Type</label>
+            <select name="addressType" required>
+              <option value="Home">Home</option>
+              <option value="Work">Work</option>
+              <option value="Other">Other</option>
+            </select>
+            <span class="error-message">Please select an address type</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="Name" placeholder="Enter your full name">
+            <span class="error-message">Name must be at least 2 characters</span>
+          </div>
+          
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" name="City" placeholder="Enter city">
+            <span class="error-message">City must be at least 2 characters</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Landmark</label>
+            <input type="text" name="Landmark" placeholder="Enter nearest landmark">
+            <span class="error-message">Landmark is optional</span>
+          </div>
+          
+          <div class="form-group">
+            <label>State</label>
+            <input type="text" name="State" placeholder="Enter state">
+            <span class="error-message">State must be at least 2 characters</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Pincode</label>
+            <input type="number" name="Pincode" placeholder="Enter pincode">
+            <span class="error-message">Pincode must be 6 digits</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" name="Phone" placeholder="Enter phone number">
+            <span class="error-message">Phone must be 10 digits</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Alternate Phone</label>
+            <input type="tel" name="AltPhone" placeholder="Enter alternate phone">
+            <span class="error-message">Alternate phone must be 10 digits if provided</span>
+          </div>
+          
+          <div class="form-group full-width">
+            <label>
+              <input type="checkbox" name="isDefault"> Make this my default address
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="save-btn">Save Address</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal for edit address -->
+  <div class="modal" id="editAddressModal">
+    <div class="modal-content">
+      <h2 id="editModalTitle">Edit Address</h2>
+      <form id="editAddressForm" method="POST" action="/editAddress">
+        <input type="hidden" name="addressId" id="editAddressId"> <!-- Hidden field for address _id -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Address Type</label>
+            <select name="addressType" id="editAddressType" required>
+              <option value="Home">Home</option>
+              <option value="Work">Work</option>
+              <option value="Other">Other</option>
+            </select>
+            <span class="error-message">Please select an address type</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="Name" id="editName" placeholder="Enter your full name">
+            <span class="error-message">Name must be at least 2 characters</span>
+          </div>
+          
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" name="City" id="editCity" placeholder="Enter city">
+            <span class="error-message">City must be at least 2 characters</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Landmark</label>
+            <input type="text" name="Landmark" id="editLandmark" placeholder="Enter nearest landmark">
+            <span class="error-message">Landmark is optional</span>
+          </div>
+          
+          <div class="form-group">
+            <label>State</label>
+            <input type="text" name="State" id="editState" placeholder="Enter state">
+            <span class="error-message">State must be at least 2 characters</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Pincode</label>
+            <input type="number" name="Pincode" id="editPincode" placeholder="Enter pincode">
+            <span class="error-message">Pincode must be 6 digits</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" name="Phone" id="editPhone" placeholder="Enter phone number">
+            <span class="error-message">Phone must be 10 digits</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Alternate Phone</label>
+            <input type="tel" name="AltPhone" id="editAltPhone" placeholder="Enter alternate phone">
+            <span class="error-message">Alternate phone must be 10 digits if provided</span>
+          </div>
+          
+          <div class="form-group full-width">
+            <label>
+              <input type="checkbox" name="isDefault" id="editIsDefault"> Make this my default address
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="save-btn">Update Address</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- JavaScript for modal functionality and validation -->
+  <script>
+    function openModal(mode) {
+      const modal = document.getElementById('addressModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const form = document.getElementById('addressForm');
+      
+      if (mode === 'add') {
+        modalTitle.textContent = 'Add New Address';
+        form.reset();
+        clearErrors(); // Clear any previous errors
+      } else if (mode === 'edit') {
+        modalTitle.textContent = 'Edit Address';
+        // Here you would populate the form with existing address data
+      }
+      
+      modal.style.display = 'block';
+    }
+    
+    function closeModal() {
+      const modal = document.getElementById('addressModal');
+      modal.style.display = 'none';
+      clearErrors(); // Clear errors when closing
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('addressModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    }
+    
+    // Clear error messages and styles
+    function clearErrors() {
+      document.querySelectorAll('.form-group').forEach(group => {
+        group.classList.remove('error');
+      });
+    }
+    
+    // Validate form fields
+    function validateForm() {
+      let isValid = true;
+      clearErrors();
+      
+      // Address Type (required, handled by HTML5)
+      
+      // Name
+      const name = document.querySelector('[name="Name"]').value;
+      if (!name || name.length < 2) {
+        setError('Name', 'Name must be at least 2 characters');
+        isValid = false;
+      }
+      
+      // City
+      const city = document.querySelector('[name="City"]').value;
+      if (!city || city.length < 2) {
+        setError('City', 'City must be at least 2 characters');
+        isValid = false;
+      }
+      
+      // State
+      const state = document.querySelector('[name="State"]').value;
+      if (!state || state.length < 2) {
+        setError('State', 'State must be at least 2 characters');
+        isValid = false;
+      }
+      
+      // Pincode
+      const pincode = document.querySelector('[name="Pincode"]').value;
+      if (!pincode || !/^\d{6}$/.test(pincode)) {
+        setError('Pincode', 'Pincode must be 6 digits');
+        isValid = false;
+      }
+      
+      // Phone
+      const phone = document.querySelector('[name="Phone"]').value;
+      if (!phone || !/^\d{10}$/.test(phone)) {
+        setError('Phone', 'Phone must be 10 digits');
+        isValid = false;
+      }
+      
+      // Alternate Phone (optional, but must be 10 digits if provided)
+      const altPhone = document.querySelector('[name="AltPhone"]').value;
+      if (altPhone && !/^\d{10}$/.test(altPhone)) {
+        setError('AltPhone', 'Alternate phone must be 10 digits if provided');
+        isValid = false;
+      }
+      
+      return isValid;
+    }
+    
+    // Set error message and style
+    function setError(fieldName, message) {
+      const group = document.querySelector(`[name="${fieldName}"]`).parentElement;
+      group.classList.add('error');
+      group.querySelector('.error-message').textContent = message;
+    }
+    
+    // Handle form submission
+    document.getElementById('addressForm').addEventListener('submit', function(e) {
+      if (!validateForm()) {
+        e.preventDefault(); // Prevent submission if validation fails
+        return;
+      }
+      // If validation passes, allow the form to submit normally to the server
+      // The server will handle the redirect to /getAddress or respond with an error
+      closeModal(); // Close modal after submission (optional, depending on UX)
+    });
+
+    // Function to open the edit modal and populate it with address data
+// Function to open the edit modal and fetch address data via AJAX
+function openEditModal(addressId) {
+  fetch(`/editAddress?id=${addressId}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        const modal = document.getElementById('editAddressModal');
+        const modalTitle = document.getElementById('editModalTitle');
+        
+        // Populate the form with address data
+        document.getElementById('editAddressId').value = data.address._id;
+        document.getElementById('editAddressType').value = data.address.addressType || 'Home';
+        document.getElementById('editName').value = data.address.Name || '';
+        document.getElementById('editCity').value = data.address.City || '';
+        document.getElementById('editLandmark').value = data.address.Landmark || '';
+        document.getElementById('editState').value = data.address.State || '';
+        document.getElementById('editPincode').value = data.address.Pincode || '';
+        document.getElementById('editPhone').value = data.address.Phone || '';
+        document.getElementById('editAltPhone').value = data.address.AltPhone || '';
+        document.getElementById('editIsDefault').checked = data.address.isDefault || false;
+
+        modalTitle.textContent = 'Edit Address';
+        modal.style.display = 'block';
+      } else {
+        alert(data.message || 'Failed to load address data');
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching address data:', error);
+      alert('An error occurred while loading the address');
+    });
+}
+
+// Function to close the edit modal
+function closeEditModal() {
+  const modal = document.getElementById('editAddressModal');
+  modal.style.display = 'none';
+  clearEditErrors(); // Clear any previous errors
+}
+
+// Close edit modal when clicking outside
+window.onclick = function(event) {
+  const addModal = document.getElementById('addressModal');
+  const editModal = document.getElementById('editAddressModal');
+  if (event.target === addModal) {
+    closeModal();
+  } else if (event.target === editModal) {
+    closeEditModal();
+  }
+};
+
+// Clear error messages and styles for edit form
+function clearEditErrors() {
+  document.querySelectorAll('.form-group').forEach(group => {
+    group.classList.remove('error');
+  });
+}
+
+// Validate edit form fields (similar to add form validation)
+function validateEditForm() {
+  let isValid = true;
+  clearEditErrors();
+
+  // Address Type
+  const addressType = document.getElementById('editAddressType').value;
+  if (!addressType) {
+    setEditError('addressType', 'Please select an address type');
+    isValid = false;
+  }
+
+  // Name
+  const name = document.getElementById('editName').value;
+  if (!name || name.length < 2) {
+    setEditError('Name', 'Name must be at least 2 characters');
+    isValid = false;
+  }
+
+  // City
+  const city = document.getElementById('editCity').value;
+  if (!city || city.length < 2) {
+    setEditError('City', 'City must be at least 2 characters');
+    isValid = false;
+  }
+
+  // State
+  const state = document.getElementById('editState').value;
+  if (!state || state.length < 2) {
+    setEditError('State', 'State must be at least 2 characters');
+    isValid = false;
+  }
+
+  // Pincode
+  const pincode = document.getElementById('editPincode').value;
+  if (!pincode || !/^\d{6}$/.test(pincode)) {
+    setEditError('Pincode', 'Pincode must be 6 digits');
+    isValid = false;
+  }
+
+  // Phone
+  const phone = document.getElementById('editPhone').value;
+  if (!phone || !/^\d{10}$/.test(phone)) {
+    setEditError('Phone', 'Phone must be 10 digits');
+    isValid = false;
+  }
+
+  // Alternate Phone (optional, but must be 10 digits if provided)
+  const altPhone = document.getElementById('editAltPhone').value;
+  if (altPhone && !/^\d{10}$/.test(altPhone)) {
+    setEditError('AltPhone', 'Alternate phone must be 10 digits if provided');
+    isValid = false;
+  }
+
+  return isValid;
+}
+
+// Set error message and style for edit form
+function setEditError(fieldName, message) {
+  const group = document.querySelector(`[name="${fieldName}"]`).parentElement;
+  group.classList.add('error');
+  group.querySelector('.error-message').textContent = message;
+}
+
+// Handle edit form submission
+document.getElementById('editAddressForm').addEventListener('submit', function(e) {
+  if (!validateEditForm()) {
+    e.preventDefault(); // Prevent submission if validation fails
+    return;
+  }
+  // If validation passes, allow the form to submit normally to the server
+  // The server will handle the update and redirect or respond with an error
+  closeEditModal(); // Close modal after submission (optional, depending on UX)
+});
+
+
+  </script>
+</body>
+</html>

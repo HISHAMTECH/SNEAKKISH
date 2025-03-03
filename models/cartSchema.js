@@ -1,43 +1,44 @@
-const mongoose=require('mongoose');
-const {Schema}=mongoose
+// models/cartSchema.js
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-
-const CartSchema=new mongoose.Schema({
-    UserId:{
-        type:Schema.Types.ObjectId,
-        ref:"User",
-        required:true
+const CartSchema = new mongoose.Schema({
+    UserId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true
     },
-    Items:[{
-        ProductId:{
-            type:Schema.Types.ObjectId,
-            ref:"Product",
-            required:true
+    Items: [{
+        ProductId: {
+            type: Schema.Types.ObjectId,
+            ref: "Product",
+            required: true
         },
-        Quantity:{
-             type:Number,
-             default:1
+        Quantity: {
+            type: Number,
+            default: 1
         },
-        Price:{
-            type:Number,
-            required:true
+        Price: {
+            type: Number,
+            required: true
         },
-        TotalPrice:{
-            type:Number,
-            required:true
+        TotalPrice: {
+            type: Number,
+            required: true
         },
-        Status:{
-            type:String,
-            default:"palced"
+        Size: { // Added Size field
+            type: String,
+            required: true
         },
-        CancellationReason:{
-            type:String,
-            default:"none"
+        Status: {
+            type: String,
+            default: "placed"
+        },
+        CancellationReason: {
+            type: String,
+            default: "none"
         }
-    }],
-    
-})
+    }]
+});
 
-const Cart=mongoose.model("Cart",CartSchema)
-
-module.exports=Brand;
+module.exports = mongoose.model("Cart", CartSchema);
