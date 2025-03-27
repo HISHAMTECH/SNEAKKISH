@@ -336,51 +336,136 @@ if(!passwordMatch){
     }
 }
 
+// const loadHome = async (req, res) => {
+//     try {
+//         const user = req.session.User;
 
-const loadHome=async (req,res)=>{
+//         // Fetch listed categories
+//         const category = await Category.find({ isListed: true });
+
+//         // Fetch products and populate the Categorys field
+//         let productData = await Product.find({
+//             isBlocked: false,
+//             Categorys: { $in: category.map(category => category._id) }
+//         })
+//         .populate('Categorys'); 
+
+        
+//         productData.sort((a, b) => new Date(b.timestamps) - new Date(a.timestamps));
+//         newArrivals = productData.slice(0, 6);
+
+//         console.log(productData);
+
+//         offerProducts=await Product.find({ProductOffer: { $gt: 0 }})
+//         offerprice=offerProducts.SalePrice-(offerProducts.ProductOffer/100)
+//         console.log(offerProducts);
+//         console.log(offerProducts.SalePrice);
+//         console.log(offerprice);
+        
+
+
+
+//         // Render the page based on whether the user is logged in
+//         if (user) {
+//             const userData = await User.findOne({ _id: user._id });
+//             res.render('home', {
+//                 user: userData,
+//                 products: newArrivals,
+//                 product:offerProducts,
+//                 category: category
+//             });
+//         } else {
+//             return res.render('home', {
+//                 products: newArrivals,
+//                 product:offerProducts,
+//                 category: category
+//             });
+//         }
+
+//     } catch (error) {
+//         console.log('Home Page Not Loaded', error);
+//         res.status(500).send("Server Error");
+//     }
+// };
+
+const loadHome = async (req, res) => {
     try {
+        const user = req.session.User;
 
-        const user=req.session.User
-        
-        
-        const category = await Category.find({isListed:true})
-        let productData=await Product.find({isBlocked:false,
-            Categorys:{$in:category.map(category=>category._id)}
-        })
-        // const brandData = await Brand.find({isBlocked:false})
+        // Fetch listed categories
+        const category = await Category.find({ isListed: true });
 
-        productData.sort((a,b)=>new Date(b.timestamps)-new Date(a.timestamps))
-        productData = productData.slice(0,4)
+        // Fetch products and populate the Categorys field
+        let productData = await Product.find({
+            isBlocked: false,
+            Categorys: { $in: category.map(category => category._id) }
+        }).populate('Categorys');
 
-    
+        // Sort by timestamp (newest first)
+        productData.sort((a, b) => new Date(b.timestamps) - new Date(a.timestamps));
+
+        // Custom rounding function
+        const roundToNearest5or10 = (num) => {
+            const integerPart = Math.floor(num);
+            const decimalPart = num - integerPart;
+            if (decimalPart > 0.75) {
+                return Math.ceil(num / 10) * 10; // Round to nearest 10
+            } else {
+                return Math.round(num / 5) * 5; // Round to nearest 5
+            }
+        };
+
+        // Filter out products with offers and get the 6 newest arrivals without offers
+        let newArrivals = productData
+            .filter(product => product.ProductOffer <= 0) 
+            .slice(0, 6) 
+            .map(product => {
+                const displayPrice = roundToNearest5or10(product.SalePrice); // Round SalePrice
+                return {
+                    ...product.toObject(),
+                    displayPrice 
+                };
+            });
+
        
+        const offerProducts = await Product.find({ ProductOffer: { $gt: 0 } }).populate('Categorys');
 
-      
         
-        if(user){
-            const userData= await User.findOne({_id:user._id})
-            res.render('home',{
-                user:userData,
-                products:productData,
-                // brands:brandData,
-                category:category
-            })
-        }else{
-            return res.render('home',{
-                products:productData,
-                // brands:brandData,
-                category:category
-            })
+        const offerProductsWithPrice = offerProducts.map(product => {
+            const discount = (product.ProductOffer / 100) * product.SalePrice;
+            const offerPriceRaw = product.SalePrice - discount; 
+            const offerPrice = roundToNearest5or10(offerPriceRaw); 
+            return {
+                ...product.toObject(), // Convert Mongoose document to plain object
+                offerPrice 
+            };
+        });
+
+        console.log(newArrivals); 
+        console.log(offerProductsWithPrice);
+
+       
+        if (user) {
+            const userData = await User.findOne({ _id: user._id });
+            res.render('home', {
+                user: userData,
+                products: newArrivals, 
+                product: offerProductsWithPrice, 
+                category: category
+            });
+        } else {
+            return res.render('home', {
+                products: newArrivals, 
+                product: offerProductsWithPrice, 
+                category: category
+            });
         }
-        
-      
-        
+
     } catch (error) {
-        console.log('Home Page Not Loaded',error);
-        res.status(500).send("Server Error")
+        console.log('Home Page Not Loaded', error);
+        res.status(500).send("Server Error");
     }
-        
-    }
+};
 
     const logout= async(req,res)=>{
     try {

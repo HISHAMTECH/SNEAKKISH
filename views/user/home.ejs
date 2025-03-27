@@ -320,8 +320,6 @@
             transition: background 0.3s ease;
         }
 
-    
-
         .product__carousel .owl-dots {
             margin-top: 20px;
             text-align: center;
@@ -400,14 +398,26 @@
         }
 
         .product__item__text .mrp {
-            text-decoration: line-through;
-            color: #999;
+            font-weight: bold;
+            color: #cc1010;
             font-size: 14px;
             margin-right: 10px;
         }
 
+        .product__item__text .sale-price1 {
+            color: #000000;
+            font-size: 18px;
+            font-weight: 700;
+        } 
         .product__item__text .sale-price {
-            color: #e74c3c;
+            text-decoration: line-through;
+            color: #000000;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .product__item__text .offer-price{
+            color: #000000;
             font-size: 18px;
             font-weight: 700;
         }
@@ -646,7 +656,7 @@
     </section>
     <!-- Banner Section End -->
 
-    <!-- Product Section Begin -->
+    <!-- Product Section Begin (New Arrivals) -->
     <section class="product spad">
         <div class="container">
             <div class="row">
@@ -667,14 +677,15 @@
                                     </div>
                                     <div class="product__item__text">
                                         <h6 class="product-name"><%= products[i].ProductName %></h6>
-                                        <p class="product-category">Men's Shoes</p>
+                                        <p class="product-category"><%= products[i].Categorys.Name %></p>
+                                        <p class="product-category"><%= products[i].Brands %></p>
                                         <div class="product-price">
-                                            <span class="sale-price">₹<%= products[i].SalePrice %></span>
+                                            <span class="sale-price1">MRP ₹<%= products[i].displayPrice %></span>
                                         </div>
                                     </div>
                                 </a>
                                 <div class="wishlist-icon">
-                                    <span onclick="addToWishlist('<%=products[i]._id%>')"><img src="img/icon/heart.png" alt="Wishlist"></span>
+                                    <span onclick="addToWishlist('<%= products[i]._id %>')"><img src="img/icon/heart.png" alt="Wishlist"></span>
                                 </div>
                             </div>
                         <% } %>
@@ -684,35 +695,38 @@
         </div>
     </section>
 
+    <!-- Product Section Begin (Offer Products) -->
     <section class="product spad">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
                     <ul class="filter__controls">
-                        <li data-filter=".new-arrivals">Offer Products</li>
+                        <li data-filter=".offer-products">Offer Products</li>
                     </ul>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-12">
                     <div class="owl-carousel owl-theme product__carousel">
-                        <% for(let i = 0; i < products.length; i++) { %>
-                            <div class="product__item mix new-arrivals">
-                                <a href="/productDetails?id=<%= products[i]._id %>">
+                        <% for(let i = 0; i < product.length; i++) { %>
+                            <div class="product__item mix offer-products">
+                                <a href="/productDetails?id=<%= product[i]._id %>">
                                     <div class="product__item__pic">
-                                        <img src="/uploads/re-image/<%= products[i].ProductImage[0] %>" alt="<%= products[i].ProductName %>" class="product-image">
+                                        <img src="/uploads/re-image/<%= product[i].ProductImage[0] %>" alt="<%= product[i].ProductName %>" class="product-image">
                                     </div>
                                     <div class="product__item__text">
-                                        <h6 class="product-name"><%= products[i].ProductName %></h6>
-                                        <p class="product-category">Men's Shoes</p>
+                                        <h6 class="product-name"><%= product[i].ProductName %></h6>
+                                        <p class="product-category"><%= product[i].Categorys.Name %></p>
+                                        <p class="product-category"><%= product[i].Brands %></p>
                                         <div class="product-price">
-                                            <span class="mrp">MRP: ₹<%= products[i].RegularPrice%></span>
-                                            <span class="sale-price">₹<%= products[i].SalePrice %></span>
+                                            <span class="sale-price">₹<%= product[i].SalePrice %></span>
+                                            <span class="offer-price">₹<%= product[i].offerPrice %></span>
                                         </div>
+                                        <p class="mrp"><%= product[i].ProductOffer %>% OFF</p>
                                     </div>
                                 </a>
                                 <div class="wishlist-icon">
-                                    <span onclick="addToWishlist('<%=products[i]._id%>')"><img src="img/icon/heart.png" alt="Wishlist"></span>
+                                    <span onclick="addToWishlist('<%= product[i]._id %>')"><img src="img/icon/heart.png" alt="Wishlist"></span>
                                 </div>
                             </div>
                         <% } %>

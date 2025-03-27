@@ -2,6 +2,9 @@ const mongoose=require('mongoose')
 const env =require("dotenv").config()
 
 const connectDB= async ()=>{
+    console.log('db start');
+    console.log(process.env.MONGODB_URI);
+    
 try {
      await mongoose.connect(process.env.MONGODB_URI)
      console.log("DB connected to atlas");
@@ -11,6 +14,7 @@ try {
     process.exit(1)
 }
 
+console.log('db end');
 
 }
 
