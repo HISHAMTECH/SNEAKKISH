@@ -7,6 +7,9 @@ const  CustomerController=require('../controller/admin/customerController')
 const  brandController=require('../controller/admin/brandController')
 const  productController=require('../controller/admin/productController')
 const orderController=require('../controller/admin/orderController')
+const couponController=require('../controller/admin/couponController')
+const salesReportController=require('../controller/admin/salesReportController')
+const walletController=require('../controller/admin/walletController')
 const multer=require("multer")
 const storage=require('../helpers/multer')
 const uploads=multer({storage:storage})
@@ -52,14 +55,30 @@ router.get('/editProduct',adminAuth,productController.getEditProduct)
 router.post('/editProduct/:id',adminAuth,uploads.array("images",3),productController.editProduct)
 router.post('/deleteImage',adminAuth,productController.deleteSingleImage)
 
-// ORDER MANAGEMENT
-
 
 // ORDER MANAGEMENT
-router.get('/orders', adminAuth, orderController.getOrders); // List orders
-router.get('/orders/:orderId', adminAuth, orderController.getOrderDetails); // View order details
-router.post('/orders/:orderId/status', adminAuth, orderController.updateOrderStatus); // Update status
-router.post('/orders/:orderId/return', adminAuth, orderController.verifyReturnRequest); // Verify return
-router.get('/orders/paginate', adminAuth, orderController.paginateOrders);
+router.get('/orders', adminAuth, orderController.getOrders);
+router.get('/orders/:orderId', adminAuth, orderController.getOrderDetails); 
+router.post('/orders/:orderId/status', adminAuth, orderController.updateOrderStatus); 
+router.post('/orders/:orderId/return', adminAuth, orderController.handleReturnRequest);
+router.get('/orders/paginate', adminAuth, orderController.paginate);
+
+
+
+//COUPON MANAGEMENT
+router.get('/coupon',adminAuth,couponController.loadCoupon)
+router.post('/createCoupon',adminAuth,couponController.createCoupon)
+router.get('/editCoupon',adminAuth,couponController.editCoupon)
+router.post('/updateCoupon',adminAuth,couponController.updateCoupon)
+router.get('/deleteCoupon',adminAuth,couponController.deleteCoupon)
+
+//SALES REPORT MANAGEMENT
+router.get('/salesReport',adminAuth,salesReportController.getSalesReport)
+router.get('/download-sales-report',adminAuth,salesReportController.downloadSalesReport);
+
+//WALLET MANAGEMENT
+router.get('/wallet',adminAuth,walletController.getWallet)
+router.get('/walletTransactions/:userId',adminAuth,walletController.getwalletTransactions)
+
 
 module.exports=router;

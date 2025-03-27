@@ -3,29 +3,28 @@ const Order = require('../../models/orderSchema');
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 
-// List orders (descending by CreatedOn) - for initial page load
+// List orders
 const getOrders = async (req, res) => {
     try {
         const orders = await Order.find()
             .populate({
                 path: 'userId',
-                select: 'name email'
+                select: 'FirstName Email'
             })
             .populate({
                 path: 'OrderedItems.Product',
                 select: 'ProductName'
             })
             .sort({ CreatedOn: -1 });
-        
-       
+
         const validOrders = orders.map(order => {
             const orderObj = order.toObject();
             if (!orderObj.userId) {
-                orderObj.userId = { name: 'N/A', email: 'N/A' };
+                orderObj.userId = { FirstName: 'N/A', Email: 'N/A' };
             }
             return orderObj;
         });
-        
+
         res.render('admin-orders', { 
             orders: validOrders, 
             currentPage: 1, 
@@ -49,19 +48,15 @@ const getOrderDetails = async (req, res) => {
 
         let query = {};
         if (mongoose.Types.ObjectId.isValid(orderId)) {
-            
             query = { $or: [{ _id: orderId }, { OrderId: orderId }] };
         } else {
-            
             query = { OrderId: orderId };
         }
 
-        
         const order = await Order.findOne(query)
             .populate({
                 path: 'userId',
-                select: 'name email',
-                match: { name: { $exists: true }, email: { $exists: true } }
+                select: 'FirstName LastName Email Wallet'
             })
             .populate({
                 path: 'OrderedItems.Product',
@@ -74,225 +69,210 @@ const getOrderDetails = async (req, res) => {
             return res.status(404).send('Order not found');
         }
 
-       
-        if (!order.userId || !order.userId.name) {
-            order.userId = { name: 'N/A', email: 'N/A' }; 
-        if (!order.OrderedItems || !order.OrderedItems.length) {
-            order.OrderedItems = []; 
+        if (!order.userId) {
+            order.userId = { FirstName: 'Guest', LastName: '', Email: 'N/A', Wallet: 0 };
         }
 
-        res.render('admin-order-details', { order }); 
-    }
- } catch (error) {
+        console.log(order.Status);
+        
+
+        res.render('admin-order-details', { order });
+    } catch (error) {
         console.error('Error fetching order details:', error);
         res.status(500).send('Error fetching order details: ' + error.message);
     }
+};
 
-}
+// Update order status
 const updateOrderStatus = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const { status } = req.body;
-        
-        console.log("Updating order status for Order ID:", orderId, "New status:", status);
+
+        console.log('Updating order status:', { orderId, status });
 
         if (!status) {
             return res.status(400).json({ success: false, message: 'Status is required' });
         }
 
-        let query = {};
-        if (mongoose.Types.ObjectId.isValid(orderId)) {
-            query = { $or: [{ _id: orderId }, { OrderId: orderId }] };
-        } else {
-            query = { OrderId: orderId };
-        }
-
-        const order = await Order.findOne(query);
-        
-        if (!order) {
-            console.log("Order not found for ID:", orderId);
-            return res.status(404).json({ success: false, message: 'Order not found' });
-        }
-        
-        const validStatuses = ['Pending', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
+        const validStatuses = ['Pending', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Return Request', 'Returned'];
         if (!validStatuses.includes(status)) {
             return res.status(400).json({ success: false, message: 'Invalid status' });
         }
-        
+
+        const order = await Order.findOne({ OrderId: orderId });
+        if (!order) {
+            return res.status(404).json({ success: false, message: `Order not found with ID: ${orderId}` });
+        }
+
+        console.log('Current status:', order.Status);
+
+        const statusHierarchy = {
+            'Pending': ['Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
+            'Shipped': ['Out for Delivery', 'Delivered', 'Cancelled'],
+            'Out for Delivery': ['Delivered', 'Cancelled'],
+            'Delivered': ['Return Request', 'Cancelled'], // Only Return Request or Cancel allowed after Delivered
+            'Return Request': [], // No changes allowed until handled
+            'Cancelled': [],
+            'Returned': []
+        };
+
+        if (order.Status === 'Return Request') {
+            return res.status(400).json({
+                success: false,
+                message: 'Status cannot be changed directly while in Return Request. Use Handle Return Request.'
+            });
+        }
+
+        if (!statusHierarchy[order.Status] || !statusHierarchy[order.Status].includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid transition from ${order.Status} to ${status}. Valid: ${JSON.stringify(statusHierarchy[order.Status] || [])}`
+            });
+        }
+
         order.Status = status;
         await order.save();
-        
-        console.log(`Order ${orderId} status updated successfully to ${status}`);
-        
+        console.log('Order status updated:', order);
+
         res.json({ success: true, message: 'Order status updated successfully' });
     } catch (error) {
         console.error('Error updating order status:', error);
-        res.status(500).json({ success: false, message: 'Error updating order status: ' + error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Error updating order status: ' + error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 };
 
-const verifyReturnRequest = async (req, res) => {
+// Handle return request
+const handleReturnRequest = async (req, res) => {
     try {
         const orderId = req.params.orderId;
-        const order = await Order.findOne({ $or: [{ OrderId: orderId }, { _id: orderId }] })
+        const { action, reason, status } = req.body; // Added status from frontend
+
+        console.log("Received return request:", { orderId, action, reason, status });
+
+        const order = await Order.findOne({ OrderId: orderId })
             .populate({
                 path: 'userId',
-                select: 'name email wallet'
+                select: 'FirstName LastName Email Wallet'
             });
+
         if (!order) {
-            return res.json({ success: false, message: 'Order not found' });
-        }
-        if (order.Status !== 'Delivered') {
-            return res.json({ success: false, message: 'Order must be delivered to request a return' });
-        }
-        order.Status = 'Return Request';
-        await order.save();
-
-        // Refund to user's wallet if user exists
-        if (order.userId) {
-            order.userId.wallet = (order.userId.wallet || 0) + order.FinalAmount;
-            await order.userId.save();
-        } else {
-            console.log('No user found for refund');
+            return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        // Update stock for returned products
-        for (let item of order.OrderedItems) {
-            if (!item.Product) continue;
-            
-            const product = await Product.findById(item.Product);
-            if (product && product.Variants) {
-                const variant = product.Variants.find(v => v.Size === item.Size);
-                if (variant) {
-                    variant.Quantity += item.Quantity;
-                    await product.save();
+        if (order.Status !== 'Return Requested') {
+            return res.status(400).json({ success: false, message: 'Order is not in Return Request status' });
+        }
+
+        if (!action || !['accept', 'deny'].includes(action)) {
+            return res.status(400).json({ success: false, message: 'Valid action (accept or deny) is required' });
+        }
+
+        if (action === 'deny' && !reason) {
+            return res.status(400).json({ success: false, message: 'Reason is required to deny return' });
+        }
+
+        if (action === 'accept') {
+            order.Status = 'Returned';
+            order.ReturnReason = reason || 'Return accepted';
+
+            if (order.userId && order.userId.Wallet !== undefined) {
+                order.userId.Wallet = (order.userId.Wallet || 0) + (order.FinalAmount || order.TotalPrice || 0);
+                await order.userId.save();
+                console.log("Wallet updated for user:", order.userId._id, "New balance:", order.userId.Wallet);
+            } else {
+                console.warn("User or Wallet field not found, skipping refund");
+            }
+
+            for (let item of order.OrderedItems) {
+                if (!item.Product) continue;
+
+                const product = await Product.findById(item.Product);
+                if (product && product.Variants) {
+                    const variant = product.Variants.find(v => v.Size === item.Size);
+                    if (variant) {
+                        variant.Quantity += item.Quantity;
+                        await product.save();
+                        console.log("Stock updated for product:", product._id, "Variant:", item.Size, "New quantity:", variant.Quantity);
+                    } else {
+                        console.warn("Variant not found for product:", item.Product, "Size:", item.Size);
+                    }
+                } else {
+                    console.warn("Product or Variants not found for item:", item.Product);
                 }
             }
+        } else if (action === 'deny') {
+            order.Status = 'Delivered';
+            order.ReturnReason = `Denied: ${reason}`;
         }
 
-        res.json({ success: true, message: 'Return request verified, amount refunded to wallet' });
+        await order.save();
+        console.log("Order updated:", order.toJSON());
+
+        res.json({ success: true, message: `Return request ${action === 'accept' ? 'accepted and refunded' : 'denied'}` });
     } catch (error) {
-        console.error('Error verifying return request:', error);
-        res.json({ success: false, message: 'Error verifying return request' });
+        console.error('Error handling return request:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error handling return request: ' + error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 };
 
-// Search, sort, filter, and paginate orders - for AJAX
-const paginateOrders = async (req, res) => {
+const paginate = async (req, res) => {
     try {
-        // Get and sanitize parameters
+        console.log("Paginate request received");
+
         const page = parseInt(req.query.page) || 1;
-        const limit = 5;
+        const limit = 10;
         const skip = (page - 1) * limit;
         const query = req.query.q || '';
         const sortBy = req.query.sortBy || 'CreatedOn';
         const sortOrder = req.query.sortOrder || 'desc';
         const status = req.query.status || '';
 
-        console.log('Query params:', { page, query, sortBy, sortOrder, status });
+        console.log('Paginate request details:', { page, query, sortBy, sortOrder, status });
 
-        // Build filter
         let filter = {};
-        
-        // Only add search filter if query is not empty
-        if (query && query.trim() !== '') {
-            // First try direct string matching for OrderId
+        if (query) {
             filter.$or = [
-                { OrderId: { $regex: query, $options: 'i' } }
+                { OrderId: { $regex: query, $options: 'i' } },
+                { 'userId.FirstName': { $regex: query, $options: 'i' } }
             ];
-            
-            // Try to convert query to ObjectId if it might be one
-            if (mongoose.Types.ObjectId.isValid(query)) {
-                filter.$or.push({ _id: mongoose.Types.ObjectId(query) });
-            }
-            
-            // Try to find users matching the query
-            try {
-                const users = await User.find({ 
-                    name: { $regex: query, $options: 'i' } 
-                }).select('_id');
-                
-                if (users && users.length > 0) {
-                    const userIds = users.map(u => u._id);
-                    filter.$or.push({ userId: { $in: userIds } });
-                }
-            } catch (userError) {
-                console.error('Error finding users:', userError);
-                // Continue without user filtering
-            }
         }
-        
-        // Add status filter if specified
-        if (status && status.trim() !== '') {
+        if (status) {
             filter.Status = status;
         }
 
-        console.log('Filter for orders query:', JSON.stringify(filter));
-
-        // Count total matching orders
-        const totalOrders = await Order.countDocuments(filter);
-        const totalPages = Math.ceil(totalOrders / limit) || 1; // Ensure at least 1 page
-
-        // Validate sorting field (security measure)
-        const validSortFields = ['CreatedOn', 'TotalPrice', 'Status'];
-        const finalSortBy = validSortFields.includes(sortBy) ? sortBy : 'CreatedOn';
-        const finalSortOrder = sortOrder === 'asc' ? 1 : -1;
-        
-        // Query for orders
         const orders = await Order.find(filter)
-            .populate({
-                path: 'userId',
-                select: 'name email'
-            })
-            .populate({
-                path: 'OrderedItems.Product',
-                select: 'ProductName'
-            })
-            .sort({ [finalSortBy]: finalSortOrder })
+            .populate('userId', 'FirstName Email')
+            .populate('OrderedItems.Product', 'ProductName')
+            .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
             .skip(skip)
-            .limit(limit)
-            .lean(); // Use lean() for better performance
+            .limit(limit);
 
-        console.log(`Found ${orders.length} orders`);
+        const total = await Order.countDocuments(filter);
+        const totalPages = Math.ceil(total / limit);
 
-        // Process orders to handle null values and formatting
-        const processedOrders = orders.map(order => {
-            // Handle null userId
-            if (!order.userId) {
-                order.userId = { name: 'N/A', email: 'N/A' };
+        console.log('Orders fetched:', { totalOrders: total, totalPages, ordersCount: orders.length });
+
+        const formattedOrders = orders.map(order => {
+            const orderObj = order.toObject();
+            if (!orderObj.userId) {
+                orderObj.userId = { FirstName: 'N/A', Email: 'N/A' };
             }
-            
-            // Ensure OrderedItems are properly formatted
-            if (order.OrderedItems) {
-                order.OrderedItems = order.OrderedItems.map(item => {
-                    if (!item.Product) {
-                        item.Product = { ProductName: 'Unknown Product' };
-                    }
-                    return item;
-                });
-            }
-            
-            return order;
+            return orderObj;
         });
 
-        // Send the response
-        res.json({ 
-            success: true, 
-            orders: processedOrders, 
-            currentPage: page, 
-            totalPages,
-            query, 
-            sortBy: finalSortBy, 
-            sortOrder: sortOrder, 
-            status 
-        });
+        res.json({ success: true, orders: formattedOrders, currentPage: page, totalPages });
     } catch (error) {
-        console.error('Error paginating orders:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Error fetching orders', 
-            error: error.message 
-        });
+        console.error('Error fetching paginated orders:', error);
+        res.status(500).json({ success: false, message: 'Error fetching orders: ' + error.message });
     }
 };
 
@@ -300,6 +280,6 @@ module.exports = {
     getOrders,
     getOrderDetails,
     updateOrderStatus,
-    verifyReturnRequest,
-    paginateOrders
+    handleReturnRequest,
+    paginate
 };

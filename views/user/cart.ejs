@@ -219,10 +219,315 @@
                 margin-top: 10px;
             }
         }
+
+        /* Header and Navigation Styles from Homepage */
+        .header {
+            position: relative;
+            z-index: 500;
+        }
+
+        .header__top, .header .container {
+            padding: 0;
+        }
+
+        .header__menu {
+            margin-bottom: 0;
+        }
+
+        /* Header Layout Adjustments */
+        .header__main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 15px;
+            background: #fff;
+        }
+
+        .header__logo {
+            flex: 0 0 auto;
+        }
+
+        .header__logo img {
+            height: 25px; /* Maintain the original size of the logo */
+            margin-left: 70px;
+            width: auto;
+        }
+
+        .header__menu ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header__menu ul li {
+            margin: 0 15px;
+        }
+
+        .header__menu ul li a {
+            font-size: 16px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .header__nav__option {
+            display: flex;
+            align-items: center;
+        }
+
+        .header__nav__option a {
+            margin-left: 15px;
+        }
+
+        /* Mobile Menu Styles */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .mobile-dropdown {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .mobile-dropdown.active {
+            right: 0;
+            display: block;
+        }
+
+        .mobile-dropdown ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .mobile-dropdown ul li {
+            margin: 15px 0;
+        }
+
+        .mobile-dropdown ul li a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            display: block;
+            padding: 10px;
+        }
+
+        .mobile-dropdown ul li a:hover {
+            background: #f1f1f1;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        /* Desktop Dropdown Styles */
+        .dropdown {
+            display: inline-block;
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            right: 0;
+            border-radius: 4px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-btn {
+            cursor: pointer;
+        }
+
+        /* Bottom Navigation Bar for Mobile */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 10px 0;
+        }
+
+        .bottom-nav ul {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .bottom-nav ul li {
+            text-align: center;
+        }
+
+        .bottom-nav ul li a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .bottom-nav ul li a i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991px) {
+            .header__menu {
+                display: none;
+            }
+
+            .header__nav__option {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header__top__right {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+
+            .header__top {
+                padding: 5px 0;
+            }
+
+            .header__top__left p {
+                font-size: 12px;
+                margin-bottom: 0;
+            }
+
+            .header__top__links a, .dropdown-btn {
+                font-size: 14px;
+            }
+
+            .header__main {
+                padding: 5px 10px;
+            }
+
+            .header__logo img {
+                height: 25px; /* Maintain the original size */
+                margin-left: 10px;
+            }
+
+            /* Show bottom navigation in mobile view */
+            .bottom-nav {
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header__top__left p {
+                font-size: 10px;
+            }
+
+            .header__top__links a, .dropdown-btn {
+                font-size: 12px;
+            }
+
+            .header__main {
+                padding: 3px 10px;
+            }
+
+            .mobile-menu-btn {
+                font-size: 18px;
+                padding: 3px;
+            }
+        }
+
+        .header__top__links a:hover {
+            color: rgb(129, 114, 114);
+        }
     </style>
 </head>
 
 <body>
+    <!-- Header Section Begin -->
+    <header class="header">
+        <div class="header__main">
+            <div class="header__logo">
+                <a href="/"><img src="/images/SNEAKKISH-26-03-.png" alt="SNEAKKISH Logo"></a>
+            </div>
+            <nav class="header__menu">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/product-page">Shop</a></li>
+                    <li><a href="#">Brands</a>
+                        <ul class="dropdown">
+                            <li><a href="./about.html">Adidas</a></li>
+                            <li><a href="./shop-details.html">Nike</a></li>
+                            <li><a href="./shopping-cart.html">New Balance</a></li>
+                            <li><a href="./checkout.html">Reebok</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="./contact.html">Contacts</a></li>
+                </ul>
+            </nav>
+            <div class="header__nav__option">
+                <a href="/Wishlist"><img src="/img/icon/heart.png" alt=""></a>
+                <a href="/cart"><img src="/img/icon/cart.png" alt=""> <span><%= cart.Items.length || 0 %></span></a>
+            </div>
+            <div class="mobile-menu-btn"><i class="fa fa-bars"></i></div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div class="mobile-dropdown">
+            <span class="close-btn">×</span>
+            <ul>
+                <li><a href="/userProfile">Profile</a></li>
+                <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </header>
+    <!-- Header Section End -->
+
     <!-- Breadcrumb Section -->
     <section class="breadcrumb-option">
         <div class="container">
@@ -291,6 +596,17 @@
         </div>
     </section>
 
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="bottom-nav">
+        <ul>
+            <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
+            <li><a href="/product-page"><i class="fa fa-shopping-bag"></i> Shop</a></li>
+            <li><a href="/cart"><i class="fa fa-shopping-cart"></i> Cart</a></li>
+            <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+            <li><a href="/userProfile"><i class="fa fa-user"></i> <%= locals.user ? locals.user.FirstName : 'Profile' %></a></li>
+        </ul>
+    </nav>
+
     <!-- Js Plugins -->
     <script src="/js/jquery-3.3.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
@@ -302,6 +618,33 @@
     <script src="/js/mixitup.min.js"></script>
     <script src="/js/owl.carousel.min.js"></script>
     <script src="/js/main.js"></script>
+
+    <!-- Header and Navigation Scripts from Homepage -->
+    <script>
+        $(document).ready(function(){
+            // Mobile menu toggle
+            $('.mobile-menu-btn').click(function() {
+                $('.mobile-dropdown').addClass('active');
+            });
+
+            $('.close-btn').click(function() {
+                $('.mobile-dropdown').removeClass('active');
+            });
+
+            // Desktop dropdown
+            $('.dropdown-btn').click(function(e) {
+                e.preventDefault();
+                $(this).parent('.dropdown').toggleClass('active');
+            });
+
+            // Close desktop dropdown when clicking outside
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    $('.dropdown').removeClass('active');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

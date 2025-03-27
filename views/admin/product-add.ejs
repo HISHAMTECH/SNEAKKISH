@@ -1,6 +1,4 @@
 <%- include("../../views/partials/admin/header") %>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
-
 <style>
 body {
     font-family: 'Poppins', sans-serif;
@@ -137,21 +135,6 @@ body {
     display: none;
 }
 
-/* Variant Styles */
-.variant-row {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-}
-
-.variant-fields {
-    display: flex;
-    gap: 15px;
-    align-items: flex-end;
-}
-
-/* Image Upload Styles */
 .image-upload-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -171,7 +154,7 @@ body {
     width: 100%;
     padding-bottom: 100%;
     margin-bottom: 10px;
-    background-color: #222; /* Dark background to see white cropper lines */
+    background-color: #222;
 }
 
 .img-preview {
@@ -180,7 +163,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Changed from cover to contain */
+    object-fit: contain;
     border-radius: 5px;
 }
 
@@ -223,42 +206,6 @@ body {
     font-size: 14px;
 }
 
-
-.cropper-container {
-    margin-top: 10px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
-}
-
-/* Make sure cropper UI elements are visible */
-.cropper-view-box,
-.cropper-face,
-.cropper-line,
-.cropper-point {
-   background-color: transparent;
-    opacity: 1 !important;
-}
-
-.cropper-view-box {
-    outline: 1px solid #fff;
-    outline-color: rgba(255, 255, 255, 0.75);
-}
-
-.cropper-dashed {
-    border-color: #fff !important;
-}
-
-.cropper-line {
-    background-color: #fff !important;
-}
-
-.cropper-point {
-    background-color: #0d6efd !important;
-    opacity: 0.8 !important;
-}
-
-/* Responsive adjustments */
 @media (max-width: 1500px) {
     .content, .card {
         width: 1000px;
@@ -342,32 +289,21 @@ body {
                         <div class="card-body">
                             <div class="variant mb-4">
                                 <label for="size" class="form-label">Size:</label>
-                                <input type="number" name="variants[0][size]" class="form-control border"
-                                    required>
+                                <input type="number" name="variants[0][size]" class="form-control border" required>
                                 <div id="size-error" class="error-message"></div>
 
                                 <label for="quantity" class="form-label">Quantity:</label>
-                                <input type="number" name="variants[0][quantity]" class="form-control border"
-                                    value="1" required>
+                                <input type="number" name="variants[0][quantity]" class="form-control border" value="1" required>
                                 <div id="quantity-error" class="error-message"></div>
 
-                                <!-- <label for="status" class="form-label">Status:</label>
-                                <select name="variants[0][status]" class="form-select border" required>
-                                    <option value="Available">Available</option>
-                                    <option value="out of stock">Out of Stock</option>
-                                    <option value="Discontinued">Discontinued</option>
-                                </select> -->
                                 <br>
-                                <button type="button"  class="btn btn-danger mt-2"
-                                    onclick="removeVariant(this)">Remove Variant</button>
+                                <button type="button" class="btn btn-danger mt-2" onclick="removeVariant(this)">Remove Variant</button>
                             </div>
                         </div>
                         <div class="card-footer">
-                            <button type="button" class="btn btn-primary" onclick="addVariant()">Add Another
-                                Variant</button>
+                            <button type="button" class="btn btn-primary" onclick="addVariant()">Add Another Variant</button>
                         </div>
                     </div>
-
 
                     <!-- Category -->
                     <div class="card mb-4">
@@ -389,8 +325,7 @@ body {
                         <div class="card-header">
                             <h4>Product Images</h4>
                             <small class="text-muted">Upload up to 3 images. First image will be the main product image.</small>
-                            <br>
-                            <br>
+                            <br><br>
                         </div>
                         <div class="card-body">
                             <div class="image-upload-container">
@@ -402,11 +337,6 @@ body {
                                     <input class="form-control" type="file" name="images" id="input1"
                                         accept="image/png, image/jpeg, image/jpg"
                                         onchange="viewImage(event, 1)">
-                                    <div class="cropper-container">
-                                        <button type="button" class="btn btn-primary btn-sm mt-2" id="saveButton1">
-                                            Save Crop
-                                        </button>
-                                    </div>
                                 </div>
 
                                 <!-- Image Upload Box 2 -->
@@ -417,11 +347,6 @@ body {
                                     <input class="form-control" type="file" name="images" id="input2"
                                         accept="image/png, image/jpeg, image/jpg"
                                         onchange="viewImage(event, 2)">
-                                    <div class="cropper-container">
-                                        <button type="button" class="btn btn-primary btn-sm mt-2" id="saveButton2">
-                                            Save Crop
-                                        </button>
-                                    </div>
                                 </div>
 
                                 <!-- Image Upload Box 3 -->
@@ -432,13 +357,7 @@ body {
                                     <input class="form-control" type="file" name="images" id="input3"
                                         accept="image/png, image/jpeg, image/jpg"
                                         onchange="viewImage(event, 3)">
-                                    <div class="cropper-container">
-                                        <button type="button" class="btn btn-primary btn-sm mt-2" id="saveButton3">
-                                            Save Crop
-                                        </button>
-                                    </div>
                                 </div>
-        
                             </div>
 
                             <div id="thumbnailsContainer" class="thumbnails-container">
@@ -456,11 +375,10 @@ body {
     </section>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
 <script>
 let variantCounter = 1;
 
-// variant
+// Variant functions
 function addVariant() {
     const variantContainer = document.getElementById('variant-container').getElementsByClassName('card-body')[0];
     const variants = variantContainer.getElementsByClassName('variant');
@@ -471,9 +389,11 @@ function addVariant() {
     newVariant.innerHTML = `
         <label for="size" class="form-label">Size:</label>
         <input type="number" name="variants[${newIndex}][size]" class="form-control border" required>
+        <div class="error-message"></div>
 
         <label for="quantity" class="form-label">Quantity:</label>
         <input type="number" name="variants[${newIndex}][quantity]" class="form-control border" value="1" required>
+        <div class="error-message"></div>
 
         <button type="button" class="btn btn-danger mt-2" onclick="removeVariant(this)">Remove Variant</button>
     `;
@@ -486,10 +406,9 @@ function removeVariant(button) {
     const variantContainer = variant.parentElement;
     variant.remove();
 
-    // Reindex remaining variants
     const variants = variantContainer.getElementsByClassName('variant');
     Array.from(variants).forEach((v, index) => {
-        v.querySelectorAll('input, select').forEach(input => {
+        v.querySelectorAll('input').forEach(input => {
             const name = input.getAttribute('name');
             if (name) {
                 input.setAttribute('name', name.replace(/variants\[\d+\]/, `variants[${index}]`));
@@ -498,80 +417,23 @@ function removeVariant(button) {
     });
 }
 
-
+// Image handling
 function viewImage(event, index) {
     const input = event.target;
     const file = input.files[0];
-
     if (!file) return;
 
     const reader = new FileReader();
     const imgView = document.getElementById(`imgView${index}`);
-    const cropperContainer = document.querySelector(`#input${index}`).nextElementSibling;
 
-    reader.onload = function (e) {
-        imgView.src = e.target.result;
-
-        // Destroy existing cropper if any
-        if (imgView.cropper) {
-            imgView.cropper.destroy();
-        }
-
-    
-
-        setTimeout(() => {
-            const cropper = new Cropper(imgView, {
-                aspectRatio: 1,
-                viewMode: 1, // Ensures the image is contained properly
-                guides: true,
-                
-                autoCropArea: 0.8,
-                cropBoxResizable: true,
-                zoomable: false,  // Prevents unnecessary zooming
-                dragMode: 'move', // Allows moving the image instead of zooming
-                toggleDragModeOnDblclick: false,
-            });
-
-            imgView.cropper = cropper;
-            cropperContainer.style.display = 'block';
-
-            document.getElementById(`saveButton${index}`).onclick = function () {
-                const canvas = cropper.getCroppedCanvas({
-                    width: 600,
-                    height: 600,
-                    imageSmoothingEnabled: true,
-                    imageSmoothingQuality: 'high'
-                });
-
-                if (canvas) {
-                    const croppedImage = canvas.toDataURL('image/jpeg', 0.9);
-                    cropper.destroy();
-                    imgView.cropper = null;
-
-                    imgView.src = croppedImage;
-                    imgView.style.width = '100%';
-                    imgView.style.height = 'auto';
-
-                    updateThumbnail(croppedImage, index);
-                    cropperContainer.style.display = 'none';
-
-                    fetch(croppedImage)
-                        .then(res => res.blob())
-                        .then(blob => {
-                            const file = new File([blob], `product-image-${index}.jpg`, { type: 'image/jpeg' });
-                            const dataTransfer = new DataTransfer();
-                            dataTransfer.items.add(file);
-                            input.files = dataTransfer.files;
-                        });
-                }
-            };
-        }, 300);
+    reader.onload = function(e) {
+        const imageUrl = e.target.result;
+        imgView.src = imageUrl;
+        updateThumbnail(imageUrl, index);
     };
 
     reader.readAsDataURL(file);
 }
-
-
 
 function updateThumbnail(imageUrl, index) {
     const thumbnailsContainer = document.getElementById('thumbnailsContainer');
@@ -587,7 +449,7 @@ function updateThumbnail(imageUrl, index) {
     
     thumbnail.innerHTML = `
         <img src="${imageUrl}" alt="Product Image ${index}">
-        <span class="remove-icon" onclick="removeThumbnail(${index})">&times;</span>
+        <span class="remove-icon" onclick="removeThumbnail(${index})">×</span>
     `;
     
     thumbnailsContainer.appendChild(thumbnail);
@@ -599,36 +461,29 @@ function removeThumbnail(index) {
         thumbnail.remove();
     }
     
-    // Clear the file input and preview
     const input = document.getElementById(`input${index}`);
     const imgView = document.getElementById(`imgView${index}`);
     input.value = '';
     imgView.src = '';
-    
-    // Hide cropper container
-    const cropperContainer = input.nextElementSibling;
-    cropperContainer.style.display = 'none';
 }
 
+// Form validation
 function validateForm() {
     clearErrorMessages();
     let isValid = true;
 
-    // Validate product name
     const productName = document.getElementsByName("productName")[0].value;
     if (productName.trim() === "") {
         displayErrorMessage("productName-error", "Please enter a product name");
         isValid = false;
     }
 
-    // Validate description
     const description = document.getElementById("descriptionid").value;
     if (description.trim() === "") {
         displayErrorMessage("description-error", "Please enter a product description");
         isValid = false;
     }
 
-    // Validate prices
     const regularPrice = document.getElementsByName("regularPrice")[0].value;
     const salePrice = document.getElementsByName("salePrice")[0].value;
 
@@ -647,43 +502,9 @@ function validateForm() {
         isValid = false;
     }
 
-    // Validate variants
-    const sizeInputs = document.getElementsByName('sizes');
-    const quantityInputs = document.getElementsByName('quantities');
-    
-    for (let i = 0; i < sizeInputs.length; i++) {
-        const size = sizeInputs[i].value;
-        const quantity = quantityInputs[i].value;
-        
-        if (!size || size <= 0) {
-            const errorDiv = sizeInputs[i].parentElement.querySelector('.error-message') 
-                || document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.textContent = 'Please enter a valid size';
-            errorDiv.style.display = 'block';
-            if (!sizeInputs[i].parentElement.querySelector('.error-message')) {
-                sizeInputs[i].parentElement.appendChild(errorDiv);
-            }
-            isValid = false;
-        }
-        
-        if (!quantity || quantity <= 0) {
-            const errorDiv = quantityInputs[i].parentElement.querySelector('.error-message') 
-                || document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.textContent = 'Please enter a valid quantity';
-            errorDiv.style.display = 'block';
-            if (!quantityInputs[i].parentElement.querySelector('.error-message')) {
-                quantityInputs[i].parentElement.appendChild(errorDiv);
-            }
-            isValid = false;
-        }
-    }
-
-    // Validate images
     const thumbnails = document.querySelectorAll('.thumbnail');
     if (thumbnails.length === 0) {
-        displayErrorMessage("images-error", "Please upload at least one product image");
+        alert("Please upload at least one product image");
         isValid = false;
     }
 

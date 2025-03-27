@@ -12,6 +12,10 @@
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
+    <!-- Owl Carousel CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+
     <!-- Css Styles -->
     <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
@@ -35,6 +39,8 @@
             max-width: 500px;
             height: auto;
             border-radius: 10px;
+            display: block;
+            margin: 0 auto; /* Center the main image */
         }
         .zoom:hover {
             transform: scale(1.1);
@@ -44,6 +50,7 @@
             gap: 10px;
             justify-content: center;
             margin-top: 10px;
+            flex-wrap: wrap; /* Allow wrapping for small screens */
         }
         .thumbnails img {
             width: 60px;
@@ -59,7 +66,30 @@
             transform: scale(1.1);
         }
 
-        /* Size Selection Styling */
+        /* Product Details Layout */
+        .product__details__container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+        .product__details__image {
+            flex: 1;
+            min-width: 300px;
+            text-align: center; /* Center content in mobile */
+        }
+        .product__details__info {
+            flex: 1;
+            min-width: 300px;
+        }
+        .product__details__text h4 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .rating {
+            margin-bottom: 15px;
+        }
         .product__details__option__size {
             margin: 20px 0;
         }
@@ -89,8 +119,9 @@
         .product__details__option__size input[type="radio"] {
             display: none;
         }
-
-        /* Cart Button Styling */
+        .product__details__cart__option {
+            margin: 20px 0;
+        }
         .product__details__cart__option .primary-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
@@ -98,15 +129,13 @@
         .product__details__cart__option .pro-qty {
             margin-right: 15px;
         }
+        .product__details__btns__option {
+            margin-top: 20px;
+        }
 
-        /* Similar Products (unchanged) */
+        /* Similar Products Section */
         .similar-products {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 40px 0;
         }
         .similar-products h2 {
             font-size: 24px;
@@ -114,317 +143,734 @@
             margin-bottom: 20px;
             text-align: center;
             font-weight: 600;
+            font-family: 'Nunito Sans', sans-serif;
         }
-        .product-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            justify-content: center;
-        }
-        .product-item {
-            flex: 0 0 calc(25% - 22.5px);
-            background: #f5f5f5;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            padding: 15px;
-            transition: transform 0.3s ease;
-            position: relative;
+        .product__item {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 10px auto; /* Center item */
             overflow: hidden;
-            border: 2px solid #007bff;
+            text-align: center;
+            max-width: 300px;
+            position: relative;
         }
-        .product-item:hover {
-            transform: translateY(-5px);
+        .product__item__pic {
+            padding-top: 100%;
+            position: relative;
+            background: #f5f5f5;
         }
-        .product-item:hover .card-body h3 {
-            display: none;
-        }
-        .product-item:hover .add-to-cart {
-            display: block;
-        }
-        .card-content { padding: 10px; }
-        .card-body h3 {
-            font-size: 20px;
-            color: #000;
-            margin: 10px 0;
-            font-weight: bold;
-            transition: opacity 0.3s ease;
-        }
-        .card-body p {
-            font-size: 14px;
-            color: #333;
-            margin: 5px 0;
-        }
-        .size-button {
-            display: inline-block;
-            padding: 8px 16px;
-            background: #27ae60;
-            color: white;
-            border-radius: 5px;
-            font-size: 14px;
-            margin: 10px 0;
-        }
-        .rating { font-size: 18px; color: #ffd700; margin: 10px 0; }
-        .product-item img {
+        .product__item__pic .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 5px;
-            margin-top: 10px;
-            display: block;
+            height: 100%;
+            object-fit: contain;
+            border-bottom: 1px solid #eee;
         }
-        .add-to-cart {
+        .product__item__text {
+            padding: 15px;
+            font-family: 'Nunito Sans', sans-serif;
+        }
+        .product__item__text .product-name {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .product__item__text .product-category {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .product__item__text .product-price {
+            margin-bottom: 15px;
+        }
+        .product__item__text .mrp {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .product__item__text .sale-price {
+            color: #e74c3c;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .wishlist-icon {
+            position: absolute;
+            left: -50px;
+            top: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+        }
+        .wishlist-icon img {
+            width: 20px;
+            height: 20px;
+        }
+        .product__item:hover .wishlist-icon {
+            left: 10px;
+        }
+        .product__carousel .owl-nav button {
             position: absolute;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 12px 24px;
-            background: #000;
-            color: white;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #333;
+            background: rgba(255, 255, 255, 0.8);
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: opacity 0.3s ease;
-            z-index: 1;
-            display: none;
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            transition: background 0.3s ease;
         }
-        .product-item a { text-decoration: none; color: inherit; display: block; }
-        @media (max-width: 991px) { .product-item { flex: 0 0 calc(33.33% - 20px); } }
-        @media (max-width: 767px) { .product-item { flex: 0 0 calc(50% - 15px); } }
-        @media (max-width: 575px) { .product-item { flex: 0 0 100%; } }
+        .product__carousel .owl-nav button:hover {
+            background: #007bff;
+            color: #fff;
+        }
+        .product__carousel .owl-prev {
+            left: -50px;
+        }
+        .product__carousel .owl-next {
+            right: -50px;
+        }
+        .product__carousel .owl-dots {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .product__carousel .owl-dot {
+            display: inline-block;
+            margin: 0 5px;
+        }
+        .product__carousel .owl-dot span {
+            width: 10px;
+            height: 10px;
+            background: #ddd;
+            border-radius: 50%;
+            display: block;
+        }
+        .product__carousel .owl-dot.active span {
+            background: #007bff;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991px) {
+            .product__details__container {
+                gap: 20px;
+            }
+            .product__details__image, .product__details__info {
+                min-width: 100%; /* Full width on smaller screens */
+            }
+            .zoom {
+                max-width: 400px; /* Slightly smaller main image */
+            }
+            .thumbnails img {
+                width: 50px;
+                height: 50px;
+            }
+            .product__item {
+                max-width: 250px;
+            }
+            .product__carousel .owl-prev {
+                left: -40px;
+            }
+            .product__carousel .owl-next {
+                right: -40px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .product__details__container {
+                gap: 15px;
+                padding: 0 10px; /* Add padding to container */
+            }
+            .product__details__image {
+                margin: 0 auto; /* Center the image section */
+                padding: 10px 0;
+            }
+            .zoom {
+                max-width: 300px; /* Further reduce main image size */
+            }
+            .thumbnails {
+                margin-top: 15px;
+                gap: 8px;
+            }
+            .thumbnails img {
+                width: 45px;
+                height: 45px;
+            }
+            .product__details__text h4 {
+                font-size: 20px;
+            }
+            .product__details__option__size label {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+            .product__details__cart__option .pro-qty {
+                margin-right: 10px;
+            }
+            .product__details__cart__option .primary-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            .similar-products {
+                padding: 30px 0;
+            }
+            .similar-products h2 {
+                font-size: 20px;
+            }
+            .product__item {
+                max-width: 280px; /* Slightly larger for single item */
+            }
+            .product__item__text .product-name {
+                font-size: 16px;
+            }
+            .product__item__text .product-category {
+                font-size: 12px;
+            }
+            .product__item__text .sale-price {
+                font-size: 16px;
+            }
+            .product__item__text .mrp {
+                font-size: 12px;
+            }
+            .product__carousel .owl-prev {
+                left: -30px;
+            }
+            .product__carousel .owl-next {
+                right: -30px;
+            }
+            .product__carousel .owl-nav button {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .product__details__container {
+                gap: 10px;
+                padding: 0 5px;
+            }
+            .zoom {
+                max-width: 100%; /* Full width for very small screens */
+            }
+            .thumbnails {
+                gap: 5px;
+            }
+            .thumbnails img {
+                width: 40px;
+                height: 40px;
+            }
+            .product__details__text h4 {
+                font-size: 18px;
+            }
+            .product__details__option__size label {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            .product__details__cart__option .pro-qty {
+                margin-right: 5px;
+            }
+            .product__details__cart__option .primary-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+            .similar-products {
+                padding: 20px 0;
+            }
+            .similar-products h2 {
+                font-size: 18px;
+            }
+            .product__item {
+                max-width: 250px; /* Adjusted for single item */
+            }
+            .product__item__text {
+                padding: 10px;
+            }
+            .product__item__text .product-name {
+                font-size: 14px;
+            }
+            .product__item__text .product-category {
+                font-size: 11px;
+            }
+            .product__item__text .sale-price {
+                font-size: 14px;
+            }
+            .product__item__text .mrp {
+                font-size: 11px;
+            }
+            .wishlist-icon {
+                width: 35px;
+                height: 35px;
+            }
+            .wishlist-icon img {
+                width: 18px;
+                height: 18px;
+            }
+            .product__carousel .owl-prev {
+                left: -20px;
+            }
+            .product__carousel .owl-next {
+                right: -20px;
+            }
+            .product__carousel .owl-nav button {
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
+            }
+        }
+
+        /* Header Styles from Shop Page */
+        .header {
+            position: relative;
+            z-index: 500;
+        }
+
+        .header__top, .header .container {
+            padding: 0;
+        }
+
+        .header__menu {
+            margin-bottom: 0;
+        }
+
+        .header__main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 15px;
+            background: #fff;
+        }
+
+        .header__logo {
+            flex: 0 0 auto;
+        }
+
+        .header__logo img {
+            height: 25px;
+            margin-left: 70px;
+            width: auto;
+        }
+
+        .header__menu ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header__menu ul li {
+            margin: 0 15px;
+        }
+
+        .header__menu ul li a {
+            font-size: 16px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .header__nav__option {
+            display: flex;
+            align-items: center;
+        }
+
+        .header__nav__option a {
+            margin-left: 15px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .mobile-dropdown {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .mobile-dropdown.active {
+            right: 0;
+            display: block;
+        }
+
+        .mobile-dropdown ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .mobile-dropdown ul li {
+            margin: 15px 0;
+        }
+
+        .mobile-dropdown ul li a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            display: block;
+            padding: 10px;
+        }
+
+        .mobile-dropdown ul li a:hover {
+            background: #f1f1f1;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .dropdown {
+            display: inline-block;
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            right: 0;
+            border-radius: 4px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-btn {
+            cursor: pointer;
+        }
+
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 10px 0;
+        }
+
+        .bottom-nav ul {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .bottom-nav ul li {
+            text-align: center;
+        }
+
+        .bottom-nav ul li a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .bottom-nav ul li a i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 991px) {
+            .header__menu {
+                display: none;
+            }
+            .header__nav__option {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .header__top__right {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+            .header__top {
+                padding: 5px 0;
+            }
+            .header__top__left p {
+                font-size: 12px;
+                margin-bottom: 0;
+            }
+            .header__top__links a, .dropdown-btn {
+                font-size: 14px;
+            }
+            .header__main {
+                padding: 5px 10px;
+            }
+            .header__logo img {
+                height: 25px;
+                margin-left: 10px;
+            }
+            .bottom-nav {
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header__top__left p {
+                font-size: 10px;
+            }
+            .header__top__links a, .dropdown-btn {
+                font-size: 12px;
+            }
+            .header__main {
+                padding: 3px 10px;
+            }
+            .mobile-menu-btn {
+                font-size: 18px;
+                padding: 3px;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <!-- Header Section -->
+    <!-- Header Section Begin -->
     <header class="header">
-        <div class="header__top">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 col-md-7">
-                        <div class="header__top__left">
-                            <p>Free shipping, 30-day return or refund guarantee.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-5">
-                        <div class="header__top__right">
-                            <div class="header__top__links">
-                                <% if (user) { %>
-                                    <a href="/profile">My Account</a>
-                                    <a href="/logout">Logout</a>
-                                <% } else { %>
-                                    <a href="/login">Sign in</a>
-                                <% } %>
-                                <a href="#">FAQs</a>
-                            </div>
-                            <div class="header__top__hover">
-                                <span>USD <i class="arrow_carrot-down"></i></span>
-                                <ul>
-                                    <li>USD</li>
-                                    <li>EUR</li>
-                                    <li>INR</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="header__main">
+            <div class="header__logo">
+                <a href="/"><img src="/images/SNEAKKISH-26-03-.png" alt="SNEAKKISH Logo"></a>
             </div>
-        </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-3">
-                    <div class="header__logo">
-                        <a href="/"><img src="/img/logo.png" alt=""></a>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <nav class="header__menu mobile-menu">
-                        <ul>
-                            <li><a href="/">Home</a></li>
-                            <li class="active"><a href="/shop">Shop</a></li>
-                            <li><a href="#">Pages</a>
-                                <ul class="dropdown">
-                                    <li><a href="/about">About Us</a></li>
-                                    <li><a href="/shop-details">Shop Details</a></li>
-                                    <li><a href="/cart">Shopping Cart</a></li>
-                                    <li><a href="/checkout">Check Out</a></li>
-                                    <li><a href="/blog-details">Blog Details</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="/blog">Blog</a></li>
-                            <li><a href="/contact">Contacts</a></li>
+            <nav class="header__menu">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li class="active"><a href="/shop">Shop</a></li>
+                    <li><a href="#">Brands</a>
+                        <ul class="dropdown">
+                            <li><a href="./about.html">Adidas</a></li>
+                            <li><a href="./shop-details.html">Nike</a></li>
+                            <li><a href="./shopping-cart.html">New Balance</a></li>
+                            <li><a href="./checkout.html">Reebok</a></li>
                         </ul>
-                    </nav>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="header__nav__option">
-                        <a href="#" class="search-switch"><img src="/img/icon/search.png" alt=""></a>
-                        <a href="/wishlist"><img src="/img/icon/heart.png" alt=""></a>
-                        <a href="/cart"><img src="/img/icon/cart.png" alt=""> <span id="cart-count">0</span></a>
-                        <div class="price" id="cart-total">$0.00</div>
-                    </div>
-                </div>
+                    </li>
+                    <li><a href="/contact">Contacts</a></li>
+                </ul>
+            </nav>
+            <div class="header__nav__option">
+                <a href="#" class="search-switch"><img src="/img/icon/search.png" alt=""></a>
+                <a href="/wishlist"><img src="/img/icon/heart.png" alt=""></a>
+                <a href="/cart"><img src="/img/icon/cart.png" alt=""> <span id="cart-count">0</span></a>
+                <div class="price" id="cart-total">$0.00</div>
             </div>
-            <div class="canvas__open"><i class="fa fa-bars"></i></div>
+            <div class="mobile-menu-btn"><i class="fa fa-bars"></i></div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div class="mobile-dropdown">
+            <span class="close-btn">×</span>
+            <ul>
+                <li><a href="/userProfile">Profile</a></li>
+                <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
         </div>
     </header>
+    <!-- Header Section End -->
+
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="bottom-nav">
+        <ul>
+            <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
+            <li><a href="/product-page"><i class="fa fa-shopping-bag"></i> Shop</a></li>
+            <li><a href="/cart"><i class="fa fa-shopping-cart"></i> Cart</a></li>
+            <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+            <li><a href="/userProfile"><i class="fa fa-user"></i> <%= locals.user ? locals.user.FirstName : 'Profile' %></a></li>
+        </ul>
+    </nav>
 
     <!-- Shop Details Section -->
     <section class="shop-details">
-        <div class="product__details__pic">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="product__details__breadcrumb">
-                            <a href="/">Home</a>
-                            <a href="/shop">Shop</a>
-                            <span>Product Details</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-3 col-md-3">
-                        <div class="thumbnails" id="thumbnailList">
-                            <% if (product.ProductImage && product.ProductImage.length > 0) { %>
-                                <% product.ProductImage.forEach((image, index) => { %>
-                                    <img src="/uploads/re-image/<%= image || '/img/shop-details/thumb-1.png' %>" 
-                                         alt="Thumbnail <%= index + 1 %>" 
-                                         class="thumbnail" 
-                                         onclick="changeMainImage('<%= image %>', this)">
-                                <% }); %>
-                            <% } else { %>
-                                <img src="/img/shop-details/thumb-1.png" 
-                                     alt="Default Thumbnail" 
-                                     class="thumbnail" 
-                                     onclick="changeMainImage('/img/shop-details/thumb-1.png', this)">
-                            <% } %>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-9">
-                        <div class="product__details__pic__item">
-                            <img src="<%= product.ProductImage && product.ProductImage.length > 0 ? '/uploads/re-image/' + product.ProductImage[0] : '/img/shop-details/product-big-2.png' %>" 
-                                 alt="<%= product.ProductName || 'Product Image' %>" 
-                                 id="mainImage" 
-                                 class="zoom">
-                        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="product__details__breadcrumb">
+                        <a href="/">Home</a>
+                        <a href="/product-page">Shop</a>
+                        <span>Product Details</span>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="product__details__content">
-            <div class="container">
-                <div class="row d-flex justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="product__details__text">
-                            <h4><%= product.ProductName || 'Product Name' %></h4>
-                            <div class="rating">
-                                <% for (let i = 1; i <= 5; i++) { %>
-                                    <% if (i <= Math.floor(product.rating || 0)) { %>
-                                        <i class="fa fa-star"></i>
-                                    <% } else if (i - (product.rating || 0) < 1 && i - (product.rating || 0) > 0) { %>
-                                        <i class="fa fa-star-half-o"></i>
-                                    <% } else { %>
-                                        <i class="fa fa-star-o"></i>
-                                    <% } %>
-                                <% } %>
-                                <span> - <%= (product.rating || 0).toFixed(1) %> Rating</span>
-                            </div>
-                            <% if (totalOffer > 0) { %>
-                                <h3>$<%= (product.SalePrice || 0).toFixed(2) %> 
-                                    <span>$<%= (product.RegularPrice || 0).toFixed(2) %></span>
-                                    <span class="discount-label"><%= totalOffer %>% OFF</span>
-                                </h3>
-                            <% } else { %>
-                                <h3>$<%= (product.SalePrice || 0).toFixed(2) %></h3>
-                            <% } %>
-                            <p><%= product.Description || 'No description available' %></p>
-                            <div class="product__details__option">
-                                <div class="product__details__option__size">
-                                    <span>Size:</span>
-                                    <% if (product.Variants && product.Variants.length > 0) { %>
-                                        <% product.Variants.forEach((variant, idx) => { %>
-                                            <label for="size-<%= variant.Size %>">
-                                                <%= variant.Size %>
-                                                <input type="radio" id="size-<%= variant.Size %>" name="size" value="<%= variant.Size %>" 
-                                                    <%= idx === 0 ? 'checked' : '' %> data-quantity="<%= variant.Quantity || 0 %>">
-                                            </label>
-                                        <% }); %>
-                                    <% } else { %>
-                                        <label>Not Available</label>
-                                    <% } %>
-                                </div>
-                            </div>
-                            <div class="product__details__cart__option">
-                                <div class="quantity">
-                                    <div class="pro-qty">
-                                        <input type="text" value="1" id="qty" min="1" 
-                                               max="<%= product.Variants && product.Variants.length > 0 ? Math.min(product.Variants[0].Quantity, 7) : 0 %>">
-                                    </div>
-                                </div>
-                                <% if (product.Status === "Available" && !product.isBlocked && product.Variants && product.Variants.some(v => v.Quantity > 0)) { %>
-                                    <a href="javascript:void(0)" onclick="addToCart('<%= product._id %>')" class="primary-btn">Add to Cart</a>
-                                <% } else { %>
-                                    <button class="primary-btn" disabled>Out of Stock</button>
-                                <% } %>
-                            </div>
-                            <div class="product__details__btns__option">
-                                <a href="javascript:void(0)" onclick="addToWishlist('<%= product._id %>')">
-                                    <i class="fa fa-heart"></i> Add to Wishlist
-                                </a>
-                            </div>
-                        </div>
+            <div class="product__details__container">
+                <div class="product__details__image">
+                    <div class="product__details__pic__item">
+                        <img src="<%= product.ProductImage && product.ProductImage.length > 0 ? '/uploads/re-image/' + product.ProductImage[0] : '/img/shop-details/product-big-2.png' %>" 
+                             alt="<%= product.ProductName || 'Product Image' %>" 
+                             id="mainImage" 
+                             class="zoom">
+                    </div>
+                    <div class="thumbnails" id="thumbnailList">
+                        <% if (product.ProductImage && product.ProductImage.length > 1) { %>
+                            <% product.ProductImage.slice(1).forEach((image, index) => { %>
+                                <img src="/uploads/re-image/<%= image || '/img/shop-details/thumb-1.png' %>" 
+                                     alt="Thumbnail <%= index + 2 %>" 
+                                     class="thumbnail" 
+                                     onclick="changeMainImage('<%= image %>', this)">
+                            <% }); %>
+                        <% } %>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="product__details__tab">
-                            <ul class="nav nav-tabs" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-toggle="tab" href="#tabs-desc" role="tab">Description</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#tabs-reviews" role="tab">Customer Reviews</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#tabs-info" role="tab">Additional information</a>
-                                </li>
-                            </ul>
-                            <div class="tab-content">
-                                <div class="tab-pane active" id="tabs-desc" role="tabpanel">
-                                    <div class="product__details__tab__content">
-                                        <p class="note"><%= product.Description || 'No description available' %></p>
-                                        <div class="product__details__tab__content__item">
-                                            <h5>Product Information</h5>
-                                            <p>Brand: <%= product.Brands || 'N/A' %></p>
-                                            <p>Color: <%= product.Colour || 'N/A' %></p>
-                                            <p>Category: <%= (category ? category.Name : 'Not Available') || 'N/A' %></p>
-                                        </div>
+                <div class="product__details__info">
+                    <div class="product__details__text">
+                        <h4><%= product.ProductName || 'Product Name' %></h4>
+                        <div class="rating">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <% if (i <= Math.floor(product.rating || 0)) { %>
+                                    <i class="fa fa-star"></i>
+                                <% } else if (i - (product.rating || 0) < 1 && i - (product.rating || 0) > 0) { %>
+                                    <i class="fa fa-star-half-o"></i>
+                                <% } else { %>
+                                    <i class="fa fa-star-o"></i>
+                                <% } %>
+                            <% } %>
+                            <span> - <%= (product.rating || 0).toFixed(1) %> Rating</span>
+                        </div>
+                        <% if (totalOffer > 0) { %>
+                            <h3><%= (product.SalePrice || 0).toFixed(2) %> 
+                                <span><%= (product.RegularPrice || 0).toFixed(2) %></span>
+                                <span class="discount-label"><%= totalOffer %>% OFF</span>
+                            </h3>
+                        <% } else { %>
+                            <h3>$<%= (product.SalePrice || 0).toFixed(2) %></h3>
+                        <% } %>
+                        <p><%= product.Description || 'No description available' %></p>
+                        <div class="product__details__option">
+                            <div class="product__details__option__size">
+                                <span>Size:</span>
+                                <% if (product.Variants && product.Variants.length > 0) { %>
+                                    <% product.Variants.forEach((variant, idx) => { %>
+                                        <label for="size-<%= variant.Size %>">
+                                            <%= variant.Size %>
+                                            <input type="radio" id="size-<%= variant.Size %>" name="size" value="<%= variant.Size %>" 
+                                                <%= idx === 0 ? 'checked' : '' %> data-quantity="<%= variant.Quantity || 0 %>">
+                                        </label>
+                                    <% }); %>
+                                <% } else { %>
+                                    <label>Not Available</label>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="product__details__cart__option">
+                            <div class="quantity">
+                                <div class="pro-qty">
+                                    <input type="text" value="1" id="qty" min="1" 
+                                           max="<%= product.Variants && product.Variants.length > 0 ? Math.min(product.Variants[0].Quantity, 7) : 0 %>">
+                                </div>
+                            </div>
+                            <% if (product.Status === "Available" && !product.isBlocked && product.Variants && product.Variants.some(v => v.Quantity > 0)) { %>
+                                <a href="javascript:void(0)" onclick="addToCart('<%= product._id %>')" class="primary-btn">Add to Cart</a>
+                            <% } else { %>
+                                <button class="primary-btn" disabled>Out of Stock</button>
+                            <% } %>
+                        </div>
+                        <%if(product){%>
+                        <div class="product__details__btns__option">
+                            <a href="javascript:void(0)" onclick="addToWishlist('<%= product._id %>')">
+                                <i class="fa fa-heart"></i> Add to Wishlist
+                            </a>
+                        </div>
+                        <%}%>
+                    </div>
+                    <div class="product__details__tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#tabs-desc" role="tab">Description</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-reviews" role="tab">Customer Reviews</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-info" role="tab">Additional information</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tabs-desc" role="tabpanel">
+                                <div class="product__details__tab__content">
+                                    <p class="note"><%= product.Description || 'No description available' %></p>
+                                    <div class="product__details__tab__content__item">
+                                        <h5>Product Information</h5>
+                                        <p>Brand: <%= product.Brands || 'N/A' %></p>
+                                        <p>Color: <%= product.Colour || 'N/A' %></p>
+                                        <p>Category: <%= (category ? category.Name : 'Not Available') || 'N/A' %></p>
+                                        <p>Available Quantity: <span id="selectedSizeQuantity"><%= product.Variants && product.Variants.length > 0 ? product.Variants[0].Quantity : 'N/A' %></span></p>
                                     </div>
                                 </div>
-                                <div class="tab-pane" id="tabs-reviews" role="tabpanel">
-                                    <div class="product__details__tab__content">
-                                        <div class="product__details__tab__content__item">
-                                            <h5>Customer Reviews</h5>
-                                            <p>No reviews yet. Be the first to review this product.</p>
-                                        </div>
+                            </div>
+                            <div class="tab-pane" id="tabs-reviews" role="tabpanel">
+                                <div class="product__details__tab__content">
+                                    <div class="product__details__tab__content__item">
+                                        <h5>Customer Reviews</h5>
+                                        <p>No reviews yet. Be the first to review this product.</p>
                                     </div>
                                 </div>
-                                <div class="tab-pane" id="tabs-info" role="tabpanel">
-                                    <div class="product__details__tab__content">
-                                        <div class="product__details__tab__content__item">
-                                            <h5>Specifications</h5>
-                                            <p>Brand: <%= product.Brands || 'N/A' %></p>
-                                            <p>Color: <%= product.Colour || 'N/A' %></p>
-                                            <p>Available Sizes: 
-                                                <% if (product.Variants && product.Variants.length > 0) { %>
-                                                    <%= product.Variants.map(v => v.Size).join(', ') || 'Not Available' %>
-                                                <% } else { %>
-                                                    Not Available
-                                                <% } %>
-                                            </p>
-                                            <p>Status: <%= product.Status || 'N/A' %></p>
-                                        </div>
+                            </div>
+                            <div class="tab-pane" id="tabs-info" role="tabpanel">
+                                <div class="product__details__tab__content">
+                                    <div class="product__details__tab__content__item">
+                                        <h5>Specifications</h5>
+                                        <p>Brand: <%= product.Brands || 'N/A' %></p>
+                                        <p>Color: <%= product.Colour || 'N/A' %></p>
+                                        <p>Available Sizes: 
+                                            <% if (product.Variants && product.Variants.length > 0) { %>
+                                                <%= product.Variants.map(v => v.Size).join(', ') || 'Not Available' %>
+                                            <% } else { %>
+                                                Not Available
+                                            <% } %>
+                                        </p>
+                                        <p>Status: <%= product.Status || 'N/A' %></p>
                                     </div>
                                 </div>
                             </div>
@@ -435,29 +881,50 @@
         </div>
     </section>
 
-    <!-- Related Section -->
-    <div class="similar-products">
-        <h2>Similar Products</h2>
-        <div class="product-list">
-            <% for (let i = 0; i < similarProducts.length; i++) { %>
-                <a href="/productDetails?id=<%= similarProducts[i]._id%>">
-                    <div class="product-item">
-                        <div class="card-content">
-                            <div class="card-body">
-                                <h3><%= similarProducts[i].ProductName || 'RAZO' %></h3>
-                                <p>$<%= (similarProducts[i].SalePrice || 14000).toFixed(2) %></p>
-                                <p>Available Sizes:</p>
-                                <div class="size-button">6</div>
-                                <div class="rating">★★★★★</div>
+    <!-- Similar Products Section -->
+    <section class="similar-products spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>Similar Products</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="owl-carousel owl-theme product__carousel">
+                        <% for (let i = 0; i < similarProducts.length; i++) { %>
+                            <div class="product__item">
+                                <a href="/productDetails?id=<%= similarProducts[i]._id %>">
+                                    <div class="product__item__pic">
+                                        <img src="/uploads/re-image/<%= similarProducts[i].ProductImage[0] %>" 
+                                             alt="<%= similarProducts[i].ProductName %>" 
+                                             class="product-image">
+                                    </div>
+                                    <div class="product__item__text">
+                                        <h6 class="product-name"><%= similarProducts[i].ProductName || 'RAZO' %></h6>
+                                        <p class="product-category">Men's Shoes</p>
+                                        <div class="product-price">
+                                            <% if (similarProducts[i].SalePrice < similarProducts[i].RegularPrice) { %>
+                                                <span class="mrp">$<%= (similarProducts[i].RegularPrice || 0).toFixed(2) %></span>
+                                                <span class="sale-price">$<%= (similarProducts[i].SalePrice || 0).toFixed(2) %></span>
+                                            <% } else { %>
+                                                <span class="sale-price">$<%= (similarProducts[i].SalePrice || 0).toFixed(2) %></span>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </a>
+                                <div class="wishlist-icon">
+                                    <a href="javascript:void(0)" onclick="addToWishlist('<%= similarProducts[i]._id %>')">
+                                        <img src="/img/icon/heart.png" alt="Wishlist">
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                        <img src="/uploads/re-image/<%= similarProducts[i].ProductImage[0] %>" alt="Similar Product">
-                        <button class="add-to-cart">Add to Cart</button>
+                        <% } %>
                     </div>
-                </a>
-            <% } %>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
     <!-- Footer Section -->
     <footer class="footer">
@@ -466,7 +933,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-6">
                     <div class="footer__about">
                         <div class="footer__logo">
-                            <a href="#"><img src="/img/footer-logo.png" alt=""></a>
+                            <a href="#"><img src="/images/SNEAKKISH-26-03-2025 (1).png" alt=""></a>
                         </div>
                         <p>The customer is at the heart of our unique business model, which includes design.</p>
                         <a href="#"><img src="/img/payment.png" alt=""></a>
@@ -531,11 +998,24 @@
     <script src="/js/mixitup.min.js"></script>
     <script src="/js/owl.carousel.min.js"></script>
     <script src="/js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
     <!-- JavaScript Logic -->
     <script>
         $(document).ready(function() {
-            // Initialize Size Selection
+            // Function to update quantity display
+            function updateQuantityDisplay(quantity) {
+                $('#selectedSizeQuantity').text(quantity || 'N/A');
+            }
+
+            // Initialize quantity display with the default selected size
+            const defaultSize = $('input[name="size"]:checked');
+            if (defaultSize.length > 0) {
+                const defaultQuantity = defaultSize.data('quantity');
+                updateQuantityDisplay(defaultQuantity);
+            }
+
+            // Handle size selection change
             $('input[name="size"]').change(function() {
                 const quantity = $(this).data('quantity');
                 $('#qty').attr('max', Math.min(quantity, 7));
@@ -543,99 +1023,99 @@
                 if (currentQty > Math.min(quantity, 7)) {
                     $('#qty').val(Math.min(quantity, 7));
                 }
-                // Update active class
                 $('.product__details__option__size label').removeClass('active');
                 $(this).parent('label').addClass('active');
+                updateQuantityDisplay(quantity);
             });
 
-            // Ensure initial active state
-            $('input[name="size"]:checked').parent('label').addClass('active');
+            // Initialize Owl Carousel for Similar Products
+            $('.product__carousel').owlCarousel({
+                loop: true,
+                margin: 20,
+                nav: true,
+                dots: true,
+                responsive: {
+                    0: { items: 1 },    // 1 item for mobile view
+                    600: { items: 2 },  // 2 items for tablets
+                    1000: { items: 4 }  // 4 items for desktop
+                }
+            });
+
+            // Mobile menu toggle
+            $('.mobile-menu-btn').click(function() {
+                $('.mobile-dropdown').addClass('active');
+            });
+
+            $('.close-btn').click(function() {
+                $('.mobile-dropdown').removeClass('active');
+            });
+
+            // Desktop dropdown
+            $('.dropdown-btn').click(function(e) {
+                e.preventDefault();
+                $(this).parent('.dropdown').toggleClass('active');
+            });
+
+            // Close desktop dropdown when clicking outside
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    $('.dropdown').removeClass('active');
+                }
+            });
         });
 
-        // Change Main Image
         function changeMainImage(imageSrc, thumbnailElement) {
             const mainImage = document.getElementById('mainImage');
-            const currentMainSrc = mainImage.src.split('/uploads/re-image/')[1] || mainImage.src.split('/img/shop-details/')[1];
-            mainImage.src = '/uploads/re-image/' + imageSrc;
-            thumbnailElement.src = '/uploads/re-image/' + currentMainSrc || '/img/shop-details/thumb-1.png';
             const thumbnails = document.getElementById('thumbnailList');
-            thumbnails.prepend(thumbnailElement);
+            const currentMainSrc = mainImage.src.split('/uploads/re-image/')[1] || '/img/shop-details/product-big-2.png';
+            mainImage.src = '/uploads/re-image/' + imageSrc;
+            
+            const newThumbnail = document.createElement('img');
+            newThumbnail.src = '/uploads/re-image/' + currentMainSrc;
+            newThumbnail.alt = 'Thumbnail';
+            newThumbnail.className = 'thumbnail';
+            newThumbnail.onclick = function() { changeMainImage(currentMainSrc, this); };
+            
+            thumbnails.insertBefore(newThumbnail, thumbnails.firstChild);
+            thumbnails.removeChild(thumbnailElement);
         }
 
-        // Add to Cart Function with SweetAlert2
-       // Add to Cart Function with SweetAlert2
-function addToCart(productId) {
-    const quantity = parseInt($('#qty').val());
-    const selectedSize = $('input[name="size"]:checked').val();
+        function addToCart(productId) {
+            const quantity = parseInt($('#qty').val());
+            const selectedSize = $('input[name="size"]:checked').val();
 
-    if (!selectedSize) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Size Required',
-            text: 'Please select a size before adding to cart.',
-            confirmButtonColor: '#007bff'
-        });
-        return;
-    }
-
-    $.ajax({
-        url: '/cart/add/' + productId,
-        method: 'POST',
-        data: {
-            quantity: quantity,
-            size: selectedSize
-        },
-        success: function(response) {
-            if (response.success) {
+            if (!selectedSize) {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Product added to cart successfully!',
-                    confirmButtonColor: '#007bff'
-                }).then(() => {
-                    // Redirect to /productDetails with productId
-                    window.location.href = '/productDetails?id=' + productId;
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: response.message || 'Failed to add product to cart',
+                    icon: 'warning',
+                    title: 'Size Required',
+                    text: 'Please select a size before adding to cart.',
                     confirmButtonColor: '#007bff'
                 });
+                return;
             }
-        },
-        error: function(err) {
-            console.error(err);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Something went wrong. Please try again.',
-                confirmButtonColor: '#007bff'
-            });
-        }
-    });
-}
 
-        // Add to Wishlist Function with SweetAlert2
-        function addToWishlist(productId) {
             $.ajax({
-                url: '/add-to-wishlist',
+                url: '/cart/add/' + productId,
                 method: 'POST',
-                data: { productId: productId },
+                data: {
+                    quantity: quantity,
+                    size: selectedSize
+                },
                 success: function(response) {
                     if (response.success) {
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
-                            text: 'Product added to wishlist successfully!',
+                            text: 'Product added to cart successfully!',
                             confirmButtonColor: '#007bff'
+                        }).then(() => {
+                            window.location.href = '/productDetails?id=' + productId;
                         });
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: response.message || 'Failed to add product to wishlist',
+                            text: response.message || 'Failed to add product to cart',
                             confirmButtonColor: '#007bff'
                         });
                     }
@@ -647,6 +1127,39 @@ function addToCart(productId) {
                         title: 'Oops...',
                         text: 'Something went wrong. Please try again.',
                         confirmButtonColor: '#007bff'
+                    });
+                }
+            });
+        }
+
+        function addToWishlist(productId) {
+            $.ajax({
+                url: '/addToWishlist',
+                method: "POST",
+                data: { productId: productId },
+                success: (response) => {
+                    if (response.status) {
+                        Swal.fire({
+                            title: 'Added To Wishlist',
+                            text: 'The Product Has Been Added To Your Wishlist',
+                            icon: 'success',
+                            timer: 2000
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Already In Wishlist',
+                            text: response.message,
+                            icon: 'info',
+                            timer: 2000
+                        });
+                    }
+                },
+                error: (error) => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'There Was An Error While Adding The Product To Wishlist',
+                        icon: 'error',
+                        timer: 2000
                     });
                 }
             });

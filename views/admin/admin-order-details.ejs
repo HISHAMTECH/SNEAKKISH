@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SNEAKKISH Admin | Order Details - <%= order.OrderId || order._id %></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background: var(--background-dark);
             color: var(--text-primary);
             min-height: 100vh;
+            margin: 0;
         }
 
         :root {
@@ -37,38 +39,47 @@
         }
 
         .container {
-            max-width: 800px;
-            width: 100%;
+            max-width: 900px;
+            width: calc(100% - 40px); /* Adjust for padding and sidebar */
             padding: 0 20px;
         }
 
         .order-details-container {
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.8);
             border-radius: 8px;
-            padding: 20px;
-            border: 1px solid #333;
+            padding: 30px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
         .order-details-container h1 {
             color: var(--primary-color);
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 26px;
+            margin-bottom: 25px;
             text-align: center;
         }
 
-        .order-info, .items, .totals {
-            margin-bottom: 20px;
+        .order-section {
+            margin-bottom: 30px;
         }
 
-        .order-info p, .items p, .totals p {
+        .order-section h3 {
+            color: var(--text-secondary);
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+
+        .order-section p {
             font-size: 16px;
             color: var(--text-primary);
             margin: 10px 0;
         }
 
-        .order-info p strong, .items p strong, .totals p strong {
+        .order-section p strong {
             color: var(--text-secondary);
+            min-width: 120px;
+            display: inline-block;
         }
 
         .status-select {
@@ -89,6 +100,7 @@
             border-radius: 4px;
             cursor: pointer;
             margin-top: 10px;
+            transition: background 0.3s ease;
         }
 
         .update-btn:hover {
@@ -102,11 +114,125 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 10px;
+            transition: background 0.3s ease;
+            display: inline-block;
         }
 
         .return-btn:hover {
             background: #cc3333;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 25px;
+            width: 450px;
+            max-width: 90%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+        }
+
+        .modal-content h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: var(--card-dark);
+            color: var(--text-primary);
+            resize: vertical;
+            font-size: 14px;
+        }
+
+        .form-group input[type="radio"] {
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .form-group label.radio-label {
+            display: inline;
+            margin-right: 20px;
+            font-weight: normal;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .form-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            flex: 1;
+        }
+
+        .accept-btn {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .accept-btn:hover {
+            background: #16a34a;
+        }
+
+        .deny-btn {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .deny-btn:hover {
+            background: #cc3333;
+        }
+
+        .modal-cancel-btn {
+            background: #666;
+            color: white;
+        }
+
+        .modal-cancel-btn:hover {
+            background: #555;
+        }
+
+        #returnReasonError {
+            margin-top: 5px;
+            color: var(--danger-color);
+            font-size: 12px;
+            display: none;
         }
     </style>
 </head>
@@ -118,55 +244,78 @@
             <div class="order-details-container">
                 <h1>Order Details - <%= order.OrderId || order._id %></h1>
 
-                <div class="order-info">
-                    <p><strong>Customer:</strong> <%= (order.userId && order.userId.name) ? order.userId.name : 'N/A' %> (<%= (order.userId && order.userId.email) ? order.userId.email : 'N/A' %>)</p>
-                    <p><strong>Date:</strong> <%= new Date(order.CreatedOn || '').toLocaleDateString() || 'N/A' %></p>
+                <div class="order-section">
+                    <h3>Order Information</h3>
+                    <p><strong>Customer:</strong> <%= (order.userId && order.userId.FirstName) ? order.userId.FirstName : 'N/A' %> (<%= (order.userId && order.userId.Email) ? order.userId.Email : 'N/A' %>)</p>
+                    <p><strong>Date:</strong> <%= new Date(order.InvoiceDate || order.CreatedOn || '').toLocaleDateString() || 'N/A' %></p>
                     <% if (order.Address) { %>
-                        <p><strong>Address:</strong> 
-                            <%= order.Address.addressType || 'N/A' %>, 
-                            <%= order.Address.City || 'N/A' %>, 
-                            <%= order.Address.State || 'N/A' %>, 
-                            <%= order.Address.Pincode || 'N/A' %>
-                        </p>
+                        <p><strong>Address:</strong> <%= order.Address.addressType || 'N/A' %>, <%= order.Address.City || 'N/A' %>, <%= order.Address.State || 'N/A' %>, <%= order.Address.Pincode || 'N/A' %></p>
                     <% } %>
                     <p><strong>Status:</strong> 
-                        <select class="status-select" id="orderStatus" onchange="updateStatus('<%= order.OrderId || order._id %>')">
-                            <option value="Pending" <%= (order.Status || 'Pending') === 'Pending' ? 'selected' : '' %>>Pending</option>
-                            <option value="Shipped" <%= (order.Status || 'Pending') === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                            <option value="Out for Delivery" <%= (order.Status || 'Pending') === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
-                            <option value="Delivered" <%= (order.Status || 'Pending') === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                            <option value="Cancelled" <%= (order.Status || 'Pending') === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                        </select>
+                        <% if (order.Status === 'Return Requested') { %>
+                            <button class="return-btn" onclick="handleReturnRequest('<%= order.OrderId || order._id %>')">Handle Return Request</button>
+                        <% } else { %>
+                            <select class="status-select" id="orderStatus" onchange="updateStatus('<%= order.OrderId || order._id %>')">
+                                <option value="Pending" <%= order.Status === 'Pending' ? 'selected' : '' %> <%= ['Delivered', 'Cancelled', 'Returned'].includes(order.Status) ? 'disabled' : '' %>>Pending</option>
+                                <option value="Shipped" <%= order.Status === 'Shipped' ? 'selected' : '' %> <%= ['Delivered', 'Cancelled', 'Returned'].includes(order.Status) ? 'disabled' : '' %>>Shipped</option>
+                                <option value="Out for Delivery" <%= order.Status === 'Out for Delivery' ? 'selected' : '' %> <%= ['Delivered', 'Cancelled', 'Returned'].includes(order.Status) ? 'disabled' : '' %>>Out for Delivery</option>
+                                <option value="Delivered" <%= order.Status === 'Delivered' ? 'selected' : '' %> <%= ['Returned'].includes(order.Status) ? 'disabled' : '' %>>Delivered</option>
+                               
+                            </select>
+                        <% } %>
                     </p>
                     <% if (order.CancellationReason && order.CancellationReason !== 'none') { %>
-                        <p><strong>Cancel Reason:</strong> <%= order.CancellationReason || 'N/A' %></p>
+                        <p><strong>Cancel Reason:</strong> <%= order.CancellationReason %></p>
                     <% } %>
-                    <% if (order.ReturnReason) { %>
-                        <p><strong>Return Reason:</strong> <%= order.ReturnReason || 'N/A' %></p>
+                    <% if (order.ReturnReason && ['Return Requested', 'Returned'].includes(order.Status)) { %>
+                        <p><strong>Return Reason:</strong> <%= order.ReturnReason %></p>
                     <% } %>
                 </div>
 
-                <div class="items">
+                <div class="order-section">
                     <h3>Ordered Items</h3>
                     <% if (order.OrderedItems && order.OrderedItems.length > 0) { %>
                         <% order.OrderedItems.forEach(item => { %>
-                            <p><strong>Product:</strong> <%= (item.Product && item.Product.ProductName) ? item.Product.ProductName : 'N/A' %> (Size: <%= item.Size || 'N/A' %>) - 
-                                <%= item.Quantity || 'N/A' %> x $<%= (item.Price || 0).toFixed(2) %></p>
+                            <p><strong>Product:</strong> <%= (item.Product && item.Product.ProductName) ? item.Product.ProductName : 'N/A' %> (Size: <%= item.Size || 'N/A' %>) - <%= item.Quantity || 'N/A' %> x $<%= (item.Price || 0).toFixed(2) %></p>
                         <% }) %>
                     <% } else { %>
                         <p>No items found.</p>
                     <% } %>
                 </div>
 
-                <div class="totals">
+                <div class="order-section">
+                    <h3>Totals</h3>
                     <p><strong>Total:</strong> $<%= (order.TotalPrice || 0).toFixed(2) %></p>
-                    <p><strong>Final Amount:</strong> $<%= (order.FinalAmount || 0).toFixed(2) %></p>
+                    <p><strong>Final Amount:</strong> $<%= (order.FinalAmount || order.TotalPrice || 0).toFixed(2) %></p>
                 </div>
-
-                <% if ((order.Status || 'Pending') === 'Delivered') { %>
-                    <button class="return-btn" onclick="verifyReturn('<%= order.OrderId || order._id %>')">Verify Return</button>
-                <% } %>
             </div>
+        </div>
+    </div>
+
+    <div class="modal" id="returnModal">
+        <div class="modal-content">
+            <h2>Handle Return Request</h2>
+            <form id="returnForm">
+                <input type="hidden" id="returnOrderId" name="orderId">
+                <div class="form-group">
+                    <label>Action</label>
+                    <div>
+                        <input type="radio" id="acceptAction" name="action" value="accept" required>
+                        <label for="acceptAction" class="radio-label">Accept</label>
+                        <input type="radio" id="denyAction" name="action" value="deny">
+                        <label for="denyAction" class="radio-label">Deny</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="returnReason">Reason (Required for Deny)</label>
+                    <textarea id="returnReason" name="reason" rows="4" placeholder="Enter your reason (optional for Accept, required for Deny)"></textarea>
+                    <span id="returnReasonError">Please provide a reason for denying the return.</span>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="modal-cancel-btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="accept-btn">Submit</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -175,154 +324,174 @@
     <script src="/js/jquery-3.3.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
-      function updateStatus(orderId) {
-    const status = document.getElementById('orderStatus').value;
-    fetch(`/admin/orders/${orderId}/status`, {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Bearer ' + localStorage.getItem('adminToken') || '',
-            'Cookie': document.cookie
-        },
-        body: `status=${encodeURIComponent(status)}`,
-        credentials: 'include'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
+       function updateStatus(orderId) {
+        const currentStatus = '<%= order.Status || "Pending" %>';
+        const newStatus = document.getElementById('orderStatus').value;
+
+        const statusHierarchy = {
+            'Pending': ['Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
+            'Shipped': ['Out for Delivery', 'Delivered', 'Cancelled'],
+            'Out for Delivery': ['Delivered', 'Cancelled'],
+            'Delivered': ['Return Request', 'Cancelled'],
+            'Return Request': [], // Locked until handled
+            'Cancelled': [],
+            'Returned': []
+        };
+
+        if (currentStatus === 'Return Request') {
             Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: data.message,
+                icon: 'error',
+                title: 'Invalid Action',
+                text: 'Status cannot be changed directly while in Return Request. Use Handle Return Request.',
                 confirmButtonColor: '#6366f1'
             });
-        } else {
+            document.getElementById('orderStatus').value = currentStatus;
+            return;
+        }
+
+        if (!statusHierarchy[currentStatus].includes(newStatus)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Transition',
+                text: `Cannot change status from ${currentStatus} to ${newStatus}. Valid: ${JSON.stringify(statusHierarchy[currentStatus] || [])}`,
+                confirmButtonColor: '#6366f1'
+            });
+            document.getElementById('orderStatus').value = currentStatus;
+            return;
+        }
+
+        fetch(`/admin/orders/${orderId}/status`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Bearer ' + localStorage.getItem('adminToken') || '',
+                'Cookie': document.cookie
+            },
+            body: `status=${encodeURIComponent(newStatus)}`,
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.message,
+                    confirmButtonColor: '#6366f1'
+                }).then(() => window.location.reload());
+            } else {
+                throw new Error(data.message || 'Failed to update order status.');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating status:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: `An error occurred while updating the status. Please try again. Details: ${error.message}`,
+                confirmButtonColor: '#6366f1'
+            });
+            document.getElementById('orderStatus').value = currentStatus;
+        });
+    }
+
+    function handleReturnRequest(orderId) {
+        document.getElementById('returnOrderId').value = orderId;
+        document.querySelector('input[name="action"]:checked')?.removeAttribute('checked');
+        document.getElementById('returnReason').value = '';
+        document.getElementById('returnReasonError').style.display = 'none';
+        document.getElementById('returnModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('returnModal').style.display = 'none';
+    }
+
+    window.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('returnModal')) closeModal();
+    });
+
+    document.querySelectorAll('input[name="action"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const returnReason = document.getElementById('returnReason');
+            const returnReasonError = document.getElementById('returnReasonError');
+            if (this.value === 'deny') {
+                returnReason.setAttribute('required', 'required');
+                returnReason.placeholder = 'Enter your reason (required for Deny)';
+            } else {
+                returnReason.removeAttribute('required');
+                returnReason.placeholder = 'Enter your reason (optional for Accept)';
+                returnReasonError.style.display = 'none';
+            }
+        });
+    });
+
+    document.getElementById('returnForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const orderId = document.getElementById('returnOrderId').value;
+        const action = document.querySelector('input[name="action"]:checked')?.value;
+        const reason = document.getElementById('returnReason').value.trim();
+        const newStatus = action === 'accept' ? 'Returned' : 'Delivered';
+
+        if (!action) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: data.message || 'Failed to update order status.',
+                text: 'Please select an action (Accept or Deny).',
                 confirmButtonColor: '#6366f1'
             });
+            return;
         }
-    })
-    .catch(error => {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'An error occurred while updating the status. Please try again. ' + error.message,
-            confirmButtonColor: '#6366f1'
-        });
-        console.error('Error updating status:', error);
-    });
-}
 
-function verifyReturn(orderId) {
-    Swal.fire({
-        title: 'Verify Return',
-        text: 'Are you sure you want to verify this return and refund the amount to the wallet?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#6366f1',
-        cancelButtonColor: '#ef4444',
-        confirmButtonText: 'Yes, verify!',
-        cancelButtonText: 'No, cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(`/orders/${orderId}/return`, {
+        if (action === 'deny' && !reason) {
+            document.getElementById('returnReasonError').style.display = 'block';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/admin/orders/${orderId}/return`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization': 'Bearer ' + localStorage.getItem('adminToken') || '',
                     'Cookie': document.cookie
                 },
+                body: `action=${encodeURIComponent(action)}&reason=${encodeURIComponent(reason || '')}&status=${encodeURIComponent(newStatus)}`,
                 credentials: 'include'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: data.message,
-                        confirmButtonColor: '#6366f1'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.message || 'Failed to verify return.',
-                        confirmButtonColor: '#6366f1'
-                    });
-                }
-            })
-            .catch(error => {
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+            }
+
+            const data = await response.json();
+            if (data.success) {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'An error occurred while verifying the return. Please try again. ' + error.message,
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.message,
                     confirmButtonColor: '#6366f1'
+                }).then(() => {
+                    closeModal();
+                    window.location.reload();
                 });
-                console.error('Error verifying return:', error);
+            } else {
+                throw new Error(data.message || 'Failed to process return request.');
+            }
+        } catch (error) {
+            console.error('Error processing return request:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: `An error occurred while processing the return. Please try again. Details: ${error.message}`,
+                confirmButtonColor: '#6366f1'
             });
         }
     });
-}
-
-        function verifyReturn(orderId) {
-            Swal.fire({
-                title: 'Verify Return',
-                text: 'Are you sure you want to verify this return and refund the amount to the wallet?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#6366f1',
-                cancelButtonColor: '#ef4444',
-                confirmButtonText: 'Yes, verify!',
-                cancelButtonText: 'No, cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(`/admin/orders/${orderId}/return`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: data.message,
-                                confirmButtonColor: '#6366f1'
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: data.message || 'Failed to verify return.',
-                                confirmButtonColor: '#6366f1'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'An error occurred while verifying the return. Please try again. ' + error.message,
-                            confirmButtonColor: '#6366f1'
-                        });
-                    });
-                }
-            });
-        }
     </script>
 </body>
 </html>

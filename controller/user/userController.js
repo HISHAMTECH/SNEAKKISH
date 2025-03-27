@@ -2,9 +2,31 @@ const User=require('../../models/userSchema')
 const Category=require("../../models/CategorySchema")
 const Product=require('../../models/productSchema')
 const Brand=require('../../models/brandSchema')
+const Coupon=require('../../models/couponSchma')
 const nodemailer=require('nodemailer')
 const env=require('dotenv').config()
 const bcrypt=require('bcrypt')
+
+function generateReferralCode(baseString, length = 8) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; // Characters to use in the code
+    let referralCode = '';
+
+    // Add part of the baseString to ensure uniqueness
+    for (let i = 0; i < baseString.length && i < length; i++) {
+        const char = baseString[i].toUpperCase();
+        if (characters.includes(char)) {
+            referralCode += char;
+        }
+    }
+
+    // Add random characters to reach the desired length
+    while (referralCode.length < length) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        referralCode += characters[randomIndex];
+    }
+
+    return referralCode;
+}
 
 
 
@@ -77,8 +99,7 @@ async function sendVerificationEmail(Email, otp) {
 
 const signUp = async (req, res) => {
     try {
-        
-        const { FirstName,LastName,Email, Password, ConfirmPassword,PhoneNumber} = req.body;
+        const { FirstName, LastName, Email, Password, ConfirmPassword, PhoneNumber, ReferralCode } = req.body;
 
         if (Password !== ConfirmPassword) {
             return res.render("signup", { message: "Passwords Do Not Match" });
@@ -89,31 +110,65 @@ const signUp = async (req, res) => {
             return res.render('signup', { message: "User With This Email Already Exists" });
         }
 
+        let referringUser = null;
+        if (ReferralCode) {
+            referringUser = await User.findOne({ ReferralCode });
+            if (!referringUser) {
+                return res.render('signup', { message: "Invalid Referral Code" });
+            }
+
+            // Find an available referral coupon
+            const referralCoupon = await Coupon.findOne({
+                couponType: 'referral',
+                isListed: true,
+                ExpiryOn: { $gt: new Date() },  // Not expired
+                $or: [
+                    { usageLimit: 0 },  // Unlimited uses
+                    { $expr: { $lt: ['$timesUsed', '$usageLimit'] } }  // Uses remaining
+                ]
+            });
+
+            if (referralCoupon) {
+                referralCoupon.assignedUsers.push(referringUser._id);
+                referralCoupon.timesUsed += 1;
+                await referralCoupon.save();
+            } else {
+                console.log('No available referral coupons found');
+                // You might want to notify the admin or proceed without assigning a coupon
+            }
+        }
+
         const otp = generateOtp();
-        console.log("Recieved",otp);
+        console.log("Received OTP:", otp);
         const emailSent = await sendVerificationEmail(Email, otp);
 
         if (!emailSent) {
             return res.render('signup', { message: "Failed to Send Verification Email. Please Try Again." });
         }
 
-        //
+        const newReferralCode = generateReferralCode();
         req.session.userOtp = otp;
-        req.session.userData = {FirstName,LastName,Email,Password,PhoneNumber};
-        
-        
+        req.session.userData = { 
+            FirstName, 
+            LastName, 
+            Email, 
+            Password, 
+            PhoneNumber, 
+            ReferralCode: newReferralCode,
+            referredBy: referringUser?._id
+        };
 
         console.log("OTP Sent");
-
-        return res.render('verify-otp',{
-            email:Email
-
-        }); 
+        return res.render('verify-otp', { email: Email });
     } catch (error) {
         console.log('Signup Error:', error.message);
         res.redirect('/pageNotFound');
     }
 };
+
+function generateReferralCode() {
+    return 'REF-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+}
 
 const securePassword =async (password)=>{
     try {
@@ -156,6 +211,10 @@ const verifyOTP = async (req, res) => {
                 return res.json({ success: false, message: 'User with this email already exists' });
             }
 
+            // Generate a unique referral code for the new user
+            const referralCode = generateReferralCode(user.Email); // Use the user's email as a base
+            console.log("refer",referralCode);
+            
             // Create a new user with GoogleId explicitly set to null for non-Google users
             const saveUserData = new User({
                 FirstName: user.FirstName,
@@ -164,6 +223,7 @@ const verifyOTP = async (req, res) => {
                 PhoneNumber: user.PhoneNumber,
                 Password: passwordHash,
                 GoogleId: null, // Explicitly set GoogleId to null for non-Google users
+                ReferralCode: referralCode, // Add the generated referral code
             });
 
             try {
@@ -292,6 +352,7 @@ const loadHome=async (req,res)=>{
         productData.sort((a,b)=>new Date(b.timestamps)-new Date(a.timestamps))
         productData = productData.slice(0,4)
 
+    
        
 
       

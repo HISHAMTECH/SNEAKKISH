@@ -1,0 +1,532 @@
+<%- include("../../views/partials/admin/header") %>
+<title>Sales Report Design Preview</title>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: url('/images/SHOES/background.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+
+    .content-container {
+        margin-left: 270px;
+        width: calc(100% - 270px);
+        min-height: calc(100vh - 120px);
+        background: rgba(0, 0, 0, 0.5);
+        padding: 20px;
+        flex-grow: 1;
+    }
+
+    .content-header {
+        text-align: center;
+        padding: 10px 0;
+        margin-bottom: 20px;
+    }
+
+    .content-header h2 {
+        margin: 0;
+        color: white;
+        font-size: 24px;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 0;
+    }
+
+    .filter-section {
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        min-height: 50px; /* Consistent height */
+    }
+
+    .filter-form-group {
+        display: flex;
+        flex-direction: row; /* Align elements horizontally */
+        align-items: center;
+        justify-content: space-between; /* Space between the left and right sides */
+        gap: 10px; /* Space between form elements */
+        width: 100%; /* Ensure it takes full width */
+    }
+
+    .form-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Space between form elements */
+    }
+
+    .form-group {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 5px; /* Space between label and input */
+    }
+
+    .form-label {
+        color: white;
+        font-size: 14px;
+        margin-right: 5px;
+        white-space: nowrap; /* Prevent label wrapping */
+    }
+
+    .form-control {
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #fff;
+        color: #333;
+        font-size: 14px;
+        width: 120px;
+    }
+
+    .form-control.date-picker {
+        width: 150px;
+    }
+
+    .btn-generate-report {
+        padding: 5px 15px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        transition: 0.3s;
+        white-space: nowrap; /* Prevent button text wrapping */
+        margin-left: 10px; /* Space after the date inputs */
+    }
+
+    .btn-generate-report:hover {
+        background: #0056b3;
+    }
+
+    .download-btn {
+        padding: 5px 15px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        transition: 0.3s;
+        white-space: nowrap; /* Prevent button text wrapping */
+    }
+
+    .download-btn:hover {
+        background: #0056b3;
+    }
+
+    .orders-count {
+        color: #fff;
+        font-size: 14px;
+        white-space: nowrap; /* Prevent count wrapping */
+        margin-right: 15px; /* Space before the download button */
+    }
+
+    .right-group {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Space between order count and download button */
+    }
+
+    .table-container {
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 8px;
+        padding: 15px;
+        display: none;
+    }
+
+    .sales-table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #fff;
+    }
+
+    .sales-table th {
+        background: #333;
+        color: #fff;
+        padding: 10px;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    .sales-table td {
+        padding: 10px;
+        border-bottom: 1px solid #555;
+        font-size: 14px;
+    }
+
+    .status-delivered {
+        background: #28a745;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        font-size: 12px;
+    }
+
+    .overall-amount {
+        text-align: right;
+        font-size: 16px;
+        margin-top: 20px;
+        color: #fff;
+        display: none;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        display: none;
+    }
+
+    .page-link {
+        padding: 5px 10px;
+        margin: 0 5px;
+        background: #444;
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .page-link.active {
+        background: #28a745;
+    }
+
+    .pagination a:hover {
+        background: #555;
+    }
+
+    footer {
+        background: #1a2526;
+        padding: 10px 20px;
+        text-align: center;
+        color: #bdc3c7;
+        font-size: 14px;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+    }
+
+    .loading {
+        text-align: center;
+        color: #fff;
+        font-size: 16px;
+        display: none;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .filter-section {
+            padding: 10px;
+        }
+        .filter-form-group {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .form-controls {
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+        }
+        .right-group {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .btn-generate-report, .download-btn {
+            width: 100%;
+            margin-left: 0;
+        }
+        .orders-count {
+            margin-right: 0;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="content-container">
+        <div class="content-header">
+            <h2>Sales Report</h2>
+        </div>
+
+        <div class="main-content">
+            <div class="filter-section">
+                <div class="filter-form-group">
+                    <form id="filterForm" class="form-controls">
+                        <div class="form-group">
+                            <label class="form-label">Filter By:</label>
+                            <select class="form-control" name="filter">
+                                <option value="all" <%= filter === 'all' ? 'selected' : '' %>>All</option>
+                                <option value="daily" <%= filter === 'daily' ? 'selected' : '' %>>Daily</option>
+                                <option value="weekly" <%= filter === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                                <option value="monthly" <%= filter === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">From:</label>
+                            <input type="date" class="form-control date-picker" name="startDate" value="<%= startDate || '' %>"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">To:</label>
+                            <input type="date" class="form-control date-picker" name="endDate" value="<%= endDate || '' %>"/>
+                        </div>
+                        <button type="submit" class="btn-generate-report">Generate Report</button>
+                    </form>
+                    <div class="right-group">
+                        <span class="orders-count"><%= ordersCount %> orders</span>
+                        <button type="button" class="download-btn" id="downloadBtn">Download Sales Report ▼</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">Loading...</div>
+
+            <div class="table-container" id="salesTableContainer">
+                <table class="sales-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Customer Name</th>
+                            <th>Order Status</th>
+                            <th>Discount Amount</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <% if (orders && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                                <tr>
+                                    <td><%= order.OrderId %></td>
+                                    <td><%= order.InvoiceDate ? order.InvoiceDate.toLocaleDateString() : 'N/A' %></td>
+                                    <td><%= order.userId && order.userId.FirstName ? order.userId.FirstName : 'N/A' %></td>
+                                    <td><span class="status-delivered"><%= order.Status || 'Pending' %></span></td>
+                                    <td><%= order.Discount || 0 %></td>
+                                    <td><%= (order.TotalPrice + order.Tax - order.Discount).toFixed(2) %></td>
+                                </tr>
+                            <% }) %>
+                        <% } else if (orders && orders.length === 0) { %>
+                            <tr>
+                                <td colspan="6">No orders found</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="overall-amount" id="overallAmount">
+                Overall Order Amount ₹<span id="totalAmount"><%= totalAmount ? totalAmount.toFixed(2) : '0.00' %></span>
+            </div>
+
+            <% if (totalPages > 1) { %>
+                <div class="pagination" id="pagination">
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                        <a href="?page=<%= i %>&filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" 
+                           class="page-link <%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+<%- include("../../views/partials/admin/footer") %>
+
+<!-- Add SweetAlert2 and Fetch CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('filterForm');
+        const tableContainer = document.getElementById('salesTableContainer');
+        const overallAmount = document.getElementById('overallAmount');
+        const pagination = document.getElementById('pagination');
+        const ordersTableBody = document.getElementById('ordersTableBody');
+        const totalAmountSpan = document.getElementById('totalAmount');
+        const loading = document.getElementById('loading');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Hide table, amount, and pagination by default
+        tableContainer.style.display = 'none';
+        overallAmount.style.display = 'none';
+        if (pagination) pagination.style.display = 'none';
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const startDate = form.querySelector('input[name="startDate"]').value;
+            const endDate = form.querySelector('input[name="endDate"]').value;
+            const filter = form.querySelector('select[name="filter"]').value;
+
+            // Validate if To date is provided without From date
+            if (endDate && !startDate) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select a From date when using a To date.',
+                });
+                return;
+            }
+
+            // If no filter or date is selected, show warning
+            if (!filter && !startDate && !endDate) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Filter Selected',
+                    text: 'Please select a filter option or date range.',
+                });
+                return;
+            }
+
+            // Show loading indicator
+            loading.style.display = 'block';
+
+            const params = new URLSearchParams({
+                filter,
+                startDate,
+                endDate,
+                page: 1,
+                limit: 10
+            }).toString();
+
+            try {
+                const response = await fetch(`/admin/salesReport?${params}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data, 'text/html');
+
+                const newTableBody = doc.getElementById('ordersTableBody').innerHTML;
+                const newTotalAmount = doc.getElementById('totalAmount').textContent;
+                const newPagination = doc.getElementById('pagination') ? doc.getElementById('pagination').innerHTML : '';
+                const newOrdersCount = doc.querySelector('.orders-count').textContent;
+
+                ordersTableBody.innerHTML = newTableBody;
+                totalAmountSpan.textContent = newTotalAmount;
+                if (pagination) pagination.innerHTML = newPagination;
+                document.querySelector('.orders-count').textContent = newOrdersCount;
+
+                tableContainer.style.display = 'block';
+                overallAmount.style.display = 'block';
+                if (pagination && newPagination) pagination.style.display = 'flex';
+
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Failed to generate report: ${error.message}`,
+                });
+                console.error('Fetch error:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Download Sales Report Options
+        downloadBtn.addEventListener('click', async () => {
+            // Show loading indicator
+            loading.style.display = 'block';
+
+            try {
+                // Fetch data for download options (assuming this data is available from the server)
+                const response = await fetch(`/admin/salesReport?filter=${form.querySelector('select[name="filter"]').value}&startDate=${form.querySelector('input[name="startDate"]').value}&endDate=${form.querySelector('input[name="endDate"]').value}&page=1&limit=1000`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data, 'text/html');
+                const ordersCount = doc.querySelector('.orders-count').textContent.replace(' orders', '');
+                const totalAmount = doc.getElementById('totalAmount').textContent;
+                const totalDiscount = calculateTotalDiscount(doc.getElementById('ordersTableBody')); // Custom function to calculate total discount
+
+                Swal.fire({
+                    title: 'Download Sales Report',
+                    html: `
+                        <ul style="text-align: left; padding-left: 20px;">
+                            <li><strong>Report:</strong> Detailed sales data</li>
+                            <li><strong>Overall Sales Count:</strong> ${ordersCount}</li>
+                            <li><strong>Overall Order Amount:</strong> ₹${totalAmount}</li>
+                            <li><strong>Overall Discount:</strong> ₹${totalDiscount.toFixed(2)}</li>
+                        </ul>
+                        <div style="margin-top: 20px;">
+                            <button id="downloadPdf" class="swal2-confirm swal2-styled" style="background-color: #007bff; color: white; padding: 5px 15px; border: none; border-radius: 4px; margin-right: 10px;">Download PDF</button>
+                            <button id="downloadExcel" class="swal2-confirm swal2-styled" style="background-color: #007bff; color: white; padding: 5px 15px; border: none; border-radius: 4px;">Download Excel</button>
+                        </div>
+                    `,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        document.getElementById('downloadPdf').addEventListener('click', () => {
+                            downloadReport('pdf', ordersCount, totalAmount, totalDiscount);
+                            Swal.close();
+                        });
+                        document.getElementById('downloadExcel').addEventListener('click', () => {
+                            downloadReport('excel', ordersCount, totalAmount, totalDiscount);
+                            Swal.close();
+                        });
+                    }
+                });
+
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Failed to prepare download: ${error.message}`,
+                });
+                console.error('Download error:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Custom function to calculate total discount from table
+        function calculateTotalDiscount(tableBody) {
+            let totalDiscount = 0;
+            if (tableBody) {
+                const rows = tableBody.getElementsByTagName('tr');
+                for (let row of rows) {
+                    const discountCell = row.getElementsByTagName('td')[4]; // Discount is in the 5th column (index 4)
+                    if (discountCell) {
+                        const discount = parseFloat(discountCell.textContent) || 0;
+                        totalDiscount += discount;
+                    }
+                }
+            }
+            return totalDiscount;
+        }
+
+        // Function to handle report download
+        function downloadReport(format, ordersCount, totalAmount, totalDiscount) {
+            const startDate = form.querySelector('input[name="startDate"]').value;
+            const endDate = form.querySelector('input[name="endDate"]').value;
+            const filter = form.querySelector('select[name="filter"]').value;
+            const params = new URLSearchParams({
+                filter,
+                startDate,
+                endDate,
+                page: 1,
+                limit: 1000,
+                format,
+                ordersCount,
+                totalAmount,
+                totalDiscount
+            }).toString();
+
+            const url = `/admin/download-sales-report?${params}`;
+            window.open(url, '_blank');
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Male_Fashion Template">
+    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Male-Fashion | Order Failure</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="/css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .failure-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .failure-container h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+
+        .failure-container img {
+            max-width: 200px;
+            margin: 20px 0;
+        }
+
+        .failure-container p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .failure-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .failure-buttons a, .failure-buttons button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .retry-btn {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        .retry-btn:hover {
+            background: #c82333;
+        }
+
+        .order-details-btn {
+            background: #007bff;
+            color: #fff;
+        }
+
+        .order-details-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="failure-container">
+        <h1>Payment Failed</h1>
+        <img src="https://cdn.pixabay.com/photo/2017/01/13/01/22/cancel-1976101_1280.png" alt="Failure Illustration">
+        <p>We’re sorry, but your payment could not be processed. Please try again or contact support.</p>
+        <div class="failure-buttons">
+            
+            <a href="/orders/<%= orderId %>" class="order-details-btn">View Order Details</a>
+        </div>
+    </div>
+
+    
+</body>
+
+</html>

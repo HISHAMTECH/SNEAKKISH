@@ -10,11 +10,14 @@
     <title>SNEAKKISH</title>
 
     <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
-    rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+
+    <!-- SweetAlert2 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
     <!-- Css Styles -->
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
@@ -27,125 +30,527 @@
     <link rel="stylesheet" href="css/style.css" type="text/css">
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.header {
-    position: relative;
-    z-index: 500;
-}
+        body {
+            overflow-x: hidden;
+        }
 
-.dropdown {
-    display: inline-block; /* Allows the dropdown to respect text-align: center */
-    position: relative; /* Needed for dropdown-content positioning */
-}
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1000;
-    right: 0;
-    border-radius: 4px;
-    margin-top: 5px;
-}
+        .header {
+            position: relative;
+            z-index: 500;
+        }
 
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1000;
-    right: 0;
-    border-radius: 4px;
-    margin-top: 5px;
-    text-align: center; /* Add this to center all content in the dropdown */
-}
+        .header__top, .header .container {
+            padding: 0;
+        }
 
-.dropdown-content a {
-    color: black;
-    padding: 10px 16px;
-    text-decoration: none;
-    display: block;
-    transition: background-color 0.3s;
-    cursor: pointer;
-    /* Remove text-align: center here, as it’s now handled by the parent */
-}
+        .header__menu {
+            margin-bottom: 0;
+        }
 
-.dropdown-content a:hover {
-    background-color: #f1f1f1;
-}
+        /* Header Layout Adjustments */
+        .header__main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 15px;
+            background: #fff;
+        }
 
-/* Show dropdown when button is clicked */
-.dropdown.active .dropdown-content {
-    display: block;
-}
+        .header__logo {
+            flex: 0 0 auto;
+        }
 
-.dropdown-btn {
-    cursor: pointer;  
-}
+        .header__logo img {
+            height: 25px; /* Maintain the original size of the logo */
+            margin-left: 70px;
+            width: auto;
+        }
 
-.product__carousel .product__item {
-    text-align: center;
-}
+        .header__menu ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
 
-.product__carousel .owl-nav button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 20px;
-    color: #333;
-}
+        .header__menu ul li {
+            margin: 0 15px;
+        }
 
-.product__carousel .owl-prev {
-    left: -30px;
-}
+        .header__menu ul li a {
+            font-size: 16px;
+            color: #333;
+            text-decoration: none;
+        }
 
-.product__carousel .owl-next {
-    right: -30px;
-}
+        .header__nav__option {
+            display: flex;
+            align-items: center;
+        }
 
-.product__carousel .owl-dots {
-    margin-top: 20px;
-    text-align: center;
-}
+        .header__nav__option a {
+            margin-left: 15px;
+        }
 
-.product__carousel .owl-dot {
-    display: inline-block;
-    margin: 0 5px;
-}
+        /* Mobile Menu Styles */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
 
-.product__carousel .owl-dot span {
-    width: 10px;
-    height: 10px;
-    background: #ddd;
-    border-radius: 50%;
-    display: block;
-}
+        .mobile-dropdown {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+        }
 
-.product__carousel .owl-dot.active span {
-    background: #007bff; /* Change to your preferred color */
-}
-.header__top__links a:hover{
-   color: rgb(129, 114, 114);
+        .mobile-dropdown.active {
+            right: 0;
+            display: block;
+        }
 
-}
+        .mobile-dropdown ul {
+            list-style: none;
+            padding: 0;
+        }
 
+        .mobile-dropdown ul li {
+            margin: 15px 0;
+        }
 
+        .mobile-dropdown ul li a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            display: block;
+            padding: 10px;
+        }
+
+        .mobile-dropdown ul li a:hover {
+            background: #f1f1f1;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        /* Desktop Dropdown Styles */
+        .dropdown {
+            display: inline-block;
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            right: 0;
+            border-radius: 4px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-btn {
+            cursor: pointer;
+        }
+
+        /* Bottom Navigation Bar for Mobile */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 10px 0;
+        }
+
+        .bottom-nav ul {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .bottom-nav ul li {
+            text-align: center;
+        }
+
+        .bottom-nav ul li a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .bottom-nav ul li a i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991px) {
+            .header__menu {
+                display: none;
+            }
+
+            .header__nav__option {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header__top__right {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+
+            .header__top {
+                padding: 5px 0;
+            }
+
+            .header__top__left p {
+                font-size: 12px;
+                margin-bottom: 0;
+            }
+
+            .header__top__links a, .dropdown-btn {
+                font-size: 14px;
+            }
+
+            .header__main {
+                padding: 5px 10px;
+            }
+
+            .header__logo img {
+                height: 25px; /* Maintain the original size */
+                margin-left: 10px;
+            }
+
+            /* Show bottom navigation in mobile view */
+            .bottom-nav {
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header__top__left p {
+                font-size: 10px;
+            }
+
+            .header__top__links a, .dropdown-btn {
+                font-size: 12px;
+            }
+
+            .header__main {
+                padding: 3px 10px;
+            }
+
+            .mobile-menu-btn {
+                font-size: 18px;
+                padding: 3px;
+            }
+        }
+
+        .product__carousel .product__item {
+            text-align: center;
+            position: relative;
+        }
+
+        .product__carousel .owl-nav button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #333;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            transition: background 0.3s ease;
+        }
+
+    
+
+        .product__carousel .owl-dots {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .product__carousel .owl-dot {
+            display: inline-block;
+            margin: 0 5px;
+        }
+
+        .product__carousel .owl-dot span {
+            width: 10px;
+            height: 10px;
+            background: #ddd;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .product__carousel .owl-dot.active span {
+            background: #007bff;
+        }
+
+        .header__top__links a:hover {
+            color: rgb(129, 114, 114);
+        }
+
+        .product__item {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            overflow: hidden;
+            text-align: center;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .product__item__pic {
+            padding-top: 100%;
+            position: relative;
+            background: #f5f5f5;
+        }
+
+        .product__item__pic .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product__item__text {
+            padding: 15px;
+            font-family: 'Nunito Sans', sans-serif;
+        }
+
+        .product__item__text .product-name {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .product__item__text .product-category {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .product__item__text .product-price {
+            margin-bottom: 15px;
+        }
+
+        .product__item__text .mrp {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .product__item__text .sale-price {
+            color: #e74c3c;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .add-cart {
+            display: inline-block;
+            padding: 8px 20px;
+            background: #000;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .add-cart:hover {
+            background: #333;
+        }
+
+        .product__item:hover .product__item__text h6 {
+            opacity: 1 !important;
+        }
+
+        .wishlist-icon {
+            position: absolute;
+            left: -50px;
+            top: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+        }
+
+        .wishlist-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .product__item:hover .wishlist-icon {
+            left: 10px;
+        }
+
+        .banner-section {
+            position: relative;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            margin-bottom: 50px;
+            overflow: hidden;
+        }
+
+        .banner {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        .banner video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .banner__content {
+            position: relative;
+            z-index: 2;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
+        .banner__content a {
+            display: inline-block;
+            padding: 10px 30px;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        .banner__content a:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .banner {
+                height: 400px;
+            }
+
+            .banner__content a {
+                padding: 8px 20px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .banner {
+                height: 300px;
+            }
+
+            .banner__content a {
+                padding: 6px 15px;
+                font-size: 12px;
+            }
+        }
+
+        .product__carousel .owl-nav button:hover {
+            background: #007bff;
+            color: #fff;
+        }
     </style>
-
-   
 </head>
-
 
 <body>
     <!-- Page Preloder -->
     <div id="preloder">
         <div class="loader"></div>
     </div>
-
-  
-  
 
     <!-- Header Section Begin -->
     <header class="header">
@@ -162,156 +567,80 @@
                             <div class="header__top__links">
                                 <%if(locals.user){%>
                                     <div class="dropdown">
-                                        <a class="dropdown-btn"><%=locals.user.FirstName%></a>
+                                        <a class="dropdown-btn"><%=locals.user.FirstName%> <%=locals.user.LastName%></a>
+                            
                                         <div class="dropdown-content">
                                             <a href="/userProfile">Profile</a>
                                             <a href="/logout">Logout</a>
                                         </div>
                                     </div>     
                                 <%}else{%>
-                                <a href="/login">Login in</a>
+                                    <a href="/login">Login</a>
                                 <%}%>
-                                <a href="#">FAQs</a>
-                            </div>
-                            <div class="header__top__hover">
-                                <span>Usd <i class="arrow_carrot-down"></i></span>
-                                <ul>
-                                    <li>USD</li>
-                                    <li>EUR</li>
-                                    <li>USD</li>
-                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-3">
-                    <div class="header__logo">
-                        <a href="/"><img src="img/logo.png" alt=""></a>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <nav class="header__menu mobile-menu">
-                        <ul>
-                            <li class="active"><a href="/">Home</a></li>
-                            <li><a href="/product-page">Shop</a></li>
-                            <li><a href="#">Pages</a>
-                                <ul class="dropdown">
-                                    <li><a href="./about.html">About Us</a></li>
-                                    <li><a href="./shop-details.html">Shop Details</a></li>
-                                    <li><a href="./shopping-cart.html">Shopping Cart</a></li>
-                                    <li><a href="./checkout.html">Check Out</a></li>
-                                    <li><a href="./blog-details.html">Blog Details</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="./blog.html">Blog</a></li>
-                            <li><a href="./contact.html">Contacts</a></li>
-                        </ul>
-                    </nav>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="header__nav__option">
-                        <a href="#" class="search-switch"><img src="img/icon/search.png" alt=""></a>
-                        <a href="#"><img src="img/icon/heart.png" alt=""></a>
-                        <a href="/cart"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
-                        
-                    </div>
-                </div>
+        <div class="header__main">
+            <div class="header__logo">
+                <a href="/"><img src="/images/SNEAKKISH-26-03-.png" alt="SNEAKKISH Logo"></a>
             </div>
-            <div class="canvas__open"><i class="fa fa-bars"></i></div>
+            <nav class="header__menu">
+                <ul>
+                    <li class="active"><a href="/">Home</a></li>
+                    <li><a href="/product-page">Shop</a></li>
+                    <li><a href="#">Brands</a>
+                        <ul class="dropdown">
+                            <li><a href="./about.html">Adidas</a></li>
+                            <li><a href="./shop-details.html">Nike</a></li>
+                            <li><a href="./shopping-cart.html">New Balance</a></li>
+                            <li><a href="./checkout.html">Reebok</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="./contact.html">Contacts</a></li>
+                </ul>
+            </nav>
+            <div class="header__nav__option">
+                <a href="/Wishlist"><img src="img/icon/heart.png" alt=""></a>
+                <a href="/cart"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
+            </div>
+            <div class="mobile-menu-btn"><i class="fa fa-bars"></i></div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div class="mobile-dropdown">
+            <span class="close-btn">×</span>
+            <ul>
+                <li><a href="/userProfile">Profile</a></li>
+                <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
         </div>
     </header>
     <!-- Header Section End -->
 
-    <!-- Hero Section Begin -->
-    <section class="hero">
-        <div class="hero__slider owl-carousel">
-            <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xl-5 col-lg-7 col-md-8">
-                            <div class="hero__text">
-                                <h6>Summer Collection</h6>
-                                <h2>Fall - Winter Collections 2030</h2>
-                                <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
-                                commitment to exceptional quality.</p>
-                                <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
-                                <div class="hero__social">
-                                    <a href="#"><i class="fa fa-facebook"></i></a>
-                                    <a href="#"><i class="fa fa-twitter"></i></a>
-                                    <a href="#"><i class="fa fa-pinterest"></i></a>
-                                    <a href="#"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="hero__items set-bg" data-setbg="img/hero/hero-2.jpg">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xl-5 col-lg-7 col-md-8">
-                            <div class="hero__text">
-                                <h6>Summer Collection</h6>
-                                <h2>Fall - Winter Collections 2030</h2>
-                                <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
-                                commitment to exceptional quality.</p>
-                                <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
-                                <div class="hero__social">
-                                    <a href="#"><i class="fa fa-facebook"></i></a>
-                                    <a href="#"><i class="fa fa-twitter"></i></a>
-                                    <a href="#"><i class="fa fa-pinterest"></i></a>
-                                    <a href="#"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Hero Section End -->
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="bottom-nav">
+        <ul>
+            <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
+            <li><a href="/product-page"><i class="fa fa-shopping-bag"></i> Shop</a></li>
+            <li><a href="/cart"><i class="fa fa-shopping-cart"></i> Cart</a></li>
+            <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+            <li><a href="/userProfile"><i class="fa fa-user"></i> <%= locals.user ? locals.user.FirstName : 'Profile' %></a></li>
+        </ul>
+    </nav>
 
     <!-- Banner Section Begin -->
-    <section class="banner spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-7 offset-lg-4">
-                    <div class="banner__item">
-                        <div class="banner__item__pic">
-                            <img src="img/banner/banner-1.jpg" alt="">
-                        </div>
-                        <div class="banner__item__text">
-                            <h2>Clothing Collections 2030</h2>
-                            <a href="#">Shop now</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="banner__item banner__item--middle">
-                        <div class="banner__item__pic">
-                            <img src="img/banner/banner-2.jpg" alt="">
-                        </div>
-                        <div class="banner__item__text">
-                            <h2>Accessories</h2>
-                            <a href="#">Shop now</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-7">
-                    <div class="banner__item banner__item--last">
-                        <div class="banner__item__pic">
-                            <img src="img/banner/banner-3.jpg" alt="">
-                        </div>
-                        <div class="banner__item__text">
-                            <h2>Shoes Spring 2030</h2>
-                            <a href="#">Shop now</a>
-                        </div>
-                    </div>
-                </div>
+    <section class="banner-section">
+        <div class="banner">
+            <video autoplay loop muted playsinline>
+                <source src="/videos/Untitled video - Made with Clipchamp.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="banner__content">
+                <a href="/product-page">Shop Now</a>
             </div>
         </div>
     </section>
@@ -330,73 +659,24 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="owl-carousel owl-theme product__carousel">
-                        <% for(let i=0; i < products.length; i++) { %>
-                        <div class="product__item mix new-arrivals">
-                            <div class="product__item__pic set-bg" data-setbg="/uploads/re-image/<%=products[i].ProductImage[0]%>">
-                                <a href="/productDetails?id=<%=products[i]._id%>">
-                                    <img src="/uploads/re-image/<%=products[i].ProductImage[0]%>" alt="Product Image">
+                        <% for(let i = 0; i < products.length; i++) { %>
+                            <div class="product__item mix new-arrivals">
+                                <a href="/productDetails?id=<%= products[i]._id %>">
+                                    <div class="product__item__pic">
+                                        <img src="/uploads/re-image/<%= products[i].ProductImage[0] %>" alt="<%= products[i].ProductName %>" class="product-image">
+                                    </div>
+                                    <div class="product__item__text">
+                                        <h6 class="product-name"><%= products[i].ProductName %></h6>
+                                        <p class="product-category">Men's Shoes</p>
+                                        <div class="product-price">
+                                            <span class="sale-price">₹<%= products[i].SalePrice %></span>
+                                        </div>
+                                    </div>
                                 </a>
-                                <span class="label">New</span>
-                                <ul class="product__hover">
-                                    <li><a href="/addToWishlist?id=<%=products[i]._id%>"><img src="img/icon/heart.png" alt=""></a></li>
-                                </ul>
-                            </div>
-                            <div class="product__item__text">
-                                <h6><%=products[i].ProductName%></h6>
-                                <a href="/addToCart?id=<%=products[i]._id%>" class="add-cart">+ Add To Cart</a>
-                                <div class="rating">
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
+                                <div class="wishlist-icon">
+                                    <span onclick="addToWishlist('<%=products[i]._id%>')"><img src="img/icon/heart.png" alt="Wishlist"></span>
                                 </div>
-                                <h5><%=products[i].SalePrice%></h5>
                             </div>
-                        </div>
-                        <% } %>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="product spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <ul class="filter__controls">
-                        <li data-filter=".new-arrivals">Brands</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="owl-carousel owl-theme product__carousel">
-                        <% for(let i=0; i < products.length; i++) { %>
-                        <div class="product__item mix new-arrivals">
-                            <div class="product__item__pic set-bg" data-setbg="/uploads/re-image/<%=products[i].ProductImage[0]%>">
-                                <a href="/productDetails?id=<%=products[i]._id%>">
-                                    <img src="/uploads/re-image/<%=products[i].ProductImage[0]%>" alt="Product Image">
-                                </a>
-                                <span class="label">New</span>
-                                <ul class="product__hover">
-                                    <li><a href="/addToWishlist?id=<%=products[i]._id%>"><img src="img/icon/heart.png" alt=""></a></li>
-                                </ul>
-                            </div>
-                            <div class="product__item__text">
-                                <h6><%=products[i].ProductName%></h6>
-                                <a href="/addToCart?id=<%=products[i]._id%>" class="add-cart">+ Add To Cart</a>
-                                <div class="rating">
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                </div>
-                                <h5><%=products[i].SalePrice%></h5>
-                            </div>
-                        </div>
                         <% } %>
                     </div>
                 </div>
@@ -416,37 +696,32 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="owl-carousel owl-theme product__carousel">
-                        <% for(let i=0; i < products.length; i++) { %>
-                        <div class="product__item mix new-arrivals">
-                            <div class="product__item__pic set-bg" data-setbg="/uploads/re-image/<%=products[i].ProductImage[0]%>">
-                                <a href="/productDetails?id=<%=products[i]._id%>">
-                                    <img src="/uploads/re-image/<%=products[i].ProductImage[0]%>" alt="Product Image">
+                        <% for(let i = 0; i < products.length; i++) { %>
+                            <div class="product__item mix new-arrivals">
+                                <a href="/productDetails?id=<%= products[i]._id %>">
+                                    <div class="product__item__pic">
+                                        <img src="/uploads/re-image/<%= products[i].ProductImage[0] %>" alt="<%= products[i].ProductName %>" class="product-image">
+                                    </div>
+                                    <div class="product__item__text">
+                                        <h6 class="product-name"><%= products[i].ProductName %></h6>
+                                        <p class="product-category">Men's Shoes</p>
+                                        <div class="product-price">
+                                            <span class="mrp">MRP: ₹<%= products[i].RegularPrice%></span>
+                                            <span class="sale-price">₹<%= products[i].SalePrice %></span>
+                                        </div>
+                                    </div>
                                 </a>
-                                <span class="label">New</span>
-                                <ul class="product__hover">
-                                    <li><a href="/addToWishlist?id=<%=products[i]._id%>"><img src="img/icon/heart.png" alt=""></a></li>
-                                </ul>
-                            </div>
-                            <div class="product__item__text">
-                                <h6><%=products[i].ProductName%></h6>
-                                <a href="/addToCart?id=<%=products[i]._id%>" class="add-cart">+ Add To Cart</a>
-                                <div class="rating">
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
-                                    <i class="fa fa-star-o"></i>
+                                <div class="wishlist-icon">
+                                    <span onclick="addToWishlist('<%=products[i]._id%>')"><img src="img/icon/heart.png" alt="Wishlist"></span>
                                 </div>
-                                <h5><%=products[i].SalePrice%></h5>
                             </div>
-                        </div>
                         <% } %>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    
+    <!-- Product Section End -->
 
     <!-- Instagram Section Begin -->
     <section class="instagram spad">
@@ -454,20 +729,19 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="instagram__pic">
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-1.jpg"></div>
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-2.jpg"></div>
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-3.jpg"></div>
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-4.jpg"></div>
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-5.jpg"></div>
-                        <div class="instagram__pic__item set-bg" data-setbg="img/instagram/instagram-6.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="images/INSTAGRAM/2ac6669abef2df8906ae97f552bf2707.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="images/INSTAGRAM/27d14151d4a4dfbff07c69a4bb9dac11.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="images/INSTAGRAM/46c2e6f5bd56f64378b8450c13af4c87.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="images/INSTAGRAM/ad42cc607e5cbd9cf8f9d33829bfdd29.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="images/INSTAGRAM/e477da24aff55f347b1f8fcfddf9d82b.jpg"></div>
+                        <div class="instagram__pic__item set-bg" data-setbg="images/INSTAGRAM/e59369fb7b33c0c359a43b4607fa4c4b.jpg"></div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="instagram__text">
                         <h2>Instagram</h2>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua.</p>
-                        <h3>#Male_Fashion</h3>
+                        <p>At SNEAKKISH, we believe that every step you take should reflect your unique style and confidence. We’re more than just a footwear brand—we’re a lifestyle. Specializing in premium men’s shoes, SNEAKKISH blends modern trends with timeless craftsmanship to deliver sneakers that are as bold and dynamic as the men who wear them.</p>
+                        <h3>#SNEAKKISH</h3>
                     </div>
                 </div>
             </div>
@@ -529,7 +803,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-6">
                     <div class="footer__about">
                         <div class="footer__logo">
-                            <a href="#"><img src="img/footer-logo.png" alt=""></a>
+                            <a href="#"><img src="" alt=""></a>
                         </div>
                         <p>The customer is at the heart of our unique business model, which includes design.</p>
                         <a href="#"><img src="img/payment.png" alt=""></a>
@@ -539,9 +813,9 @@
                     <div class="footer__widget">
                         <h6>Shopping</h6>
                         <ul>
-                            <li><a href="#">Clothing Store</a></li>
+                            <li><a href="#">Store</a></li>
                             <li><a href="#">Trending Shoes</a></li>
-                            <li><a href="#">Accessories</a></li>
+                            <li><a href="#">New Arrivals</a></li>
                             <li><a href="#">Sale</a></li>
                         </ul>
                     </div>
@@ -552,14 +826,14 @@
                         <ul>
                             <li><a href="#">Contact Us</a></li>
                             <li><a href="#">Payment Methods</a></li>
-                            <li><a href="#">Delivary</a></li>
+                            <li><a href="#">Delivery</a></li>
                             <li><a href="#">Return & Exchanges</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-lg-3 offset-lg-1 col-md-6 col-sm-6">
                     <div class="footer__widget">
-                        <h6>NewLetter</h6>
+                        <h6>Newsletter</h6>
                         <div class="footer__newslatter">
                             <p>Be the first to know about new arrivals, look books, sales & promos!</p>
                             <form action="#">
@@ -573,15 +847,12 @@
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <div class="footer__copyright__text">
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
                         <p>Copyright ©
                             <script>
                                 document.write(new Date().getFullYear());
                             </script>2020
-                            All rights reserved | This template is made with <i class="fa fa-heart-o"
-                            aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                            All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
                         </p>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
                     </div>
                 </div>
             </div>
@@ -613,52 +884,78 @@
     <script src="js/main.js"></script>
 
     <script>
-        //carousel
-    $(document).ready(function(){
-        $('.product__carousel').owlCarousel({
-            loop: true,              // Loop through items
-            margin: 20,              // Space between items
-            nav: true,               // Show navigation arrows
-            dots: true,              // Show dots below the carousel
-            responsive: {            // Responsive settings
-                0: {
-                    items: 1         // 1 item on small screens
-                },
-                600: {
-                    items: 2         // 2 items on medium screens
-                },
-                1000: {
-                    items: 4         // 4 items on large screens
+        $(document).ready(function(){
+            $('.product__carousel').owlCarousel({
+                loop: true,
+                margin: 20,
+                nav: true,
+                dots: true,
+                responsive: {
+                    0: { items: 1 },
+                    600: { items: 2 },
+                    1000: { items: 4 }
                 }
-            }
-        });
-    });
+            });
 
+            // Mobile menu toggle
+            $('.mobile-menu-btn').click(function() {
+                $('.mobile-dropdown').addClass('active');
+            });
 
+            $('.close-btn').click(function() {
+                $('.mobile-dropdown').removeClass('active');
+            });
 
-
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropdownBtn = document.querySelector('.dropdown-btn');
-            const dropdown = document.querySelector('.dropdown');
-        
-            dropdownBtn.addEventListener('click', function(e) {
+            // Desktop dropdown
+            $('.dropdown-btn').click(function(e) {
                 e.preventDefault();
-                dropdown.classList.toggle('active');
+                $(this).parent('.dropdown').toggleClass('active');
             });
-        
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!dropdown.contains(e.target)) {
-                    dropdown.classList.remove('active');
+
+            // Close desktop dropdown when clicking outside
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    $('.dropdown').removeClass('active');
                 }
             });
         });
-        </script>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
-    
+        function addToWishlist(productId){
+            $.ajax({
+                url:'/addToWishlist',
+                method:"POST",
+                data:{productId:productId},
+                success:(response)=>{
+                    if(response.status){
+                        Swal.fire({
+                            title:'Added To Wishlist',
+                            text:'The Product Has Been Added To You Wishlist',
+                            icon:'success',
+                            timer:2000
+                        });
+                    }else{
+                        Swal.fire({
+                            title:'Already In Wishlist',
+                            text:response.message,
+                            icon:'info',
+                            timer:2000
+                        });
+                    }
+                },
+                error:(error)=>{
+                    Swal.fire({
+                        title:'Error',
+                        text:'There Is An Error Occur While Adding The Product To Wishlist',
+                        icon:'error',
+                        timer:2000
+                    });
+                }
+            });
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 </body>
 
 </html>

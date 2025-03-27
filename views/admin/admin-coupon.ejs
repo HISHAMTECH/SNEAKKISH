@@ -1,0 +1,401 @@
+<%- include("../../views/partials/admin/header") %>
+
+<title>Coupon Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: url('/images/SHOES/background.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+
+    .content-container {
+        margin-left: 270px;
+        width: calc(100% - 270px);
+        min-height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .content-header {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .content-header h2 {
+        margin: 0;
+        color: white;
+        font-size: 24px;
+    }
+
+    .main-content {
+        margin-left: 30px;
+        padding: 30px;
+    }
+
+    .form-container {
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 8px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        color: white;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .btn-add-coupon {
+        width: 100%;
+        padding: 12px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .btn-add-coupon:hover {
+        background: #218838;
+    }
+
+    .table-container {
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .coupons-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .coupons-table th {
+        background: rgba(47, 79, 107, 0.9);
+        color: white;
+        padding: 15px;
+        text-align: left;
+    }
+
+    .coupons-table td {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s ease, color 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-edit {
+        background: #007bff;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #0056b3;
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #c82333;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .pagination a {
+        color: #fff;
+        background: #334155;
+        padding: 8px 12px;
+        margin: 0 5px;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+    .pagination a:hover {
+        background: #475569;
+    }
+
+    .pagination .active {
+        background: black;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+    <div class="content-container">
+        <div class="content-header">
+            <h2>MANAGE COUPONS</h2>
+        </div>
+
+        <div class="main-content">
+            <div class="form-container">
+                <form id="couponForm" method="post" action="/admin/createCoupon" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label class="form-label">Coupon Code</label>
+                        <input type="text" name="couponCode" id="couponCode" placeholder="Enter coupon code" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Discount (%)</label>
+                        <input type="number" name="discount" id="couponDiscount" placeholder="Enter discount percentage" class="form-control" min="1" max="100" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Minimum Price</label>
+                        <input type="text" name="minPrice" id="minPrice" placeholder="Enter Minimum Price" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="startDate" id="couponStartDate" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Expiry Date</label>
+                        <input type="date" name="expiryDate" id="couponExpiryDate" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Coupon Type</label>
+                        <select name="couponType" id="couponType" class="form-control">
+                            <option value="general">General</option>
+                            <option value="referral">Referral</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-add-coupon">Add Coupon</button>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table class="coupons-table">
+                    <thead>
+                        <tr>
+                            <th>Coupon Code</th>
+                            <th>Discount</th>
+                            <th>Minimum Price</th>
+                            <th>Start Date</th>
+                            <th>Expiry Date</th>
+                            <th>Coupon Type</th>
+                            <th>Users Assigned</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(let i = 0; i < coupons.length; i++) { %>
+                        <tr>
+                            <td><%= coupons[i].Name %></td>
+                            <td><%= coupons[i].OfferPrice %></td>
+                            <td><%= coupons[i].MinimumPrice %></td>
+                            <td><%= new Date(coupons[i].CreatedOn).toLocaleDateString('en-US') %></td>
+                            <td><%= new Date(coupons[i].ExpiryOn).toLocaleDateString('en-US') %></td>
+                            <td><%= coupons[i].couponType %></td>
+                            <td><%= coupons[i].assignedUsers.length %></td>
+                            <td><%= coupons[i].isListed ? 'Active' : 'Inactive' %></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="/admin/editCoupon?id=<%=coupons[i]._id%>" class="action-btn btn-edit">Edit</a>
+                                    <a href="#" class="action-btn btn-delete" onclick="return confirmDelete('<%=coupons[i]._id%>')">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <a href="#" class="active">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    document.getElementById("couponForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        
+        const couponCode = document.getElementById("couponCode").value.trim();
+        const discount = document.getElementById("couponDiscount").value;
+        const minPrice = document.getElementById("minPrice").value.trim();
+        const startDate = document.getElementById("couponStartDate").value;
+        const expiryDate = document.getElementById("couponExpiryDate").value;
+
+        let errors = [];
+
+        if (!couponCode) errors.push("Coupon code is required");
+        else if (!/^[A-Z0-9]{4,10}$/.test(couponCode)) errors.push("Coupon code must be 4-10 characters long and contain only uppercase letters and numbers");
+
+        if (!discount) errors.push("Discount percentage is required");
+        else if (isNaN(parseFloat(discount)) || parseFloat(discount) <= 0 || parseFloat(discount) > 100) errors.push("Discount must be a number between 1 and 100");
+
+        if (!minPrice) errors.push("Minimum price is required");
+        else if (isNaN(parseFloat(minPrice)) || parseFloat(minPrice) < 100) errors.push("Minimum price must be at least 100");
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (!startDate) errors.push("Start date is required");
+        else if (new Date(startDate) < today) errors.push("Start date cannot be in the past");
+
+        if (!expiryDate) errors.push("Expiry date is required");
+        else if (new Date(expiryDate) < today) errors.push("Expiry date cannot be in the past");
+        else if (startDate && new Date(expiryDate) <= new Date(startDate)) errors.push("Expiry date must be after start date");
+
+        if (errors.length > 0) {
+            Swal.fire({
+                icon: "warning",
+                title: "Validation Errors",
+                html: errors.map(error => `• ${error}`).join("<br>"),
+                confirmButtonColor: "#28a745"
+            });
+            return;
+        }
+        
+        const formData = new FormData(this);
+        const formObject = {};
+        formData.forEach((value, key) => {
+            formObject[key] = value;
+        });
+        
+        try {
+            Swal.fire({
+                title: "Adding Coupon",
+                text: "Please wait...",
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            const response = await fetch('/admin/createCoupon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formObject)
+            });
+            
+            if (response.ok) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: "Coupon has been added successfully.",
+                    confirmButtonColor: "#28a745"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById("couponForm").reset();
+                        setDefaultStartDate();
+                        window.location.reload();
+                    }
+                });
+            } else {
+                const error = await response.json();
+                throw new Error(error.message || 'Server error');
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message || "Something went wrong while adding the coupon.",
+                confirmButtonColor: "#28a745"
+            });
+        }
+    });
+    
+    function confirmDelete(couponId) {
+        return Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if(result.isConfirmed){
+                deleteCoupon(couponId);
+            }
+        });
+    }
+
+    function deleteCoupon(couponId){
+        $.ajax({
+            url:`/admin/deleteCoupon?id=${couponId}`,
+            method:"GET",
+            success: function(){
+                Swal.fire({
+                    icon:"success",
+                    title:"Deleted!",
+                    text:"The Coupon Has Been Deleted",
+                    confirmButtonText:"OK"
+                }).then(()=>{
+                    window.location.reload();
+                });
+            },
+            error: function(){
+                Swal.fire({
+                    icon:"error",
+                    title:"Error!",
+                    text:"Failed To Delete The Coupon. Please Try Again",
+                });
+            }
+        });
+    }
+
+    function setDefaultStartDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, "0");
+        const day = today.getDate().toString().padStart(2, "0");
+        document.getElementById("couponStartDate").value = `${year}-${month}-${day}`;
+    }
+
+    window.onload = function() {
+        setDefaultStartDate();
+    };
+    </script>
+
+<%- include("../../views/partials/admin/footer") %>

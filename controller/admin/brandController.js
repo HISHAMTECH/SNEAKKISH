@@ -49,6 +49,8 @@ const addBrand = async (req, res) => {
         }
 
         const brandName = req.body.name.trim()
+      
+        
 
         // Check if brand already exists
         const existingBrand = await brand.findOne({ 

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Transactions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+
+  <style>
+    /* Include the same styles as your wallet page */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f7f8fa;
+      color: #2d3748;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .breadcrumb {
+      margin-bottom: 30px;
+      font-size: 13px;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .breadcrumb a {
+      color: #718096;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .breadcrumb a:hover {
+      color: #2b6cb0;
+    }
+
+    .account-header {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 20px;
+    }
+
+    .account-header h1 {
+      font-size: 32px;
+      color: #1a202c;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    /* Sidebar toggle button (visible only on mobile) */
+    .sidebar-toggle {
+      display: none;
+      width: 100%;
+      padding: 12px;
+      background-color: #2b6cb0;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background-color: #2c5282;
+    }
+
+    .content-wrapper {
+      display: flex;
+      gap: 50px;
+    }
+
+    .sidebar {
+      width: 280px;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-section {
+      margin-bottom: 40px;
+      background-color: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+      border: 1px solid #edf2f7;
+    }
+
+    .sidebar-title {
+      color: #2d3748;
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar-menu li strong {
+      color: #718096;
+      font-size: 13px;
+      display: block;
+      margin: 10px 0;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .sidebar-menu a {
+      color: #4a5568;
+      text-decoration: none;
+      display: block;
+      padding: 10px 12px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .sidebar-menu a:hover {
+      background-color: #edf2f7;
+      color: #2b6cb0;
+    }
+
+    .sidebar-menu a.active {
+      background-color: #e6f0fa;
+      color: #2b6cb0;
+      font-weight: 600;
+    }
+
+    .main-content {
+      flex: 1;
+    }
+
+    .transactions-container {
+      background: white;
+      padding: 35px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+      border: 1px solid #edf2f7;
+    }
+
+    .transactions-header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .transactions-header h2 {
+      font-size: 26px;
+      color: #1a202c;
+      font-weight: 600;
+    }
+
+    .transaction-list {
+      display: grid;
+      gap: 20px;
+    }
+
+    .transaction-card {
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .transaction-card:hover {
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
+      transform: translateY(-3px);
+      border-color: #2b6cb0;
+    }
+
+    .transaction-details {
+      color: #4a5568;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .transaction-details p {
+      margin-bottom: 8px;
+    }
+
+    .transaction-details strong {
+      color: #1a202c;
+    }
+
+    .transaction-type.credit {
+      color: #2b6cb0;
+      font-weight: 600;
+    }
+
+    .transaction-type.debit {
+      color: #e53e3e;
+      font-weight: 600;
+    }
+
+    .no-transactions {
+      text-align: center;
+      padding: 40px 20px;
+      background: #edf2f7;
+      border-radius: 10px;
+      color: #718096;
+    }
+
+    .no-transactions p {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .content-wrapper {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        margin-bottom: 0; /* Adjusted for toggle button */
+      }
+
+      .sidebar-toggle {
+        display: block;
+      }
+
+      .sidebar-section {
+        display: none; /* Hide by default on mobile */
+        margin-bottom: 20px;
+      }
+
+      .sidebar-section.active {
+        display: block; /* Show when toggled */
+      }
+
+      .transaction-list {
+        grid-template-columns: 1fr;
+      }
+
+      /* Adjust container padding for smaller screens */
+      .container {
+        padding: 20px 10px;
+      }
+
+      /* Reduce font sizes for better fit */
+      .account-header h1 {
+        font-size: 24px;
+      }
+
+      .transactions-header h2 {
+        font-size: 20px;
+      }
+
+      .sidebar-title {
+        font-size: 12px;
+      }
+
+      .sidebar-menu a {
+        font-size: 14px;
+        padding: 8px 10px;
+      }
+
+      .transaction-details {
+        font-size: 14px;
+      }
+    }
+
+    /* Additional refinements for very small screens (e.g., < 480px) */
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px 5px;
+      }
+
+      .breadcrumb {
+        font-size: 11px;
+      }
+
+      .account-header h1 {
+        font-size: 20px;
+      }
+
+      .transactions-header h2 {
+        font-size: 18px;
+      }
+
+      .transaction-card {
+        padding: 15px;
+      }
+
+      .transaction-details p {
+        margin-bottom: 6px;
+      }
+
+      .no-transactions {
+        padding: 20px 10px;
+      }
+
+      .no-transactions p {
+        font-size: 14px;
+      }
+
+      .sidebar-toggle {
+        padding: 10px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="/">Home</a> > <a href="/userProfile">Account</a> > <a href="/wallet">Wallet</a> > All Transactions
+    </div>
+
+    <!-- Account header -->
+    <div class="account-header">
+      <h1>All Transactions</h1>
+    </div>
+
+    <!-- Main content wrapper -->
+    <div class="content-wrapper">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">Menu</button>
+        <div class="sidebar-section">
+          <h2 class="sidebar-title">Overview</h2>
+          <ul class="sidebar-menu">
+            <li><strong>ACCOUNT</strong></li>
+            <li><a href="/userProfile">Profile</a></li>
+            <li><a href="/change-password">Change Password</a></li>
+            <li><a href="/address">Address</a></li>
+            <li><a href="/wishlist">Wishlist</a></li>
+            <li><a href="/coupon">Coupons</a></li>
+            <li><a href="/wallet" class="active">Wallet</a></li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-section">
+          <h2 class="sidebar-title">Orders</h2>
+          <ul class="sidebar-menu">
+            <li><a href="/order-history">Order History</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="main-content">
+        <div class="transactions-container">
+          <div class="transactions-header">
+            <h2>All Transactions</h2>
+          </div>
+
+          <!-- Transaction History -->
+          <div class="transaction-list" id="transactionList">
+            <% if (transactions && transactions.length > 0) { %>
+              <% transactions.forEach(transaction => { %>
+                <div class="transaction-card" data-transaction-id="<%= transaction._id %>">
+                  <div class="transaction-details">
+                    <p><strong>Date:</strong> <%= new Date(transaction.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) %></p>
+                    <p><strong>Type:</strong> <span class="transaction-type <%= transaction.type === 'credit' ? 'credit' : 'debit' %>"><%= transaction.type %></span></p>
+                    <p><strong>Amount:</strong> $<%= transaction.amount.toFixed(2) %></p>
+                    <p><strong>Description:</strong> <%= transaction.description %></p>
+                  </div>
+                </div>
+              <% }) %>
+            <% } else { %>
+              <div class="no-transactions">
+                <p>No Transactions Available</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sidebar toggle function
+    function toggleSidebar() {
+      const sidebarSections = document.querySelectorAll('.sidebar-section');
+      const toggleButton = document.querySelector('.sidebar-toggle');
+      sidebarSections.forEach(section => section.classList.toggle('active'));
+      if (sidebarSections[0].classList.contains('active')) {
+        toggleButton.textContent = 'Close Menu';
+      } else {
+        toggleButton.textContent = 'Menu';
+      }
+    }
+  </script>
+</body>
+</html>

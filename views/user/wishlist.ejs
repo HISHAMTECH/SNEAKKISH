@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Sneakkish - Wishlist">
+    <meta name="keywords" content="Sneakkish, shoes, wishlist, ecommerce">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sneakkish | Your Wishlist</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="/css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    <!-- SweetAlert2 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+    <!-- Custom CSS -->
+    <style>
+        /* General Layout */
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .wishlist-section {
+            padding: 50px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-option {
+            background: #fff;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .breadcrumb__text h4 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .breadcrumb__links a, .breadcrumb__links span {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .breadcrumb__links a:hover {
+            color: #007bff;
+        }
+
+        /* Wishlist Items */
+        .wishlist-items {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .wishlist-items h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .wishlist-empty {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .wishlist-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .wishlist-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s ease;
+        }
+
+        .wishlist-item:hover {
+            background: #f8f9fa;
+        }
+
+        .wishlist-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+
+        .wishlist-item-details {
+            flex: 1;
+        }
+
+        .wishlist-item-details h5 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 5px;
+            color: #333;
+        }
+
+        .wishlist-item-details p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .wishlist-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wishlist-item-actions form {
+            display: inline;
+        }
+
+        .wishlist-item-actions button, .wishlist-item-actions a {
+            padding: 5px 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .wishlist-item-actions button:hover:not(:disabled), .wishlist-item-actions a:hover:not(:disabled) {
+            background: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        .wishlist-item-actions button:disabled, .wishlist-item-actions a:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .out-of-stock {
+            color: #ff4444;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        /* SweetAlert2 Custom Styling */
+        .swal2-popup {
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            text-align: center;
+            overflow: hidden; /* Remove scrollbar */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 250px; /* Ensure enough space for centered content */
+        }
+
+        .swal2-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .swal2-content {
+            margin: 0;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .swal2-html-container {
+            margin: 0 auto 20px;
+            width: 100%;
+        }
+
+        .swal2-select {
+            width: 80%; /* Adjusted to match the centered input in the image */
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            appearance: none;
+            cursor: pointer;
+            margin: 0 auto; /* Center the select horizontally */
+            display: block; /* Ensure it behaves as a block element */
+        }
+
+        .swal2-select:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        .swal2-actions {
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .swal2-confirm {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .swal2-cancel {
+            background-color: #dc3545;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .swal2-confirm:hover {
+            background-color: #0056b3;
+        }
+
+        .swal2-cancel:hover {
+            background-color: #c82333;
+        }
+
+        .swal2-icon.swal2-question {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+        }
+
+        /* Error Message */
+        .error-message {
+            text-align: center;
+            color: #ff4444;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        /* Continue Shopping Button */
+        .continue-shopping-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto 0;
+            padding: 12px 20px;
+            background: #666;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .continue-shopping-btn:hover {
+            background: #444;
+            color: #fff;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 767px) {
+            .wishlist-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .wishlist-item img {
+                margin: 0 0 15px;
+            }
+            .wishlist-item-actions {
+                margin-top: 10px;
+            }
+            .swal2-popup {
+                width: 90%;
+                min-height: 200px; /* Adjust for smaller screens */
+            }
+            .swal2-select {
+                width: 90%; /* Adjust select width on mobile */
+            }
+        }
+
+        /* Header and Navigation Styles from Cart Page */
+        .header {
+            position: relative;
+            z-index: 500;
+        }
+
+        .header__top, .header .container {
+            padding: 0;
+        }
+
+        .header__menu {
+            margin-bottom: 0;
+        }
+
+        /* Header Layout Adjustments */
+        .header__main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 15px;
+            background: #fff;
+        }
+
+        .header__logo {
+            flex: 0 0 auto;
+        }
+
+        .header__logo img {
+            height: 25px; /* Maintain the original size of the logo */
+            margin-left: 70px;
+            width: auto;
+        }
+
+        .header__menu ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header__menu ul li {
+            margin: 0 15px;
+        }
+
+        .header__menu ul li a {
+            font-size: 16px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .header__nav__option {
+            display: flex;
+            align-items: center;
+        }
+
+        .header__nav__option a {
+            margin-left: 15px;
+        }
+
+        /* Mobile Menu Styles */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .mobile-dropdown {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .mobile-dropdown.active {
+            right: 0;
+            display: block;
+        }
+
+        .mobile-dropdown ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .mobile-dropdown ul li {
+            margin: 15px 0;
+        }
+
+        .mobile-dropdown ul li a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            display: block;
+            padding: 10px;
+        }
+
+        .mobile-dropdown ul li a:hover {
+            background: #f1f1f1;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        /* Desktop Dropdown Styles */
+        .dropdown {
+            display: inline-block;
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            right: 0;
+            border-radius: 4px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-btn {
+            cursor: pointer;
+        }
+
+        /* Bottom Navigation Bar for Mobile */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 10px 0;
+        }
+
+        .bottom-nav ul {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .bottom-nav ul li {
+            text-align: center;
+        }
+
+        .bottom-nav ul li a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .bottom-nav ul li a i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991px) {
+            .header__menu {
+                display: none;
+            }
+
+            .header__nav__option {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header__top__right {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+
+            .header__top {
+                padding: 5px 0;
+            }
+
+            .header__top__left p {
+                font-size: 12px;
+                margin-bottom: 0;
+            }
+
+            .header__top__links a, .dropdown-btn {
+                font-size: 14px;
+            }
+
+            .header__main {
+                padding: 5px 10px;
+            }
+
+            .header__logo img {
+                height: 25px; /* Maintain the original size */
+                margin-left: 10px;
+            }
+
+            /* Show bottom navigation in mobile view */
+            .bottom-nav {
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header__top__left p {
+                font-size: 10px;
+            }
+
+            .header__top__links a, .dropdown-btn {
+                font-size: 12px;
+            }
+
+            .header__main {
+                padding: 3px 10px;
+            }
+
+            .mobile-menu-btn {
+                font-size: 18px;
+                padding: 3px;
+            }
+        }
+
+        .header__top__links a:hover {
+            color: rgb(129, 114, 114);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Section Begin (Copied from Cart Page) -->
+    <header class="header">
+        <div class="header__main">
+            <div class="header__logo">
+                <a href="/"><img src="/images/SNEAKKISH-26-03-.png" alt="SNEAKKISH Logo"></a>
+            </div>
+            <nav class="header__menu">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/product-page">Shop</a></li>
+                    <li><a href="#">Brands</a>
+                        <ul class="dropdown">
+                            <li><a href="./about.html">Adidas</a></li>
+                            <li><a href="./shop-details.html">Nike</a></li>
+                            <li><a href="./shopping-cart.html">New Balance</a></li>
+                            <li><a href="./checkout.html">Reebok</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="./contact.html">Contacts</a></li>
+                </ul>
+            </nav>
+            <div class="header__nav__option">
+                <a href="/Wishlist"><img src="/img/icon/heart.png" alt=""></a>
+                <a href="/cart"><img src="/img/icon/cart.png" alt=""> <span></span></a>
+            </div>
+            <div class="mobile-menu-btn"><i class="fa fa-bars"></i></div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div class="mobile-dropdown">
+            <span class="close-btn">×</span>
+            <ul>
+                <li><a href="/userProfile">Profile</a></li>
+                <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </header>
+    <!-- Header Section End -->
+
+    <!-- Breadcrumb Section -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Your Wishlist</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <span>Wishlist</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wishlist Section -->
+    <section class="wishlist-section">
+        <div class="container">
+            <div class="wishlist-items">
+                <h1>Your Wishlist</h1>
+                <% if (wishlist.length === 0) { %>
+                    <div class="wishlist-empty">
+                        <p>Your wishlist is empty</p>
+                        <a href="/product-page" class="continue-shopping-btn">Continue Shopping</a>
+                    </div>
+                <% } else { %>
+                    <ul class="wishlist-list">
+                        <% for(let product of wishlist) { %>
+                            <li class="wishlist-item">
+                                <img src="/uploads/re-image/<%=product.ProductImage[0] || 'default-image.jpg' %>" 
+                                     alt="">
+                                <div class="wishlist-item-details">
+                                    <h5><%=product.ProductName || 'Unnamed Product' %></h5>
+                                    <p>Price: ₹<%=product.SalePrice%></p>
+                                    <% if (product.Variants.every(v => v.Quantity <= 0)) { %>
+                                        <span class="out-of-stock">(Out of stock)</span>
+                                    <% } %>
+                                </div>
+                                <div class="wishlist-item-actions">
+                                    <a href="/productDetails?id=<%=product._id %>">View Product</a>
+                                    <button onclick="confirmRemove('<%=product._id%>')">Remove</button>
+                                    <% if (product.Variants.some(v => v.Quantity > 0)) { %>
+                                        <form action="/cart/add/<%= product._id %>" method="POST" id="add-to-cart-form-<%=product._id%>">
+                                            <!-- Hidden inputs for size and quantity, to be set dynamically -->
+                                            <input type="hidden" name="size" id="size-input-<%=product._id%>">
+                                            <input type="hidden" name="quantity" id="quantity-input-<%=product._id%>" value="1">
+                                            <button type="button" onclick="showSizeSelection('<%=product._id%>', '<%= encodeURIComponent(JSON.stringify(product.Variants.filter(v => v.Quantity > 0))) %>')">Add to Cart</button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                            </li>
+                        <% } %>
+                    </ul>
+                    <a href="/product-page" class="continue-shopping-btn">Continue Shopping</a>
+                <% } %>
+                <% if (typeof error !== 'undefined') { %>
+                    <p class="error-message"><%= error %></p>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation for Mobile (Copied from Cart Page) -->
+    <nav class="bottom-nav">
+        <ul>
+            <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
+            <li><a href="/product-page"><i class="fa fa-shopping-bag"></i> Shop</a></li>
+            <li><a href="/cart"><i class="fa fa-shopping-cart"></i> Cart</a></li>
+            <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+            <li><a href="/userProfile"><i class="fa fa-user"></i> <%= locals.user ? locals.user.FirstName : 'Profile' %></a></li>
+        </ul>
+    </nav>
+
+    <script>
+        function confirmRemove(productId) {
+            Swal.fire({
+                title: 'Are You Sure',
+                text: 'You Won\'t Be Able to Revert This Action',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Remove It'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/removeFromWishlist?productId=${productId}`;
+                }
+            });
+        }
+    
+        function showSizeSelection(productId, encodedVariants) {
+            const variants = JSON.parse(decodeURIComponent(encodedVariants));
+            const availableSizes = variants.map(v => v.Size);
+    
+            // Create the HTML for the size selection dropdown
+            const sizeOptions = availableSizes.map(size => 
+                `<option value="${size}">${size}</option>`
+            ).join('');
+    
+            Swal.fire({
+                title: 'Select Size',
+                html: `
+                    <select id="size-select" class="swal2-select" style="width: 80%; padding: 10px; margin: 0 auto; display: block;">
+                        <option value="" selected disabled>Select a size</option>
+                        ${sizeOptions}
+                    </select>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#007bff',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Add to Cart',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    popup: 'swal2-custom-popup',
+                    title: 'swal2-custom-title',
+                    confirmButton: 'swal2-custom-confirm',
+                    cancelButton: 'swal2-custom-cancel'
+                },
+                preConfirm: () => {
+                    const selectedSize = document.getElementById('size-select').value;
+                    if (!selectedSize) {
+                        Swal.showValidationMessage('Please select a size');
+                    }
+                    return selectedSize;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const selectedSize = result.value;
+    
+                    // Perform AJAX request to add to cart
+                    fetch(`/cart/add/${productId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            size: selectedSize,
+                            quantity: 1 // Default quantity
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success popup like in the image
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Product added to cart successfully!',
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    popup: 'swal2-custom-popup',
+                                    title: 'swal2-custom-title',
+                                    confirmButton: 'swal2-custom-confirm'
+                                }
+                            });
+                        } else {
+                            // Show error message
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'Failed to add product to cart',
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    popup: 'swal2-custom-popup',
+                                    title: 'swal2-custom-title',
+                                    confirmButton: 'swal2-custom-confirm'
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An unexpected error occurred',
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                popup: 'swal2-custom-popup',
+                                title: 'swal2-custom-title',
+                                confirmButton: 'swal2-custom-confirm'
+                            }
+                        });
+                    });
+                }
+            });
+        }
+    </script>
+
+    <!-- Js Plugins -->
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.nice-select.min.js"></script>
+    <script src="/js/jquery.nicescroll.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/jquery.countdown.min.js"></script>
+    <script src="/js/jquery.slicknav.js"></script>
+    <script src="/js/mixitup.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+
+    <!-- Header and Navigation Scripts from Cart Page -->
+    <script>
+        $(document).ready(function(){
+            // Mobile menu toggle
+            $('.mobile-menu-btn').click(function() {
+                $('.mobile-dropdown').addClass('active');
+            });
+
+            $('.close-btn').click(function() {
+                $('.mobile-dropdown').removeClass('active');
+            });
+
+            // Desktop dropdown
+            $('.dropdown-btn').click(function(e) {
+                e.preventDefault();
+                $(this).parent('.dropdown').toggleClass('active');
+            });
+
+            // Close desktop dropdown when clicking outside
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    $('.dropdown').removeClass('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

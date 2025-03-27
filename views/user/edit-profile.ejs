@@ -3,214 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
+    <title>Edit Profile</title>
     <style>
-
         /* Reset default styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f5f7fa;
-    color: #333;
-    line-height: 1.6;
-}
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-/* Content wrapper for flex layout */
-.content-wrapper {
-    display: flex;
-    min-height: 100vh;
-}
+        .main-content {
+            padding: 40px;
+            background-color: #f5f7fa;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-/* Sidebar styles */
-.sidebar {
-    width: 250px;
-    background-color: #ffffff;
-    padding: 20px;
-    border-right: 1px solid #e0e4e8;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-}
+        .profile-section {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
 
-.sidebar-section {
-    margin-bottom: 30px;
-}
+        .profile-section h2 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+        }
 
-.sidebar-title {
-    font-size: 1.2rem;
-    color: #2c3e50;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 5px;
-}
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-.sidebar-menu {
-    list-style: none;
-}
+        label {
+            font-size: 1rem;
+            color: #34495e;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
 
-.sidebar-menu li {
-    margin: 10px 0;
-}
+        input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            width: 100%;
+        }
 
-.sidebar-menu a {
-    text-decoration: none;
-    color: #7f8c8d;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    padding: 8px 15px;
-    display: block;
-    border-radius: 5px;
-}
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+        }
 
-.sidebar-menu a:hover {
-    color: #3498db;
-    background-color: #f8f9fa;
-}
+        input[readonly] {
+            background-color: #f8f9fa;
+            color: #7f8c8d;
+            cursor: not-allowed;
+        }
 
-.sidebar-menu a.active {
-    color: #3498db;
-    background-color: #eef2f7;
-    font-weight: bold;
-}
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
 
-.sidebar-menu strong {
-    color: #2c3e50;
-    font-size: 0.9rem;
-    padding: 8px 15px;
-    display: block;
-}
+        button {
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 200px;
+        }
 
-/* Main content styles */
-.main-content {
-    flex: 1;
-    padding: 40px;
-    background-color: #f5f7fa;
-}
+        button:hover {
+            background-color: #2980b9;
+        }
 
-.profile-section {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
-    margin: 0 auto;
-}
+        .back-button {
+            background-color: #7f8c8d;
+        }
 
-.profile-section h2 {
-    font-size: 1.8rem;
-    color: #2c3e50;
-    margin-bottom: 25px;
-}
+        .back-button:hover {
+            background-color: #6c757d;
+        }
 
-/* Form styles */
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
 
-label {
-    font-size: 1rem;
-    color: #34495e;
-    margin-bottom: 5px;
-    font-weight: 500;
-}
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
 
-input {
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-}
+            .profile-section {
+                margin: 20px auto;
+            }
+        }
 
-input:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
-}
+        @media (max-width: 480px) {
+            .profile-section {
+                padding: 20px;
+            }
 
-input[readonly] {
-    background-color: #f8f9fa;
-    color: #7f8c8d;
-    cursor: not-allowed;
-}
-
-button {
-    padding: 12px 20px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-}
-
-button:hover {
-    background-color: #2980b9;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .content-wrapper {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #e0e4e8;
-    }
-
-    .main-content {
-        padding: 20px;
-    }
-
-    .profile-section {
-        margin: 20px auto;
-    }
-}
+            button {
+                max-width: 150px;
+            }
+        }
     </style>
-    
 </head>
 <body>
-    <div class="content-wrapper">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-section">
-                <ul class="sidebar-menu">
-                    <li><strong>ACCOUNT</strong></li>
-                    <li><a href="/userProfile" class="active">HOME</a></li>
-                  
-                </ul>
-            </div>
-        </div>
-    
-        <!-- Edit Profile Form -->
-        <div class="main-content">
-            <div class="profile-section">
-                <h2>Edit Your Profile</h2>
-                <form action="/update-profile" method="POST">
+    <div class="main-content">
+        <div class="profile-section">
+            <h2>Edit Your Profile</h2>
+            <form action="/update-profile" method="POST" onsubmit="return validateForm()">
+                <div>
                     <label>First Name</label>
-                    <input type="text" name="FirstName" value="<%= user.FirstName %>">
-                    
+                    <input type="text" name="FirstName" value="<%= user.FirstName %>" required>
+                    <div id="firstName-error" class="error-message"></div>
+                </div>
+                
+                <div>
                     <label>Last Name</label>
-                    <input type="text" name="LastName" value="<%= user.LastName %>">
-                    
+                    <input type="text" name="LastName" value="<%= user.LastName %>" required>
+                    <div id="lastName-error" class="error-message"></div>
+                </div>
+                
+                <div>
+                    <label>Phone Number</label>
+                    <input type="tel" name="PhoneNumber" value="<%= user.PhoneNumber %>" required>
+                    <div id="phone-error" class="error-message"></div>
+                </div>
+
+                <div>
                     <label>Email</label>
                     <input type="email" name="Email" value="<%= user.Email %>" readonly>
-                    
+                </div>
+                
+                <div class="button-container">
                     <button type="submit">Save Changes</button>
-                </form>
-            </div>
+                    <button type="button" class="back-button" onclick="window.location.href='/userProfile'">Go Back</button>
+                </div>
+            </form>
         </div>
     </div>
-    
+
+    <script>
+    function validateForm() {
+        let isValid = true;
+        clearErrors();
+
+        const firstName = document.getElementsByName('FirstName')[0].value.trim();
+        const lastName = document.getElementsByName('LastName')[0].value.trim();
+        const phoneNumber = document.getElementsByName('PhoneNumber')[0].value.trim();
+
+        if (!firstName) {
+            displayError('firstName-error', 'First name is required');
+            isValid = false;
+        } else if (!/^[a-zA-Z\s]+$/.test(firstName)) {
+            displayError('firstName-error', 'First name should only contain letters');
+            isValid = false;
+        }
+
+        if (!lastName) {
+            displayError('lastName-error', 'Last name is required');
+            isValid = false;
+        } else if (!/^[a-zA-Z\s]+$/.test(lastName)) {
+            displayError('lastName-error', 'Last name should only contain letters');
+            isValid = false;
+        }
+
+        if (!phoneNumber) {
+            displayError('phone-error', 'Phone number is required');
+            isValid = false;
+        } else if (!/^\d{10}$/.test(phoneNumber)) {
+            displayError('phone-error', 'Phone number must be 10 digits');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function displayError(elementId, message) {
+        const errorElement = document.getElementById(elementId);
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+
+    function clearErrors() {
+        const errors = document.getElementsByClassName('error-message');
+        Array.from(errors).forEach(error => {
+            error.textContent = '';
+            error.style.display = 'none';
+        });
+    }
+    </script>
 </body>
 </html>

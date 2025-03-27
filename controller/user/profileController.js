@@ -316,12 +316,8 @@ const changePasswordValid = async (req, res) => {
                 message: "Please enter an email address"
             });
         }
-        const user = req.session.User
-        console.log(user);
-        
-
-        // Find the user by Email (uppercase to match schema)
-        const userExist = await User.findOne({_id:user}); 
+        const normalizedEmail = email.trim().toLowerCase();
+        const userExist = await User.findOne({ Email: normalizedEmail });
 
         console.log('User found:', userExist);
 
@@ -351,8 +347,9 @@ const changePasswordValid = async (req, res) => {
                 });
             }
         } else {
-            res.render("change-password", {
-                message: "User with this email does not exist"
+           
+            return res.render("change-password", {
+             message: "User with this email does not exist"
             });
         }
 
@@ -374,6 +371,7 @@ try {
 const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
+    
 
         console.log('Request body:', req.body);
         console.log('Email from body:', email);
@@ -385,6 +383,8 @@ const forgotPassword = async (req, res) => {
         }
 
         const normalizedEmail = email.trim().toLowerCase();
+       
+        
         const userExist = await User.findOne({ Email: normalizedEmail }); // Match schema field name
 
         console.log('User found:', userExist);
@@ -596,10 +596,42 @@ const verifyChangePassOtp = async (req, res) => {
 };
 
 
-// const postNewPassword = async(req,res)=>{
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.session.User; // Use session.User instead of req.user
+        if (!userId) return res.redirect('/login');
 
-// }
+        const { FirstName, LastName, PhoneNumber } = req.body;
 
+        // Validation
+        if (!FirstName || !LastName || !PhoneNumber) {
+            return res.render('edit-profile', {
+                user: await User.findById(userId),
+                error: 'All fields are required'
+            });
+        }
+
+        // Find and update user
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        user.FirstName = FirstName.trim();
+        user.LastName = LastName.trim();
+        user.PhoneNumber = PhoneNumber.trim();
+
+        await user.save();
+
+        res.redirect('/userProfile');
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        res.status(500).render('edit-profile', {
+            user: await User.findById(req.session.User).catch(() => null),
+            error: 'Failed to update profile. Please try again.'
+        });
+    }
+};
 
 
 module.exports={
@@ -619,7 +651,8 @@ module.exports={
     getResetPassword,
     resetPassword,
     verifyChangePassOtp,
-    // postNewPassword
+    updateProfile
+    
 
 
 }

@@ -7,10 +7,18 @@
     <meta name="keywords" content="Male_Fashion, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Male-Fashion | Your Orders</title>
+    <title>SNEAKKISH | Your Orders</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- OwlCarousel CSS (Added for Navbar Compatibility) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+
+    <!-- SweetAlert2 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
     <!-- Css Styles -->
     <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
@@ -24,13 +32,284 @@
 
     <!-- Custom CSS -->
     <style>
-        /* General Layout */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Nunito Sans', sans-serif;
             background: #f5f5f5;
             color: #333;
+            overflow-x: hidden;
         }
 
+        .header {
+            position: relative;
+            z-index: 500;
+        }
+
+        .header__top, .header .container {
+            padding: 0;
+        }
+
+        .header__menu {
+            margin-bottom: 0;
+        }
+
+        /* Header Layout Adjustments */
+        .header__main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 15px;
+            background: #fff;
+        }
+
+        .header__logo {
+            flex: 0 0 auto;
+        }
+
+        .header__logo img {
+            height: 25px;
+            margin-left: 70px;
+            width: auto;
+        }
+
+        .header__menu ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header__menu ul li {
+            margin: 0 15px;
+        }
+
+        .header__menu ul li a {
+            font-size: 16px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .header__nav__option {
+            display: flex;
+            align-items: center;
+        }
+
+        .header__nav__option a {
+            margin-left: 15px;
+        }
+
+        /* Mobile Menu Styles */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .mobile-dropdown {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .mobile-dropdown.active {
+            right: 0;
+            display: block;
+        }
+
+        .mobile-dropdown ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .mobile-dropdown ul li {
+            margin: 15px 0;
+        }
+
+        .mobile-dropdown ul li a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            display: block;
+            padding: 10px;
+        }
+
+        .mobile-dropdown ul li a:hover {
+            background: #f1f1f1;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        /* Desktop Dropdown Styles */
+        .dropdown {
+            display: inline-block;
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            right: 0;
+            border-radius: 4px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-btn {
+            cursor: pointer;
+        }
+
+        /* Bottom Navigation Bar for Mobile */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 10px 0;
+        }
+
+        .bottom-nav ul {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .bottom-nav ul li {
+            text-align: center;
+        }
+
+        .bottom-nav ul li a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .bottom-nav ul li a i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991px) {
+            .header__menu {
+                display: none;
+            }
+
+            .header__nav__option {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header__top__right {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+
+            .header__top {
+                padding: 5px 0;
+            }
+
+            .header__top__left p {
+                font-size: 12px;
+                margin-bottom: 0;
+            }
+
+            .header__top__links a, .dropdown-btn {
+                font-size: 14px;
+            }
+
+            .header__main {
+                padding: 5px 10px;
+            }
+
+            .header__logo img {
+                height: 25px;
+                margin-left: 10px;
+            }
+
+            /* Show bottom navigation in mobile view */
+            .bottom-nav {
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header__top__left p {
+                font-size: 10px;
+            }
+
+            .header__top__links a, .dropdown-btn {
+                font-size: 12px;
+            }
+
+            .header__main {
+                padding: 3px 10px;
+            }
+
+            .mobile-menu-btn {
+                font-size: 18px;
+                padding: 3px;
+            }
+        }
+
+        .header__top__links a:hover {
+            color: rgb(129, 114, 114);
+        }
+
+        /* Existing Orders Page Styles */
         .orders-section {
             padding: 50px 0;
         }
@@ -72,83 +351,85 @@
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 30px;
-            text-align: center;
             color: #333;
         }
 
-        .order-list {
-            list-style: none;
-            padding: 0;
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .order-item {
-            padding: 20px;
+        .order-table th, .order-table td {
+            padding: 15px;
+            text-align: left;
             border-bottom: 1px solid #eee;
-            transition: background 0.3s ease;
         }
 
-        .order-item:hover {
-            background: #f8f9fa;
-        }
-
-        .order-details {
-            font-size: 16px;
+        .order-table th {
+            font-size: 14px;
+            font-weight: 600;
             color: #666;
-            margin-bottom: 15px;
+            text-transform: uppercase;
         }
 
-        .order-details strong {
+        .order-table td {
+            font-size: 14px;
             color: #333;
+        }
+
+        .order-table img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .status-pending {
+            color: #ff8c00;
+            font-weight: 600;
+        }
+
+        .status-cancelled {
+            color: #ff4444;
+            font-weight: 600;
+        }
+
+        .status-returned {
+            color: #ff8c00;
+            font-weight: 600;
         }
 
         .order-actions {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
+            gap: 10px;
         }
 
-        .order-actions a, .order-actions button {
+        .view-btn, .download-btn {
             padding: 8px 15px;
             font-size: 14px;
             border-radius: 4px;
             text-decoration: none;
-            transition: background 0.3s ease, color 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: background 0.3s ease;
         }
 
-        .order-actions a {
+        .view-btn {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .view-btn:hover {
+            background: #e0a800;
+        }
+
+        .download-btn {
             background: #007bff;
             color: #fff;
         }
 
-        .order-actions a:hover {
+        .download-btn:hover {
             background: #0056b3;
-            color: #fff;
-        }
-
-        .order-actions form {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .order-actions input[type="text"] {
-            padding: 6px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            width: 200px;
-        }
-
-        .order-actions button {
-            background: #ff4444;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-
-        .order-actions button:hover {
-            background: #cc3333;
         }
 
         .error-message {
@@ -162,24 +443,125 @@
             .orders-container {
                 padding: 20px;
             }
+
             .orders-container h1 {
                 font-size: 24px;
             }
-            .order-details {
-                font-size: 14px;
+
+            .order-table th, .order-table td {
+                padding: 10px;
+                font-size: 13px;
             }
+
+            .order-table img {
+                width: 40px;
+                height: 40px;
+            }
+
             .order-actions {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
             }
-            .order-actions input[type="text"] {
-                width: 100%;
+
+            .view-btn, .download-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .order-table th, .order-table td {
+                font-size: 12px;
+            }
+
+            .order-table img {
+                width: 35px;
+                height: 35px;
             }
         }
     </style>
 </head>
 
 <body>
+    <!-- Header Section Begin -->
+    <header class="header">
+        <div class="header__top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-md-7">
+                        <div class="header__top__left">
+                            <p>Free shipping, 30-day return or refund guarantee.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-5">
+                        <div class="header__top__right">
+                            <div class="header__top__links">
+                                <% if (locals.user) { %>
+                                    <div class="dropdown">
+                                        <a class="dropdown-btn"><%= locals.user.FirstName %> <%= locals.user.LastName %></a>
+                                        <div class="dropdown-content">
+                                            <a href="/userProfile">Profile</a>
+                                            <a href="/logout">Logout</a>
+                                        </div>
+                                    </div>
+                                <% } else { %>
+                                    <a href="/login">Login</a>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="header__main">
+            <div class="header__logo">
+                <a href="/"><img src="/images/SNEAKKISH-26-03-.png" alt="SNEAKKISH Logo"></a>
+            </div>
+            <nav class="header__menu">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/product-page">Shop</a></li>
+                    <li><a href="#">Brands</a>
+                        <ul class="dropdown">
+                            <li><a href="#">Adidas</a></li>
+                            <li><a href="#">Nike</a></li>
+                            <li><a href="#">New Balance</a></li>
+                            <li><a href="#">Reebok</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Contacts</a></li>
+                </ul>
+            </nav>
+            <div class="header__nav__option">
+                <a href="/Wishlist"><img src="/img/icon/heart.png" alt=""></a>
+                <a href="/cart"><img src="/img/icon/cart.png" alt=""> <span>0</span></a>
+            </div>
+            <div class="mobile-menu-btn"><i class="fa fa-bars"></i></div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div class="mobile-dropdown">
+            <span class="close-btn">×</span>
+            <ul>
+                <li><a href="/userProfile">Profile</a></li>
+                <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </header>
+    <!-- Header Section End -->
+
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="bottom-nav">
+        <ul>
+            <li><a href="/"><i class="fa fa-home"></i> Home</a></li>
+            <li><a href="/product-page"><i class="fa fa-shopping-bag"></i> Shop</a></li>
+            <li><a href="/cart"><i class="fa fa-shopping-cart"></i> Cart</a></li>
+            <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+            <li><a href="/userProfile"><i class="fa fa-user"></i> <%= locals.user ? locals.user.FirstName : 'Profile' %></a></li>
+        </ul>
+    </nav>
+
     <!-- Breadcrumb Section -->
     <section class="breadcrumb-option">
         <div class="container">
@@ -202,55 +584,114 @@
         <div class="container">
             <div class="orders-container">
                 <h1>Your Orders</h1>
-                <ul class="order-list">
-                    <% if (orders && orders.length > 0) { %>
-                        <% orders.forEach(order => { %>
-                            <li class="order-item">
-                                <div class="order-details">
-                                    Order ID: <strong><%= order.OrderId || order._id %></strong> - 
-                                    Status: <strong><%= order.Status %></strong> - 
-                                    Date: <strong><%= order.CreatedOn ? new Date(order.CreatedOn).toLocaleDateString() : 'N/A' %></strong>
-                                    <% if (order.Address) { %>
-                                        <br>Address: <strong>
-                                            <%= order.Address.addressType || 'N/A' %>, 
-                                            <%= order.Address.City || 'N/A' %>, 
-                                            <%= order.Address.State || 'N/A' %>, 
-                                            <%= order.Address.Pincode || 'N/A' %>
-                                        </strong>
-                                    <% } else { %>
-                                        <br>Address: <strong>No address provided</strong>
-                                    <% } %>
-                                </div>
-                                <div class="order-actions">
-                                    <a href="/orders/<%= order.OrderId || order._id %>">View Details</a>
-                                    <% if (order.Status === 'Pending') { %>
-                                        <form action="/orders/cancel/<%= order.OrderId || order._id %>" method="POST">
-                                            <input type="text" name="reason" placeholder="Cancel reason (optional)">
-                                            <button type="submit">Cancel Order</button>
-                                        </form>
-                                    <% } %>
-                                    <% if (order.Status === 'Delivered') { %>
-                                        <form action="/orders/return/<%= order.OrderId || order._id %>" method="POST">
-                                            <input type="text" name="reason" placeholder="Return reason (required)" required>
-                                            <button type="submit">Return Order</button>
-                                        </form>
-                                    <% } %>
-                                    <a href="/orders/invoice/<%= order.OrderId || order._id %>">Download Invoice</a>
-                                </div>
-                            </li>
-                        <% }) %>
-                    <% } else { %>
-                        <li class="order-item">
-                            <p style="text-align: center; color: #666;">No orders found.</p>
-                        </li>
-                    <% } %>
-                </ul>
+                <% if (orders && orders.length > 0) { %>
+                    <table class="order-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>OrderId</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.forEach(order => { %>
+                                <tr>
+                                    <td>
+                                        <% if (order.OrderedItems && order.OrderedItems.length > 0 && order.OrderedItems[0].Product && order.OrderedItems[0].Product.ProductImage && order.OrderedItems[0].Product.ProductImage.length > 0) { %>
+                                            <img src="/uploads/re-image/<%= order.OrderedItems[0].Product.ProductImage[0] %>" 
+                                                 alt="<%= order.OrderedItems[0].Product.ProductName || 'Product Image' %>">
+                                        <% } else { %>
+                                            <img src="/uploads/re-image/default-image.jpg" alt="Default Image">
+                                        <% } %>
+                                    </td>
+                                    <td>#<%= order.OrderId || order._id %></td>
+                                    <td class="status-<%= order.Status.toLowerCase() %>"><%= order.Status %></td>
+                                    <td>₹<%= order.TotalPrice ? order.TotalPrice.toFixed(2) : 'N/A' %></td>
+                                    <td>
+                                        <div class="order-actions">
+                                            <a href="/orders/<%= order.OrderId || order._id %>" class="view-btn">View</a>
+                                            
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <p style="text-align: center; color: #666;">No orders found.</p>
+                <% } %>
                 <% if (typeof error !== 'undefined') { %>
                     <p class="error-message"><%= error %></p>
                 <% } %>
             </div>
         </div>
     </section>
+
+    <!-- Footer Section Begin -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="footer__about">
+                        <div class="footer__logo">
+                            <a href="#"><img src="" alt=""></a>
+                        </div>
+                        <p>The customer is at the heart of our unique business model, which includes design.</p>
+                        <a href="#"><img src="/img/payment.png" alt=""></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 offset-lg-1 col-md-3 col-sm-6">
+                    <div class="footer__widget">
+                        <h6>Shopping</h6>
+                        <ul>
+                            <li><a href="#">Store</a></li>
+                            <li><a href="#">Trending Shoes</a></li>
+                            <li><a href="#">New Arrivals</a></li>
+                            <li><a href="#">Sale</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6">
+                    <div class="footer__widget">
+                        <h6>Shopping</h6>
+                        <ul>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Payment Methods</a></li>
+                            <li><a href="#">Delivery</a></li>
+                            <li><a href="#">Return & Exchanges</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3 offset-lg-1 col-md-6 col-sm-6">
+                    <div class="footer__widget">
+                        <h6>Newsletter</h6>
+                        <div class="footer__newslatter">
+                            <p>Be the first to know about new arrivals, look books, sales & promos!</p>
+                            <form action="#">
+                                <input type="text" placeholder="Your email">
+                                <button type="submit"><span class="icon_mail_alt"></span></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="footer__copyright__text">
+                        <p>Copyright ©
+                            <script>
+                                document.write(new Date().getFullYear());
+                            </script>
+                            All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Section End -->
 
     <!-- Js Plugins -->
     <script src="/js/jquery-3.3.1.min.js"></script>
@@ -263,6 +704,37 @@
     <script src="/js/mixitup.min.js"></script>
     <script src="/js/owl.carousel.min.js"></script>
     <script src="/js/main.js"></script>
+
+    <!-- Additional jQuery and OwlCarousel for Navbar (Added) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        $(document).ready(function() {
+            // Mobile menu toggle
+            $('.mobile-menu-btn').click(function() {
+                $('.mobile-dropdown').addClass('active');
+            });
+
+            $('.close-btn').click(function() {
+                $('.mobile-dropdown').removeClass('active');
+            });
+
+            // Desktop dropdown
+            $('.dropdown-btn').click(function(e) {
+                e.preventDefault();
+                $(this).parent('.dropdown').toggleClass('active');
+            });
+
+            // Close desktop dropdown when clicking outside
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    $('.dropdown').removeClass('active');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

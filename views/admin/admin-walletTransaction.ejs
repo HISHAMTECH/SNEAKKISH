@@ -1,0 +1,177 @@
+<%- include("../../views/partials/admin/header") %>
+<title>Transaction Details</title>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: url('/images/SHOES/background.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .content-container {
+        margin-left: 0;
+        width: calc(100% - 290px);
+        min-height: calc(100vh - 120px);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 1200px;
+    }
+
+    .content-header {
+        text-align: center;
+        padding: 20px;
+        margin-left: 290px;
+    }
+
+    .content-header h2 {
+        margin: 0;
+        color: white;
+        font-size: 24px;
+    }
+
+    .main-content {
+        width: 100%;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .transactions-table {
+        background: rgba(0, 0, 0, 0.8); /* Black transparent background */
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 800px;
+    }
+
+    .transactions-table table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #fff;
+        text-align: center; /* Ensure table-wide centering */
+    }
+
+    .transactions-table th {
+        background: #333;
+        color: #fff;
+        padding: 10px;
+        text-align: center; /* Center headers */
+        font-size: 16px;
+        border: 1px solid #555;
+    }
+
+    .transactions-table td {
+        padding: 10px;
+        border: 1px solid #555;
+        font-size: 16px;
+        text-align: center; /* Center data */
+        vertical-align: middle; /* Vertically center content */
+    }
+
+    .action-btn {
+        background-color: #007bff;
+        color: #fff;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .action-btn:hover {
+        background-color: #0056b3;
+    }
+
+    footer {
+        background: #1a2526;
+        padding: 10px 20px;
+        text-align: center;
+        color: #bdc3c7;
+        font-size: 14px;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        max-width: calc(100% - 290px);
+    }
+
+    @media (max-width: 768px) {
+        .content-container {
+            width: 100%;
+            margin: 0;
+        }
+        .transactions-table {
+            padding: 10px;
+        }
+        .transactions-table table {
+            display: block;
+            overflow-x: auto;
+        }
+        footer {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="content-container">
+        <div class="content-header">
+            <h2>Transaction Details</h2>
+        </div>
+
+        <div class="main-content">
+            <div class="transactions-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction Date</th>
+                            <th>Time</th>
+                            <th>Transaction Type</th>
+                            <th>Transaction Amount</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (Transaction && Transaction.length > 0) { %>
+                            <% for(let i = 0; i < Transaction.length; i++) { %>
+                                <tr>
+                                    <td><%= new Date(Transaction[i].date).toLocaleDateString() %></td>
+                                    <td><%= new Date(Transaction[i].date).toLocaleTimeString() %></td>
+                                    <td><%= Transaction[i].type || 'N/A' %></td>
+                                    <td><%= Transaction[i].amount || 'N/A' %></td>
+                                    <td><%= Transaction[i].description || 'N/A' %></td>
+                                    <td>
+                                        <% if (Transaction[i].description && 
+                                              (Transaction[i].description.includes('Refund for canceled order') || 
+                                               Transaction[i].description.includes('Refund for Returned order')) && 
+                                              Transaction[i].orderId) { %>
+                                            <a href="/orders/<%= Transaction[i].orderId._id %>" class="action-btn">View Order</a>
+                                        <% } else { %>
+                                            <span>-</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="6">No transactions available for this user</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <%- include("../../views/partials/admin/footer") %>
+</body>
+</html>

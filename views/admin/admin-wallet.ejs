@@ -1,0 +1,178 @@
+<%- include("../../views/partials/admin/header") %>
+<title>Wallet Management</title>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: url('/images/SHOES/background.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .content-container {
+        margin-left: 0;
+        width: calc(100% - 290px);
+        min-height: calc(100vh - 120px);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 1200px;
+    }
+
+    .content-header {
+        text-align: center;
+        padding: 20px;
+        margin-left: 290px;
+    }
+
+    .content-header h2 {
+        margin: 0;
+        color: white;
+        font-size: 24px;
+    }
+
+    .main-content {
+        width: 100%;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .wallet-table {
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 800px;
+    }
+
+    .wallet-table table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #fff;
+    }
+
+    .wallet-table th {
+        background: #333;
+        color: #fff;
+        padding: 10px;
+        text-align: left;
+        font-size: 16px;
+        border: 1px solid #555;
+    }
+
+    .wallet-table td {
+        padding: 10px;
+        border: 1px solid #555;
+        font-size: 16px;
+    }
+
+    .see-all-btn {
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        transition: 0.3s;
+        white-space: nowrap;
+        text-decoration: none; /* Base rule to remove underline */
+        display: block;
+        margin: 0 auto;
+    }
+
+    .see-all-btn:hover {
+        background: #0056b3;
+    }
+
+    /* Increased specificity to target the anchor inside the button */
+    .wallet-table td .see-all-btn a {
+        text-decoration: none !important; /* Override any inherited styles */
+        color: inherit; /* Inherit the button's color */
+        display: inline-block; /* Ensure the anchor behaves like the button */
+    }
+
+    /* Global anchor override as a fallback */
+    a {
+        text-decoration: none !important;
+    }
+
+    footer {
+        background: #1a2526;
+        padding: 10px 20px;
+        text-align: center;
+        color: #bdc3c7;
+        font-size: 14px;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        max-width: calc(100% - 290px);
+    }
+
+    @media (max-width: 768px) {
+        .content-container {
+            width: 100%;
+            margin: 0;
+        }
+        .wallet-table {
+            padding: 10px;
+        }
+        .wallet-table table {
+            display: block;
+            overflow-x: auto;
+        }
+        .see-all-btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+        footer {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="content-container">
+        <div class="content-header">
+            <h2>Wallet Management</h2>
+        </div>
+
+        <div class="main-content">
+            <div class="wallet-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Name</th>
+                            <th>Balance Amount</th>
+                            <th></th> <!-- Placeholder for the button column -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(let i = 0; i < wallet.length; i++) { %>
+                        <tr>
+                            <td><%= i + 1 %></td>
+                            <td><%= wallet[i].userId ? wallet[i].userId.FirstName : 'N/A' %></td>
+                            <td><%= wallet[i].balance || 'N/A' %></td>
+                            <td>
+                                <a href="/admin/walletTransactions/<%= wallet[i].userId._id %>"><button class="see-all-btn">SEE ALL TRANSACTION</button></a>
+                            </td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <%- include("../../views/partials/admin/footer") %>
+</body>
+</html>

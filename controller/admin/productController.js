@@ -115,7 +115,10 @@ const getAllProducts = async (req, res) => {
         
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isBlocked: false });
+       console.log(categories);
        
+        console.log(productData);
+        
         if (categories.length > 0 && brands.length > 0) {
           
             res.render('products', {
@@ -136,39 +139,90 @@ const getAllProducts = async (req, res) => {
 };
 
 
-const addProductOffer = async(req,res)=>{
+// const addProductOffer = async(req,res)=>{
  
 
-    try {
-        const { productId, percentage, finalDiscount } = req.body;
+//     try {
+//         const { productId, percentage, finalDiscount } = req.body;
         
-        // Update product with both the product offer and final calculated discount
-        await Product.findByIdAndUpdate(productId, {
-            ProductOffer: percentage,
-            FinalDiscount: finalDiscount
-        });
+//         // Update product with both the product offer and final calculated discount
+//         await Product.findByIdAndUpdate(productId, {
+//             ProductOffer: percentage,
+//             FinalDiscount: finalDiscount
+//         });
         
-        res.json({ status: true });
-    } catch (error) {
-        console.error('Error adding product offer:', error);
-        res.json({ status: false, message: 'Error adding product offer' });
-    }
-}
+//         res.json({ status: true });
+//     } catch (error) {
+//         console.error('Error adding product offer:', error);
+//         res.json({ status: false, message: 'Error adding product offer' });
+//     }
+// }
 
-const checkCategoryOffer = async (req,res)=>{
-    try {
-        const { productId } = req.body;
+// const checkCategoryOffer = async (req,res)=>{
+//     try {
+//         const { productId } = req.body;
         
       
-        const product = await Product.findById(productId).populate('Categorys');
+//         const product = await Product.findById(productId).populate('Categorys');
         
+//         if (!product) {
+//             return res.json({ status: false, message: 'Product not found' });
+//         }
+
+        
+//         const hasOffer = product.Categorys.CategoryOffer > 0;
+        
+//         res.json({
+//             status: true,
+//             hasOffer,
+//             offerPercentage: product.Categorys.CategoryOffer || 0
+//         });
+//     } catch (error) {
+//         console.error('Error checking category offer:', error);
+//         res.json({ status: false, message: 'Error checking category offer' });
+//     }
+// }
+
+const addProductOffer = async (req, res) => {
+    try {
+        const { productId, percentage, appliedDiscount } = req.body;
+
+        const product = await Product.findById(productId).populate('Categorys');
         if (!product) {
             return res.json({ status: false, message: 'Product not found' });
         }
 
-        
+        // Store the original regular price if not already stored
+        if (!product.RegularPrice) {
+            product.RegularPrice = product.SalePrice;
+        }
+
+        // Calculate the new sale price based on the applied (greatest) discount
+        const discountAmount = Math.floor(product.RegularPrice * (appliedDiscount / 100));
+        product.SalePrice = product.RegularPrice - discountAmount;
+
+        // Save the product offer percentage (even if not applied, for tracking)
+        product.ProductOffer = parseFloat(percentage);
+
+        await product.save();
+        res.json({ status: true, message: 'Offer applied successfully' });
+    } catch (error) {
+        console.error('Error adding product offer:', error);
+        res.status(500).json({ status: false, message: 'Internal Server Error' });
+    }
+};
+
+const checkCategoryOffer = async (req, res) => {
+    try {
+        const { productId } = req.body;
+        const product = await Product.findById(productId).populate('Categorys');
+
+        if (!product) {
+            return res.json({ status: false, message: 'Product not found' });
+        }
+
         const hasOffer = product.Categorys.CategoryOffer > 0;
-        
+
         res.json({
             status: true,
             hasOffer,
@@ -178,25 +232,60 @@ const checkCategoryOffer = async (req,res)=>{
         console.error('Error checking category offer:', error);
         res.json({ status: false, message: 'Error checking category offer' });
     }
-}
+};
 
-
-const removeProductOffer =  async (req,res)=>{
-    try {
+// const removeProductOffer =  async (req,res)=>{
+//     try {
         
-        const {productId} = req.body
-        const findProduct = await Product.findOne({_id:productId})
-        const percentage = findProduct.ProductOffer;
-        findProduct.SalePrice = findProduct.SalePrice + Math.floor(findProduct.RegularPrice*(percentage/100))
-       findProduct.ProductOffer=0;
-       await findProduct.save()
-       res.json({status:true})
+//         const {productId} = req.body
+//         const findProduct = await Product.findOne({_id:productId})
+//         const percentage = findProduct.ProductOffer;
+//         findProduct.SalePrice = findProduct.SalePrice + Math.floor(findProduct.RegularPrice*(percentage/100))
+//        findProduct.ProductOffer=0;
+//        await findProduct.save()
+//        res.json({status:true})
 
+//     } catch (error) {
+//         res.redirect('/pageError')
+//         res.status(500).json({status:false,message:"Internal Server Error"})
+//     }
+// }
+
+const removeProductOffer = async (req, res) => {
+    try {
+        const { productId } = req.body;
+        const product = await Product.findById(productId).populate('Categorys');
+
+        if (!product) {
+            return res.json({ status: false, message: 'Product not found' });
+        }
+
+        // If no regular price is stored, assume current SalePrice is the regular price
+        if (!product.RegularPrice) {
+            product.RegularPrice = product.SalePrice;
+        }
+
+        // Check remaining category offer
+        const categoryOffer = product.Categorys.CategoryOffer || 0;
+
+        // Revert price based on the remaining category offer (if any)
+        if (categoryOffer > 0) {
+            const discountAmount = Math.floor(product.RegularPrice * (categoryOffer / 100));
+            product.SalePrice = product.RegularPrice - discountAmount;
+        } else {
+            product.SalePrice = product.RegularPrice; // No offers, revert to regular price
+        }
+
+        // Remove the product offer
+        product.ProductOffer = 0;
+        await product.save();
+
+        res.json({ status: true, message: 'Product offer removed successfully' });
     } catch (error) {
-        res.redirect('/pageError')
-        res.status(500).json({status:false,message:"Internal Server Error"})
+        console.error('Error removing product offer:', error);
+        res.status(500).json({ status: false, message: 'Internal Server Error' });
     }
-}
+};
 
 const blockProduct = async (req,res)=>{
     try {

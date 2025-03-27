@@ -22,68 +22,69 @@
     <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 
+    <!-- SweetAlert2 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+    <!-- Razorpay Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <!-- Custom CSS -->
     <style>
-        /* General Layout */
         body {
             font-family: 'Nunito Sans', sans-serif;
-            background: #f5f5f5;
+            background: #f8f9fa;
             color: #333;
         }
 
         .checkout-section {
-            padding: 50px 0;
+            padding: 30px 0;
         }
 
         .container {
             max-width: 1200px;
+            padding: 0 15px;
         }
 
-        /* Breadcrumb */
-        .breadcrumb-option {
-            background: #fff;
-            padding: 20px 0;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .breadcrumb__text h4 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .breadcrumb__links a, .breadcrumb__links span {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .breadcrumb__links a:hover {
-            color: #007bff;
-        }
-
-        /* Checkout Container */
         .checkout-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .left-column, .right-column {
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 20px;
         }
 
-        .checkout-container h1 {
-            font-size: 28px;
+        .left-column {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .right-column {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .section-title {
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 30px;
-            text-align: center;
-            color: #333;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
         }
 
-        /* Address Section */
-        .address-section h2, .order-summary h2 {
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #333;
+        .section-title i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .address-section {
+            margin-bottom: 30px;
         }
 
         .address-list {
@@ -91,89 +92,166 @@
         }
 
         .address-item {
-            display: flex;
-            align-items: center;
             padding: 15px;
-            border: 1px solid #ddd;
+            border: 1px solid #e1e1e1;
             border-radius: 5px;
             margin-bottom: 10px;
-            transition: border-color 0.3s ease;
-        }
-
-        .address-item:hover {
-            border-color: #007bff;
+            position: relative;
         }
 
         .address-item input[type="radio"] {
-            margin-right: 15px;
+            margin-right: 10px;
         }
 
         .address-item span {
-            flex: 1;
-            font-size: 16px;
+            font-size: 14px;
             color: #666;
+            line-height: 1.5;
         }
 
         .address-item a {
-            color: #007bff;
-            text-decoration: none;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #333;
             font-size: 14px;
+            text-decoration: none;
         }
 
         .address-item a:hover {
-            text-decoration: underline;
+            color: #007bff;
         }
 
         .add-address {
-            display: inline-block;
-            color: #007bff;
+            display: inline-flex;
+            align-items: center;
+            color: #333;
             font-size: 14px;
+            font-weight: 600;
             text-decoration: none;
-            margin-top: 10px;
+            background: #000;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+
+        .add-address i {
+            margin-right: 5px;
         }
 
         .add-address:hover {
-            text-decoration: underline;
-        }
-
-        /* Order Summary */
-        .order-summary {
-            margin-top: 40px;
+            background: #333;
         }
 
         .order-list {
             list-style: none;
             padding: 0;
+            margin-bottom: 20px;
         }
 
         .order-item {
             display: flex;
             align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+            border-bottom: 1px solid #e1e1e1;
         }
 
         .order-item img {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             object-fit: cover;
             border-radius: 5px;
-            margin-right: 20px;
+            margin-right: 15px;
         }
 
         .order-item span {
-            font-size: 16px;
+            font-size: 14px;
+            color: #333;
+            flex: 1;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .coupon-section {
+            margin-bottom: 20px;
+        }
+
+        .coupon-section label {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .coupon-section label i {
+            margin-right: 5px;
+        }
+
+        .coupon-input {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        #coupon-select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e1e1e1;
+            border-radius: 5px 0 0 5px;
+            font-size: 14px;
+        }
+
+        #apply-coupon-btn, #remove-coupon-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        #apply-coupon-btn {
+            background: #000;
+            color: #fff;
+        }
+
+        #apply-coupon-btn:hover {
+            background: #333;
+        }
+
+        #remove-coupon-btn {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        #remove-coupon-btn:hover {
+            background: #c82333;
+        }
+
+        .available-coupons {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f1f5f9;
+            border-radius: 5px;
+            font-size: 14px;
             color: #666;
         }
 
-        /* Totals */
         .totals {
             margin-top: 20px;
-            text-align: right;
         }
 
         .totals p {
-            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
             margin: 5px 0;
             color: #666;
         }
@@ -183,18 +261,56 @@
         }
 
         .totals .final-total {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 700;
-            color: #007bff;
+            color: #000;
         }
 
-        /* Place Order Button */
-        .place-order-btn {
+        .totals .final-total strong {
+            color: #000;
+        }
+
+        /* Add styling for the Remove Wallet Money button */
+        .totals .wallet-amount-container {
+            position: relative;
+        }
+
+        .totals .remove-wallet-btn {
+            font-size: 12px;
+            color: #dc3545;
+            text-decoration: none;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .totals .remove-wallet-btn:hover {
+            color: #c82333;
+            text-decoration: underline;
+        }
+
+        .payment-method {
+            margin-top: 20px;
+        }
+
+        .payment-method label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
             display: block;
-            width: 200px;
-            margin: 30px auto 0;
-            padding: 12px 20px;
-            background: #007bff;
+        }
+
+        .payment-method select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e1e1e1;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 12px;
+            background: #000;
             color: #fff;
             border: none;
             border-radius: 5px;
@@ -202,37 +318,230 @@
             font-weight: 600;
             text-align: center;
             cursor: pointer;
-            transition: background 0.3s ease;
+            margin-top: 20px;
         }
 
         .place-order-btn:hover {
-            background: #0056b3;
+            background: #333;
         }
 
-        /* Responsive Adjustments */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 20px;
+            width: 400px;
+            max-width: 90%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e1e1e1;
+            border-radius: 5px;
+        }
+
+        #max-amount-btn {
+            position: absolute;
+            right: 10px;
+            top: 32px;
+            padding: 5px 10px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #max-amount-btn:hover {
+            background: #333;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-actions button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .save-btn {
+            background: #000;
+            color: #fff;
+        }
+
+        .save-btn:hover {
+            background: #333;
+        }
+
+        .cancel-btn {
+            background: #666;
+            color: #fff;
+        }
+
+        .cancel-btn:hover {
+            background: #555;
+        }
+
+        /* Responsive Design */
         @media (max-width: 767px) {
-            .address-item, .order-item {
+            .checkout-section {
+                padding: 20px 0;
+            }
+
+            .checkout-container {
                 flex-direction: column;
-                text-align: center;
+                gap: 20px;
             }
-            .address-item input[type="radio"], .order-item img {
-                margin: 0 0 10px;
+
+            .left-column, .right-column {
+                padding: 15px;
             }
-            .totals {
-                text-align: center;
+
+            .section-title {
+                font-size: 16px;
+            }
+
+            .address-item span {
+                font-size: 13px;
+            }
+
+            .order-item span {
+                font-size: 13px;
+            }
+
+            .order-item img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .coupon-section label, #coupon-select, #apply-coupon-btn, #remove-coupon-btn {
+                font-size: 13px;
+            }
+
+            .available-coupons {
+                font-size: 13px;
+            }
+
+            .totals p {
+                font-size: 13px;
+            }
+
+            .totals .final-total {
+                font-size: 15px;
+            }
+
+            .payment-method label, .payment-method select {
+                font-size: 13px;
+            }
+
+            .place-order-btn {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .modal-content {
+                width: 90%;
+                margin: 20px auto;
+                padding: 15px;
+            }
+
+            .modal-content h2 {
+                font-size: 18px;
+            }
+
+            .form-group input {
+                padding: 6px;
+            }
+
+            #max-amount-btn {
+                top: 28px;
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .section-title {
+                font-size: 14px;
+            }
+
+            .address-item span {
+                font-size: 12px;
+            }
+
+            .order-item span {
+                font-size: 12px;
+            }
+
+            .coupon-section label, #coupon-select, #apply-coupon-btn, #remove-coupon-btn {
+                font-size: 12px;
+            }
+
+            .available-coupons {
+                font-size: 12px;
+            }
+
+            .totals p {
+                font-size: 12px;
+            }
+
+            .totals .final-total {
+                font-size: 14px;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Breadcrumb Section -->
     <section class="breadcrumb-option">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="breadcrumb__text">
-                        <h4>Checkout</h4>
+                        <h4>Your Cart</h4>
                         <div class="breadcrumb__links">
                             <a href="/">Home</a>
                             <a href="/cart">Cart</a>
@@ -247,59 +556,145 @@
     <!-- Checkout Section -->
     <section class="checkout-section">
         <div class="container">
-            <div class="checkout-container">
-                <h1>Checkout</h1>
-                <form action="/checkout/place-order" method="POST">
-                    <!-- Address Section -->
-                    <div class="address-section">
-                        <h2>Select Address</h2>
-                        <div class="address-list">
-                            <% if (userAddress && Array.isArray(userAddress.Address) && userAddress.Address.length > 0) { %>
-                                <% userAddress.Address.forEach((addr, index) => { %>
-                                    <div class="address-item">
-                                        <input type="radio" name="addressId" value="<%= addr._id %>" <%= index === 0 ? 'checked' : '' %>>
-                                        <span><%= addr.Name %>, <%= addr.City %>, <%= addr.State %>, <%= addr.Pincode %></span>
-                                        <a href="/address">Edit</a>
-                                    </div>
+            <form action="/checkout/place-order" method="POST" id="checkout-form">
+                <div class="checkout-container">
+                    <!-- Left Column -->
+                    <div class="left-column">
+                        <!-- Address Section -->
+                        <div class="address-section">
+                            <h2 class="section-title"><i class="fa fa-truck"></i> Shipping Address</h2>
+                            <div class="address-list">
+                                <% if (userAddress && Array.isArray(userAddress.Address) && userAddress.Address.length > 0) { %>
+                                    <% userAddress.Address.forEach((addr, index) => { %>
+                                        <div class="address-item">
+                                            <input type="radio" name="addressId" value="<%= addr._id %>" <%= index === 0 ? 'checked' : '' %>>
+                                            <span>
+                                                <strong><%= addr.Name %></strong><br>
+                                                <%= addr.City %>, <%= addr.State %>, <%= addr.Pincode %>
+                                            </span>
+                                            <a href="/address">Edit</a>
+                                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <p>No addresses available. Please add one.</p>
+                                <% } %>
+                            </div>
+                            <a href="/address" class="add-address"><i class="fa fa-plus"></i> Add New Address</a>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="right-column">
+                        <!-- Order Summary -->
+                        <div class="order-summary">
+                            <h2 class="section-title"><i class="fa fa-shopping-cart"></i> Your Order</h2>
+                            <div class="order-header">
+                                <span>Product</span>
+                                <span>Qty</span>
+                                <span>Price</span>
+                            </div>
+                            <ul class="order-list">
+                                <% cart.Items.forEach(item => { %>
+                                    <li class="order-item">
+                                        <img src="/uploads/re-image/<%= item.ProductId.ProductImage[0] || 'default-image.jpg' %>" 
+                                             alt="<%= item.ProductId.ProductName || 'Product Image' %>">
+                                        <span><%= item.ProductId.ProductName || 'Unnamed Product' %> (Size: <%= item.Size %>)</span>
+                                        <span class="quantity">x<%= item.Quantity %></span>
+                                        <span class="price">$<%= item.TotalPrice.toFixed(2) %></span>
+                                    </li>
                                 <% }) %>
-                            <% } else { %>
-                                <p>No addresses available. Please add one.</p>
-                            <% } %>
+                            </ul>
+
+                            <!-- Coupon Section -->
+                            <div class="coupon-section">
+                                <label for="coupon-select"><i class="fa fa-ticket"></i> Have a Coupon?</label>
+                                <div class="coupon-input">
+                                    <select id="coupon-select" name="couponId">
+                                        <option value="" selected disabled>Enter Coupon Code</option>
+                                        <% if (coupons && coupons.length > 0) { %>
+                                            <% coupons.forEach(coupon => { %>
+                                                <option value="<%= coupon._id %>" 
+                                                        data-offer-price="<%= coupon.OfferPrice %>" 
+                                                        data-minimum-price="<%= coupon.MinimumPrice %>">
+                                                    <%= coupon.Name %> - <%= coupon.OfferPrice %>% off (Min: $<%= coupon.MinimumPrice %>)
+                                                </option>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <option value="" disabled>No coupons available</option>
+                                        <% } %>
+                                    </select>
+                                    <button type="button" id="apply-coupon-btn">Apply Coupon</button>
+                                    <button type="button" id="remove-coupon-btn" style="display: none;">Remove</button>
+                                </div>
+                                <div class="available-coupons">
+                                    Available Coupons: <% if (coupons && coupons.length > 0) { %>
+                                        <%= coupons.map(coupon => coupon.Name).join(', ') %>
+                                    <% } else { %>
+                                        No Coupons Available
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <!-- Totals -->
+                            <div class="totals">
+                                <p>Subtotal: <strong>$<span id="subtotal"><%= total.toFixed(2) %></span></strong></p>
+                                <p>Tax: <strong>$<span id="tax"><%= tax.toFixed(2) %></span></strong></p>
+                                <p>Discount: <strong>$<span id="discount"><%= discount.toFixed(2) %></span></strong></p>
+                                <p class="wallet-amount-container">
+                                    Wallet Amount: 
+                                    <strong>
+                                        $<span id="wallet-amount">0.00</span>
+                                        <% if (wallet && wallet.balance > 0) { %>
+                                            <a href="#" id="remove-wallet-btn" class="remove-wallet-btn" style="display: none;">Remove</a>
+                                        <% } %>
+                                    </strong>
+                                </p>
+                                <p class="final-total">Total: <strong>$<span id="final-total"><%= finalTotal.toFixed(2) %></span></strong></p>
+                            </div>
+
+                            <!-- Payment Method -->
+                            <div class="payment-method">
+                                <label><i class="fa fa-credit-card"></i> Select Payment Method</label>
+                                <select id="payment-method" name="paymentMethod" onchange="handlePaymentMethodChange(this.value)">
+                                    <option value="cod">Cash on Delivery</option>
+                                    <option value="wallet">Wallet</option>
+                                    <option value="razorpay" selected>Razorpay</option>
+                                </select>
+                            </div>
+
+                            <!-- Hidden Inputs -->
+                            <input type="hidden" name="walletAmount" id="walletAmount" value="0">
+                            <input type="hidden" name="razorpayOrderId" id="razorpayOrderId">
+                            <input type="hidden" name="razorpayPaymentId" id="razorpayPaymentId">
+                            <input type="hidden" name="razorpaySignature" id="razorpaySignature">
+
+                            <!-- Place Order Button -->
+                            <button type="submit" class="place-order-btn" id="place-order-btn"><i class="fa fa-check"></i> Place Order</button>
                         </div>
-                        <a href="/address" class="add-address">Add New Address</a>
                     </div>
-
-                    <!-- Order Summary -->
-                    <div class="order-summary">
-                        <h2>Order Summary</h2>
-                        <ul class="order-list">
-                            <% cart.Items.forEach(item => { %>
-                                <li class="order-item">
-                                    <img src="/uploads/re-image/<%= item.ProductId.ProductImage[0] || 'default-image.jpg' %>" 
-                                         alt="<%= item.ProductId.ProductName || 'Product Image' %>">
-                                    <span>
-                                        <%= item.ProductId.ProductName || 'Unnamed Product' %> (Size: <%= item.Size %>) - 
-                                        <%= item.Quantity %> x $<%= item.Price.toFixed(2) %> = $<%= item.TotalPrice.toFixed(2) %>
-                                    </span>
-                                </li>
-                            <% }) %>
-                        </ul>
-
-                        <!-- Totals -->
-                        <div class="totals">
-                            <p>Total: <strong>$<%= total.toFixed(2) %></strong></p>
-                            <p>Tax: <strong>$<%= tax.toFixed(2) %></strong></p>
-                            <p>Discount: <strong>$<%= discount.toFixed(2) %></strong></p>
-                            <p class="final-total">Final Total: $<%= finalTotal.toFixed(2) %></p>
-                        </div>
-                    </div>
-
-                    <!-- Place Order Button -->
-                    <button type="submit" class="place-order-btn">Place Order (Cash on Delivery)</button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </section>
+
+    <!-- Wallet Amount Modal -->
+    <div class="modal" id="walletModal">
+        <div class="modal-content">
+            <h2>Use Wallet Balance</h2>
+            <p>Current Wallet Balance: $<%= wallet ? wallet.balance.toFixed(2) : '0.00' %></p>
+            <form id="walletForm">
+                <div class="form-group">
+                    <label for="wallet-amount-input">Amount to Use</label>
+                    <input type="number" id="wallet-amount-input" name="walletAmount" step="0.01" min="0" placeholder="Enter amount">
+                    <button type="button" id="max-amount-btn" onclick="setMaxAmount()">Max</button>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="save-btn">Apply</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Js Plugins -->
     <script src="/js/jquery-3.3.1.min.js"></script>
@@ -312,6 +707,350 @@
     <script src="/js/mixitup.min.js"></script>
     <script src="/js/owl.carousel.min.js"></script>
     <script src="/js/main.js"></script>
-</body>
 
+    <!-- Custom JavaScript -->
+    <script>
+        let appliedWalletAmount = 0;
+        let appliedCouponId = null;
+        let currentDiscount = <%= discount %>;
+        const COD_MAXIMUM_AMOUNT = 9000; // Maximum amount for COD eligibility
+
+        // Initialize Nice Select on page load
+        $(document).ready(function() {
+            $('#coupon-select').niceSelect();
+            $('#payment-method').niceSelect();
+            updatePaymentMethodOptions(); // Update payment methods based on initial total
+            toggleCouponSection(); // Check initial wallet state
+
+            // Add event listener for Remove Wallet Money button
+            $('#remove-wallet-btn').on('click', function(e) {
+                e.preventDefault();
+                appliedWalletAmount = 0;
+                document.getElementById('walletAmount').value = appliedWalletAmount;
+                document.getElementById('wallet-amount').textContent = appliedWalletAmount.toFixed(2);
+                document.getElementById('remove-wallet-btn').style.display = 'none';
+                updateFinalTotal();
+            });
+        });
+
+        function openModal() {
+            document.getElementById('walletModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('walletModal').style.display = 'none';
+        }
+
+        function setMaxAmount() {
+            const walletBalance = <%= wallet ? wallet.balance : 0 %>;
+            const finalTotalBeforeWallet = parseFloat(document.getElementById('subtotal').textContent) + 
+                                          parseFloat(document.getElementById('tax').textContent) - 
+                                          currentDiscount;
+            const maxAmount = Math.min(walletBalance, finalTotalBeforeWallet);
+            document.getElementById('wallet-amount-input').value = maxAmount.toFixed(2);
+        }
+
+        function handlePaymentMethodChange(method) {
+            const finalTotalBeforeWallet = parseFloat(document.getElementById('subtotal').textContent) + 
+                                          parseFloat(document.getElementById('tax').textContent) - 
+                                          currentDiscount;
+
+            if (method === 'wallet') {
+                openModal();
+            } else {
+                // When switching to COD or Razorpay, retain the appliedWalletAmount
+                if (appliedWalletAmount > finalTotalBeforeWallet) {
+                    appliedWalletAmount = finalTotalBeforeWallet; // Cap at remaining amount
+                }
+                document.getElementById('walletAmount').value = appliedWalletAmount;
+                document.getElementById('wallet-amount').textContent = appliedWalletAmount.toFixed(2);
+                updateFinalTotal();
+                toggleCouponSection(); // Re-evaluate coupon section state
+            }
+        }
+
+        function updateFinalTotal(discount = currentDiscount) {
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+            const tax = parseFloat(document.getElementById('tax').textContent);
+            const walletAmount = appliedWalletAmount;
+            const finalTotal = Math.max(0, subtotal + tax - discount - walletAmount);
+            document.getElementById('final-total').textContent = finalTotal.toFixed(2);
+            document.getElementById('wallet-amount').textContent = walletAmount.toFixed(2);
+            document.getElementById('discount').textContent = discount.toFixed(2);
+            // Show or hide the Remove Wallet Money button based on applied amount
+            if (appliedWalletAmount > 0) {
+                document.getElementById('remove-wallet-btn').style.display = 'inline';
+            } else {
+                document.getElementById('remove-wallet-btn').style.display = 'none';
+            }
+            updatePaymentMethodOptions(); // Update payment methods whenever the total changes
+            toggleCouponSection(); // Check if coupon should be disabled after wallet update
+        }
+
+        function updatePaymentMethodOptions() {
+            const finalTotal = parseFloat(document.getElementById('final-total').textContent);
+            const paymentMethodSelect = document.getElementById('payment-method');
+            const codOption = paymentMethodSelect.querySelector('option[value="cod"]');
+
+            if (finalTotal >= COD_MAXIMUM_AMOUNT) {
+                codOption.disabled = true;
+                if (paymentMethodSelect.value === 'cod') {
+                    paymentMethodSelect.value = 'razorpay';
+                }
+            } else {
+                codOption.disabled = false;
+            }
+
+            $('#payment-method').niceSelect('update');
+        }
+
+        function toggleCouponSection() {
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+            const tax = parseFloat(document.getElementById('tax').textContent);
+            const initialTotal = subtotal + tax - currentDiscount;
+            const couponSelect = document.getElementById('coupon-select');
+            const applyBtn = document.getElementById('apply-coupon-btn');
+            const removeBtn = document.getElementById('remove-coupon-btn');
+
+            if (appliedWalletAmount >= initialTotal && initialTotal > 0) {
+                // Disable coupon selection if wallet covers the full amount
+                couponSelect.disabled = true;
+                applyBtn.style.display = 'none';
+                removeBtn.style.display = 'none';
+                $('#coupon-select').niceSelect('update'); // Update Nice Select UI
+            } else {
+                // Enable coupon selection if wallet doesn't cover the full amount
+                couponSelect.disabled = false;
+                if (!appliedCouponId) {
+                    applyBtn.style.display = 'inline-block';
+                    removeBtn.style.display = 'none';
+                } else {
+                    applyBtn.style.display = 'none';
+                    removeBtn.style.display = 'inline-block';
+                }
+                $('#coupon-select').niceSelect('update'); // Update Nice Select UI
+            }
+        }
+
+        document.getElementById('walletForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const walletAmountInput = parseFloat(document.getElementById('wallet-amount-input').value);
+            const walletBalance = <%= wallet ? wallet.balance : 0 %>;
+            const finalTotalBeforeWallet = parseFloat(document.getElementById('subtotal').textContent) + 
+                                          parseFloat(document.getElementById('tax').textContent) - 
+                                          currentDiscount;
+
+            if (!walletAmountInput || walletAmountInput <= 0) {
+                Swal.fire('Error', 'Please enter a valid amount', 'error');
+                return;
+            }
+
+            if (walletAmountInput > walletBalance) {
+                Swal.fire('Error', 'Insufficient wallet balance', 'error');
+                return;
+            }
+
+            // Prevent selecting more than the order total
+            if (walletAmountInput > finalTotalBeforeWallet) {
+                Swal.fire('Error', `You cannot apply more than the order total of $${finalTotalBeforeWallet.toFixed(2)}`, 'error');
+                return;
+            }
+
+            appliedWalletAmount = walletAmountInput;
+            document.getElementById('walletAmount').value = appliedWalletAmount;
+            updateFinalTotal();
+            closeModal();
+        });
+
+        document.getElementById('apply-coupon-btn').addEventListener('click', function() {
+            const couponSelect = document.getElementById('coupon-select');
+            const selectedCouponId = couponSelect.value;
+            const selectedOption = couponSelect.options[couponSelect.selectedIndex];
+            const offerPercentage = selectedOption ? parseFloat(selectedOption.getAttribute('data-offer-price')) : 0;
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+
+            if (!selectedCouponId) {
+                Swal.fire('Error', 'Please select a coupon to apply', 'error');
+                return;
+            }
+
+            // Calculate remaining amount after wallet
+            const initialTotal = subtotal + parseFloat(document.getElementById('tax').textContent) - currentDiscount;
+            const remainingAmount = Math.max(0, initialTotal - appliedWalletAmount);
+            const potentialDiscount = (subtotal * offerPercentage) / 100;
+
+            if (potentialDiscount > remainingAmount) {
+                Swal.fire('Error', 'Coupon cannot be applied as the discount amount exceeds the remaining amount after wallet usage.', 'error');
+                return;
+            }
+
+            fetch('/checkout/apply-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ couponId: selectedCouponId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    Swal.fire('Error', data.message || 'Failed to apply coupon', 'error');
+                } else {
+                    currentDiscount = data.discount || 0;
+                    appliedCouponId = selectedCouponId;
+                    updateFinalTotal(currentDiscount);
+                    Swal.fire('Success', 'Coupon applied successfully!', 'success');
+                    document.getElementById('apply-coupon-btn').style.display = 'none';
+                    document.getElementById('remove-coupon-btn').style.display = 'inline-block';
+                    toggleCouponSection(); // Re-evaluate coupon section state after applying
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Error', 'An unexpected error occurred', 'error');
+            });
+        });
+
+        document.getElementById('remove-coupon-btn').addEventListener('click', function() {
+            if (!appliedCouponId) return;
+
+            fetch('/checkout/remove-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ couponId: appliedCouponId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Success', 'Coupon removed successfully!', 'success');
+                    currentDiscount = data.discount || 0;
+                    appliedCouponId = null;
+                    document.getElementById('discount').textContent = '0.00';
+
+                    const couponSelect = document.getElementById('coupon-select');
+                    couponSelect.value = '';
+                    couponSelect.selectedIndex = 0;
+
+                    $('#coupon-select').niceSelect('destroy');
+                    $('#coupon-select').niceSelect();
+
+                    updateFinalTotal(currentDiscount);
+                    document.getElementById('apply-coupon-btn').style.display = 'inline-block';
+                    document.getElementById('remove-coupon-btn').style.display = 'none';
+                    toggleCouponSection(); // Re-evaluate coupon section state after removing
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to remove coupon', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Error', 'An unexpected error occurred', 'error');
+            });
+        });
+
+        document.getElementById('checkout-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Check if an address is selected or if addresses exist
+            const addressSelected = document.querySelector('input[name="addressId"]:checked');
+            const hasAddresses = <%= userAddress && Array.isArray(userAddress.Address) && userAddress.Address.length > 0 ? 'true' : 'false' %>;
+
+            if (!hasAddresses || !addressSelected) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Please add or select an address to proceed.',
+                    icon: 'error',
+                    confirmButtonText: 'Add Address',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/checkout';
+                    }
+                });
+                return;
+            }
+
+            const paymentMethod = document.getElementById('payment-method').value;
+            const finalTotal = parseFloat(document.getElementById('final-total').textContent);
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+            const tax = parseFloat(document.getElementById('tax').textContent);
+            const initialTotal = subtotal + tax - currentDiscount;
+
+            if (paymentMethod === 'cod' && finalTotal >= COD_MAXIMUM_AMOUNT) {
+                Swal.fire('Error', `Cash on Delivery is only available for orders less than $${COD_MAXIMUM_AMOUNT}. Your current total is $${finalTotal.toFixed(2)}.`, 'error');
+                return;
+            }
+
+            if (paymentMethod === 'wallet' && appliedWalletAmount <= 0) {
+                Swal.fire('Error', 'Please apply a wallet amount to proceed', 'error');
+                return;
+            }
+
+            if (paymentMethod === 'wallet' && appliedWalletAmount < initialTotal) {
+                Swal.fire('Error', 'Please use the full wallet amount or select another payment method for the remaining amount.', 'error');
+                return;
+            }
+
+            if (paymentMethod === 'razorpay') {
+                try {
+                    const response = await fetch('/checkout/create-razorpay-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            amount: finalTotal * 100,
+                            addressId: document.querySelector('input[name="addressId"]:checked')?.value,
+                            walletAmount: appliedWalletAmount,
+                            couponId: appliedCouponId
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (!data.success) {
+                        Swal.fire('Error', data.message || 'Failed to create Razorpay order', 'error');
+                        return;
+                    }
+
+                    const options = {
+                        key: '<%= process.env.RAZORPAY_KEY_ID %>',
+                        amount: data.order.amount,
+                        currency: data.order.currency,
+                        name: 'SNEAKKISH',
+                        description: 'Order Payment',
+                        order_id: data.order.id,
+                        handler: async function(response) {
+                            document.getElementById('razorpayOrderId').value = response.razorpay_order_id;
+                            document.getElementById('razorpayPaymentId').value = response.razorpay_payment_id;
+                            document.getElementById('razorpaySignature').value = response.razorpay_signature;
+                            document.getElementById('checkout-form').submit();
+                        },
+                        prefill: {
+                            name: '<%= user.FirstName %> <%= user.LastName %>',
+                            email: '<%= user.Email %>',
+                            contact: '<%= user.Address[0]?.Phone || "" %>'
+                        },
+                        theme: {
+                            color: '#007bff'
+                        }
+                    };
+
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+
+                    rzp.on('payment.failed', function(response) {
+                        Swal.fire('Error', 'Payment failed: ' + response.error.description, 'error');
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'An unexpected error occurred while initiating payment', 'error');
+                }
+            } else {
+                document.getElementById('checkout-form').submit();
+            }
+        });
+
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
 </html>

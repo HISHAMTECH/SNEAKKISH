@@ -1,41 +1,102 @@
-const mongoose=require('mongoose')
-const {Schema}=mongoose
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-
-const orderSchema = new mongoose.Schema({
-    OrderId:{
-        type:String,
-        default:()=>uuidv4()
+const orderSchema = new Schema({
+    OrderId: {
+        type: String,
+        required: true,
+        unique: true
     },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId, // Ensure this is an ObjectId
+        ref: 'User', // Reference to the User model
+        required: true // Optional, depending on your use case
+    },
     OrderedItems: [{
-        Product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-        Quantity: Number,
-        Price: Number,
-        Size: String
+        Product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Product",
+            required: true
+        },
+        Quantity: {
+            type: Number,
+            required: true
+        },
+        Price: {
+            type: Number,
+            required: true
+        },
+        Size: {
+            type: String,
+            required: true
+        }
     }],
-    TotalPrice:{
-        type:Number,
-        required:true
+    TotalPrice: {
+        type: Number,
+        required: true
     },
-    FinalAmount:{
-        type:Number,
-        required:true
+    Tax: {
+        type: Number,
+        
+    },
+    Discount: {
+        type: Number,
+        default: 0
+    },
+    FinalAmount: {
+        type: Number,
+        required: true
     },
     Address: {
-        addressType: String,
-        City: String,
-        State: String,
-        Pincode: Number,
-        _id: mongoose.Schema.Types.ObjectId
+        addressType: {
+            type: String,
+            default: 'N/A'
+        },
+        City: {
+            type: String,
+            default: 'N/A'
+        },
+        State: {
+            type: String,
+            default: 'N/A'
+        },
+        Pincode: {
+            type: String,
+            default: 'N/A'
+        },
+        _id: {
+            type: Schema.Types.ObjectId,
+            required: true
+        }
     },
-    Status:{
-        type:String,
-        required:true,
-        enum:['Pending','Processing','Shipped','Delivered','Cancelled','Return Request','Returned']
+    Status: {
+        type: String,
+        default: 'Pending'
     },
-    InvoiceDate: Date,
-    CreatedOn: { type: Date, default: Date.now }
+    InvoiceDate: {
+        type: Date,
+        default: Date.now
+    },
+    WalletAmount: {
+        type: Number,
+        default: 0
+    },
+    PaymentMethod: {
+        type: String,
+        enum: ['cod', 'wallet', 'mixed','razorpay'],
+        default: 'cod'
+    },
+    // Add missing fields
+    CancellationReason: {
+        type: String,
+        default: 'none'
+    },
+    ReturnReason: {
+        type: String,
+        default: ''
+    }
 });
-module.exports = mongoose.model('Order', orderSchema);
 
+const Order = mongoose.model("Order", orderSchema);
+
+module.exports = Order;

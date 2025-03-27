@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wallet Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* Include the same styles as your coupon page */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f7f8fa;
+      color: #2d3748;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .breadcrumb {
+      margin-bottom: 30px;
+      font-size: 13px;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .breadcrumb a {
+      color: #718096;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .breadcrumb a:hover {
+      color: #2b6cb0;
+    }
+
+    .account-header {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 20px;
+    }
+
+    .account-header h1 {
+      font-size: 32px;
+      color: #1a202c;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    /* Sidebar toggle button (visible only on mobile) */
+    .sidebar-toggle {
+      display: none;
+      width: 100%;
+      padding: 12px;
+      background-color: #2b6cb0;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background-color: #2c5282;
+    }
+
+    .content-wrapper {
+      display: flex;
+      gap: 50px;
+    }
+
+    .sidebar {
+      width: 280px;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-section {
+      margin-bottom: 40px;
+      background-color: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+      border: 1px solid #edf2f7;
+    }
+
+    .sidebar-title {
+      color: #2d3748;
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar-menu li strong {
+      color: #718096;
+      font-size: 13px;
+      display: block;
+      margin: 10px 0;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .sidebar-menu a {
+      color: #4a5568;
+      text-decoration: none;
+      display: block;
+      padding: 10px 12px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .sidebar-menu a:hover {
+      background-color: #edf2f7;
+      color: #2b6cb0;
+    }
+
+    .sidebar-menu a.active {
+      background-color: #e6f0fa;
+      color: #2b6cb0;
+      font-weight: 600;
+    }
+
+    .main-content {
+      flex: 1;
+    }
+
+    .wallet-container {
+      background: white;
+      padding: 35px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+      border: 1px solid #edf2f7;
+    }
+
+    .wallet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .wallet-header h2 {
+      font-size: 26px;
+      color: #1a202c;
+      font-weight: 600;
+    }
+
+    .add-funds-btn, .withdraw-btn {
+      padding: 10px 20px;
+      border: none;
+      background-color: #2b6cb0;
+      color: white;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-decoration: none;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .add-funds-btn:hover, .withdraw-btn:hover {
+      background-color: #2c5282;
+    }
+
+    .wallet-balance {
+      margin-bottom: 30px;
+      padding: 25px;
+      background-color: #f7fafc;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .wallet-balance h3 {
+      font-size: 18px;
+      color: #1a202c;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .wallet-balance p {
+      font-size: 28px;
+      color: #2b6cb0;
+      font-weight: 700;
+    }
+
+    .transaction-list {
+      display: grid;
+      gap: 20px;
+    }
+
+    .transaction-card {
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .transaction-card:hover {
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
+      transform: translateY(-3px);
+      border-color: #2b6cb0;
+    }
+
+    .transaction-details {
+      color: #4a5568;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .transaction-details p {
+      margin-bottom: 8px;
+    }
+
+    .transaction-details strong {
+      color: #1a202c;
+    }
+
+    .transaction-type.credit {
+      color: #2b6cb0;
+      font-weight: 600;
+    }
+
+    .transaction-type.debit {
+      color: #e53e3e;
+      font-weight: 600;
+    }
+
+    .no-transactions {
+      text-align: center;
+      padding: 40px 20px;
+      background: #edf2f7;
+      border-radius: 10px;
+      color: #718096;
+    }
+
+    .no-transactions p {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      margin: 50px auto;
+      padding: 35px;
+      width: 600px;
+      max-width: 90%;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+      border: 1px solid #edf2f7;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h2 {
+      font-size: 26px;
+      color: #1a202c;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #4a5568;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #2b6cb0;
+      box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.2);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+      justify-content: flex-end;
+    }
+
+    .save-btn {
+      padding: 10px 20px;
+      background: #2b6cb0;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    .save-btn:hover {
+      background: #2c5282;
+    }
+
+    .cancel-btn {
+      padding: 10px 20px;
+      background: #718096;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    .cancel-btn:hover {
+      background: #5a667a;
+    }
+
+    .see-all-btn {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #2b6cb0;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    .see-all-btn:hover {
+      background-color: #2c5282;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .content-wrapper {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        margin-bottom: 0; /* Adjusted for toggle button */
+      }
+
+      .sidebar-toggle {
+        display: block;
+      }
+
+      .sidebar-section {
+        display: none; /* Hide by default on mobile */
+        margin-bottom: 20px;
+      }
+
+      .sidebar-section.active {
+        display: block; /* Show when toggled */
+      }
+
+      .transaction-list {
+        grid-template-columns: 1fr;
+      }
+
+      /* Adjust container padding for smaller screens */
+      .container {
+        padding: 20px 10px;
+      }
+
+      /* Reduce font sizes for better fit */
+      .account-header h1 {
+        font-size: 24px;
+      }
+
+      .wallet-header h2 {
+        font-size: 20px;
+      }
+
+      .sidebar-title {
+        font-size: 12px;
+      }
+
+      .sidebar-menu a {
+        font-size: 14px;
+        padding: 8px 10px;
+      }
+
+      .wallet-balance h3 {
+        font-size: 16px;
+      }
+
+      .wallet-balance p {
+        font-size: 24px;
+      }
+
+      .transaction-details {
+        font-size: 14px;
+      }
+
+      /* Adjust button sizes */
+      .add-funds-btn,
+      .withdraw-btn,
+      .save-btn,
+      .cancel-btn,
+      .see-all-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+
+      /* Modal adjustments */
+      .modal-content {
+        width: 90%;
+        padding: 20px;
+        margin: 20px auto;
+      }
+
+      .modal-content h2 {
+        font-size: 20px;
+      }
+
+      .form-group input,
+      .form-group select {
+        font-size: 14px;
+        padding: 8px 10px;
+      }
+    }
+
+    /* Additional refinements for very small screens (e.g., < 480px) */
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px 5px;
+      }
+
+      .breadcrumb {
+        font-size: 11px;
+      }
+
+      .account-header h1 {
+        font-size: 20px;
+      }
+
+      .wallet-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .wallet-header h2 {
+        font-size: 18px;
+      }
+
+      .wallet-balance {
+        padding: 15px;
+      }
+
+      .wallet-balance h3 {
+        font-size: 14px;
+      }
+
+      .wallet-balance p {
+        font-size: 20px;
+      }
+
+      .transaction-card {
+        padding: 15px;
+      }
+
+      .transaction-details p {
+        margin-bottom: 6px;
+      }
+
+      .add-funds-btn,
+      .withdraw-btn,
+      .see-all-btn {
+        width: 100%;
+        text-align: center;
+      }
+
+      .modal-content {
+        padding: 15px;
+        margin: 10px auto;
+      }
+
+      .form-actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .save-btn,
+      .cancel-btn {
+        width: 100%;
+      }
+
+      .no-transactions {
+        padding: 20px 10px;
+      }
+
+      .no-transactions p {
+        font-size: 14px;
+      }
+
+      .sidebar-toggle {
+        padding: 10px;
+        font-size: 13px;
+      }
+    }
+
+    .form-group.error input, .form-group.error select {
+      border-color: #e53e3e;
+    }
+
+    .form-group .error-message {
+      color: #e53e3e;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .form-group.error .error-message {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="/">Home</a> > <a href="/userProfile">Account</a> > Wallet
+    </div>
+
+    <!-- Account header -->
+    <div class="account-header">
+      <h1>My Wallet</h1>
+    </div>
+
+    <!-- Main content wrapper -->
+    <div class="content-wrapper">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">Menu</button>
+        <div class="sidebar-section">
+          <h2 class="sidebar-title">Overview</h2>
+          <ul class="sidebar-menu">
+            <li><strong>ACCOUNT</strong></li>
+            <li><a href="/userProfile">Profile</a></li>
+            <li><a href="/change-password">Change Password</a></li>
+            <li><a href="/address">Address</a></li>
+            <li><a href="/wishlist">Wishlist</a></li>
+            <li><a href="/coupon">Coupons</a></li>
+            <li><a href="/wallet" class="active">Wallet</a></li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-section">
+          <h2 class="sidebar-title">Orders</h2>
+          <ul class="sidebar-menu">
+            <li><a href="/orders">Order History</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="main-content">
+        <div class="wallet-container">
+          <div class="wallet-header">
+            <h2>Wallet Overview</h2>
+            <div>
+              <a href="#" class="add-funds-btn">Add Funds</a>
+            </div>
+          </div>
+
+          <!-- Wallet Balance -->
+          <div class="wallet-balance">
+            <h3>Current Balance</h3>
+            <p>$<%= wallet ? wallet.balance.toFixed(2) : '0.00' %></p>
+          </div>
+
+          <!-- Transaction History -->
+          <div class="transaction-list" id="transactionList">
+            <% if (transactions && transactions.length > 0) { %>
+              <% transactions.slice(0, 3).forEach(transaction => { %>
+                <div class="transaction-card" data-transaction-id="<%= transaction._id %>">
+                  <div class="transaction-details">
+                    <p><strong>Date:</strong> <%= new Date(transaction.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) %></p>
+                    <p><strong>Type:</strong> <span class="transaction-type <%= transaction.type === 'credit' ? 'credit' : 'debit' %>"><%= transaction.type %></span></p>
+                    <p><strong>Amount:</strong> $<%= transaction.amount.toFixed(2) %></p>
+                    <p><strong>Description:</strong> <%= transaction.description %></p>
+                  </div>
+                </div>
+              <% }) %>
+            <% } else { %>
+              <div class="no-transactions">
+                <p>No Transactions Available</p>
+              </div>
+            <% } %>
+          </div>
+          <% if (transactions && transactions.length > 3) { %>
+            <a href="/wallet/transactions" class="see-all-btn">See All Transactions</a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Funds Modal -->
+  <div class="modal" id="addFundsModal">
+    <div class="modal-content">
+      <h2>Add Funds</h2>
+      <form id="addFundsForm">
+        <div class="form-group">
+          <label for="amount">Amount</label>
+          <input type="number" id="amount" name="amount" step="0.01" min="1" required>
+          <div class="error-message">Please enter a valid amount.</div>
+        </div>
+        <div class="form-group">
+          <label for="paymentMethod">Payment Method</label>
+          <select id="paymentMethod" name="paymentMethod" required>
+            <option value="">Select a payment method</option>
+            <option value="credit_card">Credit Card</option>
+            <option value="debit_card">Debit Card</option>
+            <option value="upi">UPI</option>
+          </select>
+          <div class="error-message">Please select a payment method.</div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" onclick="closeModal('addFundsModal')">Cancel</button>
+          <button type="submit" class="save-btn">Add Funds</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Sidebar toggle function
+    function toggleSidebar() {
+      const sidebarSections = document.querySelectorAll('.sidebar-section');
+      const toggleButton = document.querySelector('.sidebar-toggle');
+      sidebarSections.forEach(section => section.classList.toggle('active'));
+      if (sidebarSections[0].classList.contains('active')) {
+        toggleButton.textContent = 'Close Menu';
+      } else {
+        toggleButton.textContent = 'Menu';
+      }
+    }
+
+    // Modal handling functions
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'block';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Handle add funds button
+    document.querySelector('.add-funds-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      openModal('addFundsModal');
+    });
+
+    // Handle add funds form submission
+    document.getElementById('addFundsForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const amount = document.getElementById('amount').value;
+      const paymentMethod = document.getElementById('paymentMethod').value;
+
+      // Reset error states
+      document.querySelectorAll('.form-group').forEach(group => group.classList.remove('error'));
+
+      // Validation
+      let isValid = true;
+      if (!amount || amount <= 0) {
+        document.querySelector('#addFundsForm .form-group:nth-child(1)').classList.add('error');
+        isValid = false;
+      }
+      if (!paymentMethod) {
+        document.querySelector('#addFundsForm .form-group:nth-child(2)').classList.add('error');
+        isValid = false;
+      }
+
+      if (!isValid) return;
+
+      try {
+        const response = await fetch('/wallet/add-funds', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ amount, paymentMethod })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          Swal.fire('Success!', 'Money added to wallet successfully.', 'success');
+          closeModal('addFundsModal');
+          // Refresh the page to update balance and transactions
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          Swal.fire('Error!', data.message || 'Failed to add funds.', 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error!', 'An error occurred while adding funds.', 'error');
+        console.error("error",error);
+      }
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal')) {
+        closeModal('addFundsModal');
+      }
+    });
+  </script>
+</body>
+</html>

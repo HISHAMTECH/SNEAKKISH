@@ -22,17 +22,19 @@
     <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 
+    <!-- SweetAlert2 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
     <!-- Custom CSS -->
     <style>
-        /* General Layout */
         body {
             font-family: 'Nunito Sans', sans-serif;
-            background: #f8f9fa; /* Light gray background consistent with shop.ejs */
+            background: #f8f9fa;
             color: #2c2c2c;
             margin: 0;
         }
 
-        /* Order Details Section */
         .order-details-section {
             padding: 50px 0;
         }
@@ -41,7 +43,6 @@
             max-width: 1200px;
         }
 
-        /* Breadcrumb */
         .breadcrumb-option {
             background: #fff;
             padding: 20px 0;
@@ -65,7 +66,6 @@
             color: #007bff;
         }
 
-        /* Order Details Container */
         .order-details-container {
             background: #fff;
             border-radius: 8px;
@@ -78,96 +78,270 @@
         .order-details-container h1 {
             font-size: 28px;
             font-weight: 700;
-            color: #007bff; /* Blue to match shop.ejs accents */
+            color: #007bff;
             margin-bottom: 20px;
             text-align: center;
         }
 
-        /* Order Info */
-        .order-info {
+        /* Table Styling for Order Info, Address, Items, and Totals */
+        .order-info, .delivery-address, .ordered-items, .totals {
             margin-bottom: 30px;
         }
 
-        .order-info p {
-            font-size: 16px;
-            color: #666;
-            margin: 10px 0;
-        }
-
-        .order-info p strong {
-            color: #333;
-        }
-
-        .order-info .highlight {
-            color: #007bff;
-            font-weight: 600;
-        }
-
-        /* Ordered Items */
-        .ordered-items {
-            margin-bottom: 30px;
-        }
-
-        .ordered-items h2 {
+        .order-info h2, .delivery-address h2, .ordered-items h2, .totals h2 {
             font-size: 22px;
             font-weight: 600;
             color: #333;
             margin-bottom: 15px;
         }
 
-        .item-list {
-            list-style: none;
-            padding: 0;
+        .order-table, .address-table, .items-table, .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
         }
 
-        .item {
-            padding: 15px;
+        .order-table th, .order-table td,
+        .address-table th, .address-table td,
+        .items-table th, .items-table td,
+        .totals-table th, .totals-table td {
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 16px;
+            color: #666;
             border-bottom: 1px solid #eee;
-            font-size: 16px;
-            color: #666;
         }
 
-        .item:last-child {
-            border-bottom: none;
-        }
-
-        /* Totals */
-        .totals {
-            text-align: right;
-        }
-
-        .totals p {
-            font-size: 16px;
-            color: #666;
-            margin: 5px 0;
-        }
-
-        .totals p strong {
+        .order-table th,
+        .address-table th,
+        .items-table th,
+        .totals-table th {
+            background: #f1f1f1;
+            font-weight: 600;
             color: #333;
         }
 
-        .totals .final-amount {
-            font-size: 20px;
+        .order-table td strong,
+        .address-table td strong,
+        .totals-table td strong {
+            color: #333;
+        }
+
+        .order-table .highlight {
+            color: #007bff;
+            font-weight: 600;
+        }
+
+        .items-table img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .totals-table .final-amount {
+            font-size: 18px;
             font-weight: 700;
             color: #007bff;
         }
 
-        /* Responsive Adjustments */
+        .action-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .action-buttons button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .cancel-btn {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        .cancel-btn:hover {
+            background: #c82333;
+        }
+
+        .return-btn {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .return-btn:hover {
+            background: #e0a800;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #28a745;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        /* Override default button styles for the wrapper */
+        .action-buttons button:has(.download-btn) {
+            padding: 0;
+            background: none;
+            border: none;
+            margin: 0 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #fff;
+            margin: 50px auto;
+            padding: 20px;
+            width: 400px;
+            max-width: 90%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-actions button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background: #007bff;
+            color: #fff;
+        }
+
+        .save-btn:hover {
+            background: #0056b3;
+        }
+
+        .modal-cancel-btn {
+            background: #666;
+            color: #fff;
+        }
+
+        .modal-cancel-btn:hover {
+            background: #555;
+        }
+
+        /* Responsive Design */
         @media (max-width: 767px) {
             .order-details-container {
                 padding: 20px;
                 margin: 20px;
             }
+
             .order-details-container h1 {
                 font-size: 24px;
             }
-            .order-info p, .item, .totals p {
-                font-size: 14px;
-            }
-            .ordered-items h2 {
+
+            .order-info h2, .delivery-address h2, .ordered-items h2, .totals h2 {
                 font-size: 20px;
             }
-            .totals {
+
+            .order-table th, .order-table td,
+            .address-table th, .address-table td,
+            .items-table th, .items-table td,
+            .totals-table th, .totals-table td {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+
+            .items-table img {
+                width: 40px;
+                height: 40px;
+            }
+
+            /* Stack table rows for smaller screens */
+            .items-table, .items-table thead, .items-table tbody, .items-table th, .items-table td, .items-table tr {
+                display: block;
+            }
+
+            .items-table thead {
+                display: none;
+            }
+
+            .items-table tr {
+                margin-bottom: 15px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .items-table td {
+                display: flex;
+                justify-content: space-between;
+                text-align: right;
+                padding: 8px;
+                border-bottom: none;
+            }
+
+            .items-table td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #333;
+                text-align: left;
+                flex: 1;
+            }
+
+            .items-table td img {
+                margin: 0 auto;
+            }
+
+            .totals, .action-buttons {
                 text-align: center;
             }
         }
@@ -198,39 +372,196 @@
         <div class="container">
             <div class="order-details-container">
                 <h1>Order Details - <%= order.OrderId || order._id %></h1>
+
+                <!-- Order Information -->
                 <div class="order-info">
-                    <p>Status: <strong class="highlight"><%= order.Status %></strong></p>
-                    <p>Date: <strong><%= order.CreatedOn ? new Date(order.CreatedOn).toLocaleDateString() : 'N/A' %></strong></p>
-                    <% if (order.Address) { %>
-                        <p>Address: <strong><%= order.Address.addressLine %>, <%= order.Address.city %>, <%= order.Address.state %>, <%= order.Address.pincode %></strong></p>
-                    <% } %>
-                    <% if (order.CancellationReason && order.CancellationReason !== 'none') { %>
-                        <p>Cancel Reason: <strong><%= order.CancellationReason %></strong></p>
-                    <% } %>
-                    <% if (order.ReturnReason) { %>
-                        <p>Return Reason: <strong><%= order.ReturnReason %></strong></p>
-                    <% } %>
+                    <h2>Order Information</h2>
+                    <table class="order-table">
+                        <thead>
+                            <tr>
+                                <th>Detail</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Status</td>
+                                <td><strong class="highlight"><%= order.Status %></strong></td>
+                            </tr>
+                            <tr>
+                                <td>Date</td>
+                                <td><strong><%= order.InvoiceDate ? new Date(order.InvoiceDate).toLocaleDateString() : 'N/A' %></strong></td>
+                            </tr>
+                            <tr>
+                                <td>Payment Method</td>
+                                <td><strong><%= order.PaymentMethod || 'N/A' %></strong></td>
+                            </tr>
+                            <% if (order.CancellationReason && order.CancellationReason !== 'Not specified') { %>
+                                <tr>
+                                    <td>Cancel Reason</td>
+                                    <td><strong><%= order.CancellationReason %></strong></td>
+                                </tr>
+                            <% } %>
+                            <% if (order.ReturnReason) { %>
+                                <tr>
+                                    <td>Return Reason</td>
+                                    <td><strong><%= order.ReturnReason %></strong></td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
                 </div>
 
+                <!-- Delivery Address -->
+                <% if (order.Address) { %>
+                    <div class="delivery-address">
+                        <h2>Delivery Address</h2>
+                        <table class="address-table">
+                            <thead>
+                                <tr>
+                                    <th>Detail</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Type</td>
+                                    <td><strong><%= order.Address.addressType %></strong></td>
+                                </tr>
+                                <tr>
+                                    <td>City</td>
+                                    <td><strong><%= order.Address.City %></strong></td>
+                                </tr>
+                                <tr>
+                                    <td>State</td>
+                                    <td><strong><%= order.Address.State %></strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Pincode</td>
+                                    <td><strong><%= order.Address.Pincode %></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } %>
+
+                <!-- Ordered Items -->
                 <div class="ordered-items">
                     <h2>Ordered Items</h2>
-                    <ul class="item-list">
-                        <% order.OrderedItems.forEach(item => { %>
-                            <li class="item">
-                                <%= item.Product.ProductName || 'Unnamed Product' %> (Size: <%= item.Size %>) - 
-                                <%= item.Quantity %> x $<%= item.Price.toFixed(2) %>
-                            </li>
-                        <% }) %>
-                    </ul>
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% order.OrderedItems.forEach(item => { %>
+                                <tr>
+                                    <td data-label="Image">
+                                        <img src="<%= item.Product.Image || '/images/placeholder.jpg' %>" alt="<%= item.Product.ProductName || 'Product Image' %>">
+                                    </td>
+                                    <td data-label="Name"><%= item.Product.ProductName || 'Unnamed Product' %></td>
+                                    <td data-label="Size"><%= item.Size %></td>
+                                    <td data-label="Price">$<%= item.Price.toFixed(2) %> x <%= item.Quantity %></td>
+                                    <td data-label="Subtotal">$<%= (item.Price * item.Quantity).toFixed(2) %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
                 </div>
 
+                <!-- Totals -->
                 <div class="totals">
-                    <p>Total: <strong>$<%= order.TotalPrice.toFixed(2) %></strong></p>
-                    <p>Final Amount: <strong class="final-amount">$<%= order.FinalAmount.toFixed(2) %></strong></p>
+                    <h2>Order Summary</h2>
+                    <table class="totals-table">
+                        <thead>
+                            <tr>
+                                <th>Detail</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Subtotal</td>
+                                <td><strong>$<%= order.TotalPrice.toFixed(2) %></strong></td>
+                            </tr>
+                            <tr>
+                                <td>Tax</td>
+                                <td><strong>$<%= order.Tax.toFixed(2) %></strong></td>
+                            </tr>
+                            <tr>
+                                <td>Discount</td>
+                                <td><strong>$<%= order.Discount.toFixed(2) %></strong></td>
+                            </tr>
+                            <tr>
+                                <td>Wallet Amount Used</td>
+                                <td><strong>$<%= order.WalletAmount.toFixed(2) %></strong></td>
+                            </tr>
+                            <% const calculatedFinalAmount = Math.max(0, order.TotalPrice + order.Tax - order.Discount - order.WalletAmount); %>
+                            <tr>
+                                <td class="final-amount">Final Amount</td>
+                                <td class="final-amount"><strong>$<%= calculatedFinalAmount.toFixed(2) %></strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+
+                <% if (order.Status === 'Pending') { %>
+                    <div class="action-buttons">
+                        <button class="cancel-btn" onclick="openModal('cancelModal')">Cancel Order</button>
+                        <button><a href="/orders/invoice/<%= order.OrderId || order._id %>" class="download-btn">Download Invoice</a></button>
+                    </div>
+                <% } else if (order.Status === 'Delivered') { %>
+                    <div class="action-buttons">
+                        <button class="return-btn" onclick="openModal('returnModal')">Request Return</button>
+                        <button><a href="/orders/invoice/<%= order.OrderId || order._id %>" class="download-btn">Download Invoice</a></button>
+                    </div>
+                <% } else { %>
+                    <div class="action-buttons">
+                        <button><a href="/orders/invoice/<%= order.OrderId || order._id %>" class="download-btn">Download Invoice</a></button>
+                    </div>
+                <% } %>
             </div>
         </div>
     </section>
+
+    <!-- Cancel Order Modal -->
+    <div class="modal" id="cancelModal">
+        <div class="modal-content">
+            <h2>Cancel Order</h2>
+            <form id="cancelForm" action="/orders/cancel/<%= order.OrderId %>" method="POST">
+                <div class="form-group">
+                    <label for="cancelReason">Reason for Cancellation</label>
+                    <textarea id="cancelReason" name="reason" rows="4" placeholder="Enter your reason (optional)"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="modal-cancel-btn" onclick="closeModal('cancelModal')">Cancel</button>
+                    <button type="submit" class="save-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Return Order Modal -->
+    <div class="modal" id="returnModal">
+        <div class="modal-content">
+            <h2>Request Return</h2>
+            <form id="returnForm" action="/orders/return/<%= order.OrderId %>" method="POST">
+                <div class="form-group">
+                    <label for="returnReason">Reason for Return</label>
+                    <textarea id="returnReason" name="reason" rows="4" required placeholder="Enter your reason"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="modal-cancel-btn" onclick="closeModal('returnModal')">Cancel</button>
+                    <button type="submit" class="save-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Js Plugins -->
     <script src="/js/jquery-3.3.1.min.js"></script>
@@ -243,6 +574,113 @@
     <script src="/js/mixitup.min.js"></script>
     <script src="/js/owl.carousel.min.js"></script>
     <script src="/js/main.js"></script>
-</body>
 
+    <!-- Custom JavaScript -->
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                closeModal('cancelModal');
+                closeModal('returnModal');
+            }
+        });
+
+        document.getElementById('cancelForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = this;
+            const reason = document.getElementById('cancelReason').value.trim();
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to cancel order',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred: ' + error.message,
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+
+        document.getElementById('returnForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = this;
+            const reason = document.getElementById('returnReason').value.trim();
+
+            if (!reason) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please provide a return reason',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to request return',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred: ' + error.message,
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    </script>
+</body>
 </html>

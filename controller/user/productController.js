@@ -2,35 +2,40 @@ const Product=require('../../models/productSchema')
 const Category=require('../../models/CategorySchema')
 const Brand=require('../../models/brandSchema')
 const User=require('../../models/userSchema')
-// const fs=require("fs")
-// const path=require('path')
-// const sharp=require('sharp')
+const Cart=require('../../models/cartSchema')
+
 
 const productDetails = async(req, res) => {
     try {
-        // Get user id from session if authenticated
-        const userId = req.session.userId;
-        const userData = userId ? await User.findById(userId) : null;
         
-        // Get product id from query parameter
+        const userId = req.session.User;
+        const userData = userId ? await User.findById(userId) : null;
+       
         const productId = req.query.id;
+        console.log(productId);
+        
         if (!productId) {
             return res.redirect('/shop');
         }
-        
-        // Find product by id and populate category
+    
         const product = await Product.findById(productId).populate('Categorys');
         
         if (!product) {
             return res.redirect('/pageNotFound');
         }
         
-        // Calculate offers
+        
         const categoryOffer = product.Categorys ? product.Categorys.CategoryOffer || 0 : 0;
         const productOffer = product.ProductOffer || 0;
-        const totalOffer = categoryOffer + productOffer;
+        let totalOffer=0
+        if(categoryOffer>productOffer){
+             totalOffer = categoryOffer
+        }else{
+             totalOffer = productOffer;
+        }
+       
         
-        // Find similar products based on brand, category or color
+        
         const similarProducts = await Product.find({
             $or: [
                 { Brands: product.Brands },
@@ -42,7 +47,7 @@ const productDetails = async(req, res) => {
             Status: "Available"
         }).limit(4);
         
-        // Check if the user has this product in cart
+        
         let cartItem = null;
         if (userId) {
             const cart = await Cart.findOne({ userId });
@@ -71,58 +76,71 @@ const productDetails = async(req, res) => {
 
 const productPage = async (req, res) => {
     try {
-        const userId = req.session.User;
-        const category = await Category.find({ isListed: true });
-        const brands = await Brand.find({ isBlocked: false }).lean();
+        const { query, category, brand, priceRange, sort, page = 1, limit = 9 } = req.query;
 
-        let query = { isBlocked: false };
-        const { category: categoryId, brand: brandId, priceRange, sort } = req.query;
-
-        // Filter by category
-        if (categoryId) {
-            query.Categorys = categoryId;
-        } else {
-            query.Categorys = { $in: category.map(cat => cat._id) };
+        // Build the filter object
+        const filter = {};
+        if (query) {
+            filter.ProductName = { $regex: query, $options: 'i' };
         }
-
-        // Filter by brand
-        if (brandId) {
-            query.brand = brandId; // Adjust based on your schema field for brand
+        if (category) {
+            filter.Categorys = category;
         }
-
-        // Filter by price range
+        if (brand) {
+            filter.Brands = brand;
+        }
         if (priceRange) {
-            const [min, max] = priceRange.split('-').map(Number);
-            if (max) {
-                query.SalePrice = { $gte: min, $lte: max };
-            } else {
-                query.SalePrice = { $gte: min };
+            const [minPrice, maxPrice] = priceRange.split('-');
+            filter.SalePrice = { $gte: parseFloat(minPrice) };
+            if (maxPrice !== '+') {
+                filter.SalePrice.$lte = parseFloat(maxPrice);
             }
         }
 
-        let productData = await Product.find(query).lean();
-
-        // Sort products
+        // Build the sort object
+        const sortOptions = {};
         if (sort === 'lowToHigh') {
-            productData.sort((a, b) => a.SalePrice - b.SalePrice);
+            sortOptions.SalePrice = 1;
         } else if (sort === 'highToLow') {
-            productData.sort((a, b) => b.SalePrice - a.SalePrice);
-        } else {
-            productData.sort((a, b) => new Date(b.timestamps) - new Date(a.timestamps));
+            sortOptions.SalePrice = -1;
         }
 
+        // Pagination
+        const totalProducts = await Product.countDocuments(filter);
+        const totalPages = Math.ceil(totalProducts / limit);
+        const skip = (page - 1) * limit;
+
+        // Fetch products with filters, sorting, and pagination
+        const products = await Product.find(filter)
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(limit)
+            .populate('Categorys')
+            .populate('Brands');
+
+        // Fetch categories and brands for filters
+        const categories = await Category.find();
+        const brands = await Brand.find();
+        console.log("brands",brand);
+        console.log("brands",category);
         
-        console.log('Sort query:', sort); // Debug log for sort
 
         res.render('shop', {
-            product: productData || [],
-            categories: category || [],
-            brands: brands || [],
-            sort: sort || 'lowToHigh' // Pass the sort value to the template
+            products,
+            categories,
+            brands,
+            totalProducts,
+            totalPages,
+            currentPage: parseInt(page),
+            query,
+            category,
+            brand,
+            priceRange,
+            sort
         });
     } catch (error) {
-        console.error("Error For Rendering Product Page", error);
-        res.redirect('/pageNotFound');
+        console.error('Error in /shop route:', error);
+        res.status(500).render('error', { message: 'Error loading shop page' });
     }
 };
 

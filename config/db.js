@@ -4,7 +4,7 @@ const env =require("dotenv").config()
 const connectDB= async ()=>{
 try {
      await mongoose.connect(process.env.MONGODB_URI)
-     console.log("DB connected");
+     console.log("DB connected to atlas");
      
 } catch (error) {
     console.log("DB connection failed",error.message);
