@@ -600,7 +600,7 @@
                                              alt="<%= item.ProductId.ProductName || 'Product Image' %>">
                                         <span><%= item.ProductId.ProductName || 'Unnamed Product' %> (Size: <%= item.Size %>)</span>
                                         <span class="quantity">x<%= item.Quantity %></span>
-                                        <span class="price">$<%= item.TotalPrice.toFixed(2) %></span>
+                                        <span class="price">₹<%= item.TotalPrice.toFixed(2) %></span>
                                     </li>
                                 <% }) %>
                             </ul>
@@ -637,19 +637,19 @@
 
                             <!-- Totals -->
                             <div class="totals">
-                                <p>Subtotal: <strong>$<span id="subtotal"><%= total.toFixed(2) %></span></strong></p>
-                                <p>Tax: <strong>$<span id="tax"><%= tax.toFixed(2) %></span></strong></p>
-                                <p>Discount: <strong>$<span id="discount"><%= discount.toFixed(2) %></span></strong></p>
+                                <p>Subtotal: <strong>₹<span id="subtotal"><%= total.toFixed(2) %></span></strong></p>
+                                <p>Tax: <strong>₹<span id="tax"><%= tax.toFixed(2) %></span></strong></p>
+                                <p>Discount: <strong>₹<span id="discount"><%= discount.toFixed(2) %></span></strong></p>
                                 <p class="wallet-amount-container">
                                     Wallet Amount: 
                                     <strong>
-                                        $<span id="wallet-amount">0.00</span>
+                                        ₹<span id="wallet-amount">0.00</span>
                                         <% if (wallet && wallet.balance > 0) { %>
                                             <a href="#" id="remove-wallet-btn" class="remove-wallet-btn" style="display: none;">Remove</a>
                                         <% } %>
                                     </strong>
                                 </p>
-                                <p class="final-total">Total: <strong>$<span id="final-total"><%= finalTotal.toFixed(2) %></span></strong></p>
+                                <p class="final-total">Total: <strong>₹<span id="final-total"><%= finalTotal.toFixed(2) %></span></strong></p>
                             </div>
 
                             <!-- Payment Method -->
@@ -681,7 +681,7 @@
     <div class="modal" id="walletModal">
         <div class="modal-content">
             <h2>Use Wallet Balance</h2>
-            <p>Current Wallet Balance: $<%= wallet ? wallet.balance.toFixed(2) : '0.00' %></p>
+            <p>Current Wallet Balance: ₹<%= wallet ? wallet.balance.toFixed(2) : '0.00' %></p>
             <form id="walletForm">
                 <div class="form-group">
                     <label for="wallet-amount-input">Amount to Use</label>

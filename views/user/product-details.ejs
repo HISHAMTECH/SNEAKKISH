@@ -74,6 +74,31 @@
             align-items: flex-start;
             margin-top: 20px;
         }
+
+        .product__details__container .mrp {
+            font-weight: bold;
+            color: #cc1010;
+            font-size: 20px;
+            margin-top: 0px;
+            margin-right: 10px;
+        }
+
+        .product__details__container .sale-price{
+            text-decoration: line-through;
+            font-weight: bold;
+            font-size: 21px;
+        }
+        .product__details__container .offer-price{
+            font-weight: bold;
+            font-size: 21px;
+        }
+
+        .product__details__container .sale-price1{
+            
+            font-weight: bold;
+            font-size: 21px;
+        }
+
         .product__details__image {
             flex: 1;
             min-width: 300px;
@@ -153,6 +178,7 @@
             overflow: hidden;
             text-align: center;
             max-width: 300px;
+            height: 450px;
             position: relative;
         }
         .product__item__pic {
@@ -183,26 +209,38 @@
             font-size: 14px;
             color: #666;
             margin-bottom: 10px;
-            text-transform: uppercase;
         }
         .product__item__text .product-price {
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
         .product__item__text .mrp {
-            text-decoration: line-through;
-            color: #999;
+            font-weight: bold;
+            color: #cc1010;
             font-size: 14px;
+            margin-top: 0px;
             margin-right: 10px;
         }
-        .product__item__text .sale-price {
-            color: #e74c3c;
+        .product__item__text .sale-price1 {
+            color: #000000;
             font-size: 18px;
             font-weight: 700;
         }
+        .product__item__text .sale-price {
+            text-decoration: line-through;
+            color: #000000;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .product__item__text .offer-price {
+            color: #000000;
+            font-size: 18px;
+            font-weight: 700;
+            
+        }
         .wishlist-icon {
             position: absolute;
-            left: -50px;
-            top: 10px;
+            left: 20px;
+            top: 20px;
             background: #fff;
             border: 1px solid #ddd;
             border-radius: 50%;
@@ -220,7 +258,7 @@
             height: 20px;
         }
         .product__item:hover .wishlist-icon {
-            left: 10px;
+            left: 20px;
         }
         .product__carousel .owl-nav button {
             position: absolute;
@@ -689,19 +727,11 @@
                 <ul>
                     <li><a href="/">Home</a></li>
                     <li class="active"><a href="/shop">Shop</a></li>
-                    <li><a href="#">Brands</a>
-                        <ul class="dropdown">
-                            <li><a href="./about.html">Adidas</a></li>
-                            <li><a href="./shop-details.html">Nike</a></li>
-                            <li><a href="./shopping-cart.html">New Balance</a></li>
-                            <li><a href="./checkout.html">Reebok</a></li>
-                        </ul>
-                    </li>
                     <li><a href="/contact">Contacts</a></li>
                 </ul>
             </nav>
             <div class="header__nav__option">
-                <a href="#" class="search-switch"><img src="/img/icon/search.png" alt=""></a>
+                
                 <a href="/wishlist"><img src="/img/icon/heart.png" alt=""></a>
                 <a href="/cart"><img src="/img/icon/cart.png" alt=""> <span id="cart-count">0</span></a>
                 <div class="price" id="cart-total">$0.00</div>
@@ -747,7 +777,7 @@
             <div class="product__details__container">
                 <div class="product__details__image">
                     <div class="product__details__pic__item">
-                        <img src="<%= product.ProductImage && product.ProductImage.length > 0 ? '/uploads/re-image/' + product.ProductImage[0] : '/img/shop-details/product-big-2.png' %>" 
+                        <img src="<%= product.ProductImage && product.ProductImage.length > 0 ? '/Uploads/re-image/' + product.ProductImage[0] : '/img/shop-details/product-big-2.png' %>" 
                              alt="<%= product.ProductName || 'Product Image' %>" 
                              id="mainImage" 
                              class="zoom">
@@ -755,7 +785,7 @@
                     <div class="thumbnails" id="thumbnailList">
                         <% if (product.ProductImage && product.ProductImage.length > 1) { %>
                             <% product.ProductImage.slice(1).forEach((image, index) => { %>
-                                <img src="/uploads/re-image/<%= image || '/img/shop-details/thumb-1.png' %>" 
+                                <img src="/Uploads/re-image/<%= image || '/img/shop-details/thumb-1.png' %>" 
                                      alt="Thumbnail <%= index + 2 %>" 
                                      class="thumbnail" 
                                      onclick="changeMainImage('<%= image %>', this)">
@@ -778,13 +808,17 @@
                             <% } %>
                             <span> - <%= (product.rating || 0).toFixed(1) %> Rating</span>
                         </div>
-                        <% if (totalOffer > 0) { %>
-                            <h3><%= (product.SalePrice || 0).toFixed(2) %> 
-                                <span><%= (product.RegularPrice || 0).toFixed(2) %></span>
-                                <span class="discount-label"><%= totalOffer %>% OFF</span>
-                            </h3>
-                        <% } else { %>
-                            <h3>$<%= (product.SalePrice || 0).toFixed(2) %></h3>
+                        <div class="product-price">
+                            <% if (product.appliedOffer > 0) { %>
+                                <span class="offer-price">₹<%= product.offerPrice %></span>
+                                <span class="sale-price">₹<%= product.displayPrice %></span>
+                               
+                            <% } else { %>
+                                <span class="sale-price1">MRP ₹<%= product.displayPrice %></span>
+                            <% } %>
+                        </div>
+                        <% if (product.appliedOffer > 0) { %>
+                            <p class="mrp"><%= product.appliedOffer %>% OFF</p>
                         <% } %>
                         <p><%= product.Description || 'No description available' %></p>
                         <div class="product__details__option">
@@ -893,30 +927,34 @@
                 <div class="col-lg-12">
                     <div class="owl-carousel owl-theme product__carousel">
                         <% for (let i = 0; i < similarProducts.length; i++) { %>
-                            <div class="product__item">
+                            <div class="product__item mix new-arrivals">
                                 <a href="/productDetails?id=<%= similarProducts[i]._id %>">
                                     <div class="product__item__pic">
-                                        <img src="/uploads/re-image/<%= similarProducts[i].ProductImage[0] %>" 
+                                        <img src="<%= similarProducts[i].ProductImage && similarProducts[i].ProductImage.length > 0 ? '/Uploads/re-image/' + similarProducts[i].ProductImage[0] : '/img/default-product.jpg' %>" 
                                              alt="<%= similarProducts[i].ProductName %>" 
                                              class="product-image">
                                     </div>
                                     <div class="product__item__text">
-                                        <h6 class="product-name"><%= similarProducts[i].ProductName || 'RAZO' %></h6>
-                                        <p class="product-category">Men's Shoes</p>
+                                        <h6 class="product-name"><%= similarProducts[i].ProductName || 'Unnamed Product' %></h6>
+                                        <p class="product-category"><%= similarProducts[i].Categorys.Name || 'Uncategorized' %></p>
+                                        <p class="product-category"><%= similarProducts[i].Brands || 'Unknown Brand' %></p>
                                         <div class="product-price">
-                                            <% if (similarProducts[i].SalePrice < similarProducts[i].RegularPrice) { %>
-                                                <span class="mrp">$<%= (similarProducts[i].RegularPrice || 0).toFixed(2) %></span>
-                                                <span class="sale-price">$<%= (similarProducts[i].SalePrice || 0).toFixed(2) %></span>
+                                            <% if (similarProducts[i].appliedOffer > 0) { %>
+                                                <span class="sale-price">₹<%= similarProducts[i].displayPrice %></span>
+                                                <span class="offer-price">₹<%= similarProducts[i].offerPrice %></span>
                                             <% } else { %>
-                                                <span class="sale-price">$<%= (similarProducts[i].SalePrice || 0).toFixed(2) %></span>
+                                                <span class="sale-price1">MRP ₹<%= similarProducts[i].displayPrice %></span>
                                             <% } %>
                                         </div>
+                                        <% if (similarProducts[i].appliedOffer > 0) { %>
+                                            <p class="mrp"><%= similarProducts[i].appliedOffer %>% OFF</p>
+                                        <% } %>
                                     </div>
                                 </a>
                                 <div class="wishlist-icon">
-                                    <a href="javascript:void(0)" onclick="addToWishlist('<%= similarProducts[i]._id %>')">
+                                    <span onclick="addToWishlist('<%= similarProducts[i]._id %>')">
                                         <img src="/img/icon/heart.png" alt="Wishlist">
-                                    </a>
+                                    </span>
                                 </div>
                             </div>
                         <% } %>
@@ -1067,11 +1105,11 @@
         function changeMainImage(imageSrc, thumbnailElement) {
             const mainImage = document.getElementById('mainImage');
             const thumbnails = document.getElementById('thumbnailList');
-            const currentMainSrc = mainImage.src.split('/uploads/re-image/')[1] || '/img/shop-details/product-big-2.png';
-            mainImage.src = '/uploads/re-image/' + imageSrc;
+            const currentMainSrc = mainImage.src.split('/Uploads/re-image/')[1] || '/img/shop-details/product-big-2.png';
+            mainImage.src = '/Uploads/re-image/' + imageSrc;
             
             const newThumbnail = document.createElement('img');
-            newThumbnail.src = '/uploads/re-image/' + currentMainSrc;
+            newThumbnail.src = '/Uploads/re-image/' + currentMainSrc;
             newThumbnail.alt = 'Thumbnail';
             newThumbnail.className = 'thumbnail';
             newThumbnail.onclick = function() { changeMainImage(currentMainSrc, this); };
@@ -1107,9 +1145,8 @@
                             icon: 'success',
                             title: 'Success',
                             text: 'Product added to cart successfully!',
-                            confirmButtonColor: '#007bff'
-                        }).then(() => {
-                            window.location.href = '/productDetails?id=' + productId;
+                            confirmButtonColor: '#007bff',
+                            timer: 2000
                         });
                     } else {
                         Swal.fire({

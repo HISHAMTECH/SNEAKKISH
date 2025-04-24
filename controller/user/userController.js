@@ -388,63 +388,156 @@ if(!passwordMatch){
 //     }
 // };
 
+// const loadHome = async (req, res) => {
+//     try {
+//         const user = req.session.User;
+
+       
+//         const category = await Category.find({ isListed: true });
+
+        
+//         let productData = await Product.find({
+//             isBlocked: false,
+//             Categorys: { $in: category.map(category => category._id) }
+//         }).populate('Categorys');
+
+        
+//         productData.sort((a, b) => new Date(b.timestamps) - new Date(a.timestamps));
+
+        
+//         const roundToNearest5or10 = (num) => {
+//             const integerPart = Math.floor(num);
+//             const decimalPart = num - integerPart;
+//             if (decimalPart > 0.75) {
+//                 return Math.ceil(num / 10) * 10; 
+//             } else {
+//                 return Math.round(num / 5) * 5; 
+//             }
+//         };
+
+        
+//         let newArrivals = productData
+//             .filter(product => product.ProductOffer <= 0) 
+//             .slice(0, 6) 
+//             .map(product => {
+//                 const displayPrice = roundToNearest5or10(product.SalePrice); 
+//                 return {
+//                     ...product.toObject(),
+//                     displayPrice 
+//                 };
+//             });
+
+       
+//         const offerProducts = await Product.find({ ProductOffer: { $gt: 0 } }).populate('Categorys');
+
+        
+//         const offerProductsWithPrice = offerProducts.map(product => {
+//             const discount = (product.ProductOffer / 100) * product.SalePrice;
+//             const offerPriceRaw = product.SalePrice - discount; 
+//             const offerPrice = roundToNearest5or10(offerPriceRaw); 
+//             return {
+//                 ...product.toObject(), // Convert Mongoose document to plain object
+//                 offerPrice 
+//             };
+//         });
+
+//         console.log(newArrivals); 
+//         console.log(offerProductsWithPrice);
+
+       
+//         if (user) {
+//             const userData = await User.findOne({ _id: user._id });
+//             res.render('home', {
+//                 user: userData,
+//                 products: newArrivals, 
+//                 product: offerProductsWithPrice, 
+//                 category: category
+//             });
+//         } else {
+//             return res.render('home', {
+//                 products: newArrivals, 
+//                 product: offerProductsWithPrice, 
+//                 category: category
+//             });
+//         }
+
+//     } catch (error) {
+//         console.log('Home Page Not Loaded', error);
+//         res.status(500).send("Server Error");
+//     }
+// };
+
 const loadHome = async (req, res) => {
     try {
         const user = req.session.User;
 
-        // Fetch listed categories
+        // Fetch categories that are listed
         const category = await Category.find({ isListed: true });
 
-        // Fetch products and populate the Categorys field
+        // Fetch products that are not blocked and belong to listed categories
         let productData = await Product.find({
             isBlocked: false,
             Categorys: { $in: category.map(category => category._id) }
         }).populate('Categorys');
 
-        // Sort by timestamp (newest first)
+        // Sort products by timestamp (newest first)
         productData.sort((a, b) => new Date(b.timestamps) - new Date(a.timestamps));
 
-        // Custom rounding function
+        // Function to round prices to nearest 5 or 10
         const roundToNearest5or10 = (num) => {
             const integerPart = Math.floor(num);
             const decimalPart = num - integerPart;
             if (decimalPart > 0.75) {
-                return Math.ceil(num / 10) * 10; // Round to nearest 10
+                return Math.ceil(num / 10) * 10; 
             } else {
-                return Math.round(num / 5) * 5; // Round to nearest 5
+                return Math.round(num / 5) * 5; 
             }
         };
 
-        // Filter out products with offers and get the 6 newest arrivals without offers
+        // New Arrivals (products with no offers from either product or category)
         let newArrivals = productData
-            .filter(product => product.ProductOffer <= 0) 
-            .slice(0, 6) 
+            .filter(product => {
+                const productOffer = product.ProductOffer || 0;
+                const categoryOffer = product.Categorys?.CategoryOffer || 0;
+                return productOffer <= 0 && categoryOffer <= 0; // Exclude if any offer exists
+            })
+            .slice(0, 6)
             .map(product => {
-                const displayPrice = roundToNearest5or10(product.SalePrice); // Round SalePrice
+                const displayPrice = roundToNearest5or10(product.SalePrice); 
                 return {
                     ...product.toObject(),
                     displayPrice 
                 };
             });
 
-       
-        const offerProducts = await Product.find({ ProductOffer: { $gt: 0 } }).populate('Categorys');
+        // Fetch all products and populate their categories
+        const allProducts = await Product.find({}).populate('Categorys');
 
-        
-        const offerProductsWithPrice = offerProducts.map(product => {
-            const discount = (product.ProductOffer / 100) * product.SalePrice;
-            const offerPriceRaw = product.SalePrice - discount; 
-            const offerPrice = roundToNearest5or10(offerPriceRaw); 
-            return {
-                ...product.toObject(), // Convert Mongoose document to plain object
-                offerPrice 
-            };
-        });
+        // Filter products with offers and calculate the higher offer (ProductOffer vs CategoryOffer)
+        const offerProductsWithPrice = allProducts
+            .filter(product => {
+                const categoryOffer = product.Categorys?.CategoryOffer || 0;
+                const productOffer = product.ProductOffer || 0;
+                return Math.max(categoryOffer, productOffer) > 0; // Include products with any offer
+            })
+            .map(product => {
+                const categoryOffer = product.Categorys?.CategoryOffer || 0;
+                const productOffer = product.ProductOffer || 0;
+                const highestOffer = Math.max(categoryOffer, productOffer); // Choose the higher offer
+                const discount = (highestOffer / 100) * product.SalePrice;
+                const offerPriceRaw = product.SalePrice - discount;
+                const offerPrice = roundToNearest5or10(offerPriceRaw);
+                return {
+                    ...product.toObject(),
+                    offerPrice,
+                    appliedOffer: highestOffer // Store the applied offer percentage
+                };
+            });
+            console.log("pro",productData)
+        console.log("BEW",newArrivals); 
+        // console.log(offerProductsWithPrice);
 
-        console.log(newArrivals); 
-        console.log(offerProductsWithPrice);
-
-       
+        // Render the home page based on user session
         if (user) {
             const userData = await User.findOne({ _id: user._id });
             res.render('home', {

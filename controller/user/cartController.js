@@ -15,6 +15,8 @@ const { v4: uuidv4 } = require('uuid');
 const getCart = async (req, res) => {
     try {
         const cart = await Cart.findOne({ UserId: req.session.User._id }).populate('Items.ProductId');
+        console.log("cart",cart);
+        
         res.render('cart', { cart: cart || { Items: [] } });
     } catch (error) {
         res.status(500).send('Error fetching cart');
@@ -90,22 +92,115 @@ const addToCart = async (req, res) => {
 
 
 
+
+
+// const incrementQuantity = async (req, res) => {
+//     try {
+//         const userId = req.session.User._id;
+//         const productId = req.params.productId;
+//         const size = req.body.size; // String from form (e.g., "4")
+
+//         // Validate inputs
+//         if (!userId || !mongoose.Types.ObjectId.isValid(productId) || !size) {
+//             return res.redirect('/cart?error=Invalid request');
+//         }
+
+//         const cart = await Cart.findOne({ UserId: userId });
+//         const product = await Product.findById(productId);
+
+//         // Check if cart and product exist
+//         if (!cart || !product) {
+//             return res.redirect('/cart?error=Cart or product not found');
+//         }
+
+//         // Convert size to number for comparison
+//         const numericSize = parseInt(size);
+//         console.log('size:', size, 'numericSize:', numericSize);
+
+//         // Find the variant with matching size
+//         const variant = product.Variants.find(v => v.Size === numericSize);
+//         console.log('variant:', variant);
+
+//         // Check if variant exists and has stock
+//         if (!variant) {
+//             return res.redirect('/cart?error=Selected size not available');
+//         }
+
+//         const itemIndex = cart.Items.findIndex(item => 
+//             item.ProductId.toString() === productId && item.Size === size
+//         );
+
+//         if (itemIndex > -1) {
+//             const newQuantity = cart.Items[itemIndex].Quantity + 1;
+//             if (newQuantity > variant.Quantity || newQuantity > 7) {
+//                 return res.redirect('/cart?error=Quantity limit exceeded (max 7 or stock)');
+//             }
+//             cart.Items[itemIndex].Quantity = newQuantity;
+//             cart.Items[itemIndex].TotalPrice = newQuantity * cart.Items[itemIndex].Price;
+//             await cart.save();
+//         } else {
+//             // If item not found in cart (unlikely in increment), redirect with error
+//             return res.redirect('/cart?error=Item not found in cart');
+//         }
+
+//         res.redirect('/cart');
+//     } catch (error) {
+//         console.error('Error in incrementQuantity:', error);
+//         res.status(500).send('Error incrementing quantity');
+//     }
+// };
+
+
+
+// const decrementQuantity = async (req, res) => {
+//     try {
+//         const userId = req.session.User._id;
+//         const productId = req.params.productId;
+//         const size = req.body.size; // Assuming size is sent in the request
+//         const cart = await Cart.findOne({ UserId: userId });
+
+//         const itemIndex = cart.Items.findIndex(item => 
+//             item.ProductId.toString() === productId && item.Size === size
+//         );
+
+//         if (itemIndex > -1) {
+//             if (cart.Items[itemIndex].Quantity > 1) {
+//                 cart.Items[itemIndex].Quantity -= 1;
+//                 cart.Items[itemIndex].TotalPrice = cart.Items[itemIndex].Quantity * cart.Items[itemIndex].Price;
+//             } else {
+//                 cart.Items.splice(itemIndex, 1);
+//             }
+//             await cart.save();
+//         }
+//         res.redirect('/cart');
+//     } catch (error) {
+//         res.status(500).send('Error decrementing quantity');
+//     }
+// };
+
 const incrementQuantity = async (req, res) => {
     try {
         const userId = req.session.User._id;
         const productId = req.params.productId;
         const size = req.body.size; // String from form (e.g., "4")
+        const isAjax = req.path.includes('/ajax');
 
         // Validate inputs
         if (!userId || !mongoose.Types.ObjectId.isValid(productId) || !size) {
+            if (isAjax) {
+                return res.json({ success: false, message: 'Invalid request' });
+            }
             return res.redirect('/cart?error=Invalid request');
         }
 
-        const cart = await Cart.findOne({ UserId: userId });
+        const cart = await Cart.findOne({ UserId: userId }).populate('Items.ProductId');
         const product = await Product.findById(productId);
 
         // Check if cart and product exist
         if (!cart || !product) {
+            if (isAjax) {
+                return res.json({ success: false, message: 'Cart or product not found' });
+            }
             return res.redirect('/cart?error=Cart or product not found');
         }
 
@@ -119,73 +214,194 @@ const incrementQuantity = async (req, res) => {
 
         // Check if variant exists and has stock
         if (!variant) {
+            if (isAjax) {
+                return res.json({ success: false, message: 'Selected size not available' });
+            }
             return res.redirect('/cart?error=Selected size not available');
         }
 
         const itemIndex = cart.Items.findIndex(item => 
-            item.ProductId.toString() === productId && item.Size === size
+            item.ProductId._id.toString() === productId && item.Size === size
         );
 
         if (itemIndex > -1) {
             const newQuantity = cart.Items[itemIndex].Quantity + 1;
             if (newQuantity > variant.Quantity || newQuantity > 7) {
+                if (isAjax) {
+                    return res.json({ 
+                        success: false, 
+                        message: 'Quantity limit exceeded (max 7 or stock)' 
+                    });
+                }
                 return res.redirect('/cart?error=Quantity limit exceeded (max 7 or stock)');
             }
             cart.Items[itemIndex].Quantity = newQuantity;
             cart.Items[itemIndex].TotalPrice = newQuantity * cart.Items[itemIndex].Price;
             await cart.save();
+            
+            // If AJAX request, send JSON response
+            if (isAjax) {
+                return res.json({
+                    success: true,
+                    quantity: newQuantity,
+                    totalPrice: cart.Items[itemIndex].TotalPrice,
+                    cartCount: cart.Items.length,
+                    maxQuantityReached: newQuantity >= variant.Quantity || newQuantity >= 7
+                });
+            }
         } else {
-            // If item not found in cart (unlikely in increment), redirect with error
+            // If item not found in cart (unlikely in increment), send error
+            if (isAjax) {
+                return res.json({ success: false, message: 'Item not found in cart' });
+            }
             return res.redirect('/cart?error=Item not found in cart');
         }
 
         res.redirect('/cart');
     } catch (error) {
         console.error('Error in incrementQuantity:', error);
+        if (req.path.includes('/ajax')) {
+            return res.status(500).json({ success: false, message: 'Error incrementing quantity' });
+        }
         res.status(500).send('Error incrementing quantity');
     }
 };
 
-
-
+// Decrement quantity with AJAX support
 const decrementQuantity = async (req, res) => {
     try {
         const userId = req.session.User._id;
         const productId = req.params.productId;
-        const size = req.body.size; // Assuming size is sent in the request
+        const size = req.body.size;
+        const isAjax = req.path.includes('/ajax');
+        
+        // Validate inputs
+        if (!userId || !mongoose.Types.ObjectId.isValid(productId) || !size) {
+            if (isAjax) {
+                return res.json({ success: false, message: 'Invalid request' });
+            }
+            return res.redirect('/cart?error=Invalid request');
+        }
+
+        const cart = await Cart.findOne({ UserId: userId }).populate('Items.ProductId');
+        
+        if (!cart) {
+            if (isAjax) {
+                return res.json({ success: false, message: 'Cart not found' });
+            }
+            return res.redirect('/cart?error=Cart not found');
+        }
+
+        const itemIndex = cart.Items.findIndex(item => 
+            item.ProductId._id.toString() === productId && item.Size === size
+        );
+
+        if (itemIndex > -1) {
+            let removed = false;
+            
+            if (cart.Items[itemIndex].Quantity > 1) {
+                cart.Items[itemIndex].Quantity -= 1;
+                cart.Items[itemIndex].TotalPrice = cart.Items[itemIndex].Quantity * cart.Items[itemIndex].Price;
+            } else {
+                cart.Items.splice(itemIndex, 1);
+                removed = true;
+            }
+            
+            await cart.save();
+            
+            // If AJAX request, send JSON response
+            if (isAjax) {
+                return res.json({
+                    success: true,
+                    removed: removed,
+                    quantity: removed ? 0 : cart.Items[itemIndex].Quantity,
+                    totalPrice: removed ? 0 : cart.Items[itemIndex].TotalPrice,
+                    cartCount: cart.Items.length
+                });
+            }
+        } else {
+            if (isAjax) {
+                return res.json({ success: false, message: 'Item not found in cart' });
+            }
+        }
+        
+        res.redirect('/cart');
+    } catch (error) {
+        console.error('Error in decrementQuantity:', error);
+        if (req.path.includes('/ajax')) {
+            return res.status(500).json({ success: false, message: 'Error decrementing quantity' });
+        }
+        res.status(500).send('Error decrementing quantity');
+    }
+};
+
+// const removeFromCart = async (req, res) => {
+//     try {
+//         const userId = req.session.User._id;
+//         const productId = req.params.productId;
+//         const size = req.body.size; // Assuming size is sent in the request
+//         await Cart.updateOne(
+//             { UserId: userId },
+//             { $pull: { Items: { ProductId: productId, Size: size } } }
+//         );
+//         res.redirect('/cart');
+//     } catch (error) {
+//         res.status(500).send('Error removing item');
+//     }
+// };
+
+const removeFromCart = async (req, res) => {
+    try {
+        const userId = req.session.User._id;
+        const productId = req.params.productId;
+        const size = req.body.size;
+        const isAjax = req.path.includes('/ajax');
+        
+        // Validate inputs
+        if (!userId || !mongoose.Types.ObjectId.isValid(productId) || !size) {
+            if (isAjax) {
+                return res.json({ success: false, message: 'Invalid request' });
+            }
+            return res.redirect('/cart?error=Invalid request');
+        }
+
         const cart = await Cart.findOne({ UserId: userId });
+        
+        if (!cart) {
+            if (isAjax) {
+                return res.json({ success: false, message: 'Cart not found' });
+            }
+            return res.redirect('/cart?error=Cart not found');
+        }
 
         const itemIndex = cart.Items.findIndex(item => 
             item.ProductId.toString() === productId && item.Size === size
         );
 
         if (itemIndex > -1) {
-            if (cart.Items[itemIndex].Quantity > 1) {
-                cart.Items[itemIndex].Quantity -= 1;
-                cart.Items[itemIndex].TotalPrice = cart.Items[itemIndex].Quantity * cart.Items[itemIndex].Price;
-            } else {
-                cart.Items.splice(itemIndex, 1);
-            }
+            cart.Items.splice(itemIndex, 1);
             await cart.save();
+            
+            // If AJAX request, send JSON response
+            if (isAjax) {
+                return res.json({
+                    success: true,
+                    cartCount: cart.Items.length
+                });
+            }
+        } else {
+            if (isAjax) {
+                return res.json({ success: false, message: 'Item not found in cart' });
+            }
         }
+        
         res.redirect('/cart');
     } catch (error) {
-        res.status(500).send('Error decrementing quantity');
-    }
-};
-
-const removeFromCart = async (req, res) => {
-    try {
-        const userId = req.session.User._id;
-        const productId = req.params.productId;
-        const size = req.body.size; // Assuming size is sent in the request
-        await Cart.updateOne(
-            { UserId: userId },
-            { $pull: { Items: { ProductId: productId, Size: size } } }
-        );
-        res.redirect('/cart');
-    } catch (error) {
-        res.status(500).send('Error removing item');
+        console.error('Error in removeFromCart:', error);
+        if (req.path.includes('/ajax')) {
+            return res.status(500).json({ success: false, message: 'Error removing item' });
+        }
+        res.status(500).send('Error removing item from cart');
     }
 };
 

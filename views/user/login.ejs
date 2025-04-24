@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +27,7 @@
             width: 100%;
             background: #000;
             color: #fff;
-            padding: 0.5rem 2rem; /* Reduce padding to control navbar size */
+            padding: 0.5rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -56,7 +54,7 @@
         .login-form {
             flex: 1;
             padding: 1rem;
-            margin-top:5rem;
+            margin-top: 5rem;
         }
 
         .login-form h1 {
@@ -97,7 +95,6 @@
             text-align: center;
             justify-content: center;
             text-decoration: none;
-            
             color: #333;
             font-size: 0.9rem;
         }
@@ -129,130 +126,248 @@
             width: 100%;
             border-radius: 8px;
         }
+
         .nav-bar {
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            background-color: #000; 
-            padding: 0.5rem 1rem; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #000;
+            padding: 0.5rem 1rem;
             color: #fff;
             height: 50px;
             width: 100%;
         }
-    
+
         .navbar-logo {
             height: 200px;
-            width: 200px; 
+            width: 200px;
         }
-    
+
         .nav-links {
             display: flex;
-            gap: 1rem; 
+            gap: 1rem;
         }
-       
-    .account-text {
-        display: flex;
-        margin: 0;
-        padding: 0;
-        white-space: nowrap; 
-    }
 
-    .account-text a {
-        color: blue;
-        text-decoration: underline; 
-    }
-       
-    .social-btns {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
+        .account-text {
+            display: flex;
+            margin: 0;
+            padding: 0;
+            white-space: nowrap;
+        }
 
-.btn {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  font-size: 16px;
-  padding: 10px 20px;
-  border-radius: 5px;
-  transition: all 0.3s ease;
-}
+        .account-text a {
+            color: blue;
+            text-decoration: underline;
+        }
 
-.btn img {
-  width: 24px;
-  height: 24px;
-  margin-right: 10px;
-}
+        .social-btns {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
 
-.btn-outline-google {
-  border: 2px solid #db4437;
-  color: #db4437;
-  background: transparent;
-}
+        .btn {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
 
-.btn-outline-google:hover {
-  background: #db4437;
-  color: white;
-}
+        .btn img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
 
-    
-    
+        .btn-outline-google {
+            border: 2px solid #db4437;
+            color: #db4437;
+            background: transparent;
+        }
 
+        .btn-outline-google:hover {
+            background: #db4437;
+            color: white;
+        }
+
+        /* Media Queries for Mobile Responsiveness */
+        @media (max-width: 768px) {
+            /* Adjust header and navbar for mobile */
+            header {
+                padding: 0.5rem 1rem;
+            }
+
+            .nav-bar {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                height: auto;
+            }
+
+            .navbar-logo {
+                height: 40px; /* Reduce logo size for mobile */
+                width: auto;
+            }
+
+            .nav-links {
+                gap: 0.5rem;
+            }
+
+            header nav a {
+                margin: 0 10px;
+                font-size: 0.9rem; /* Slightly smaller font for mobile */
+            }
+
+            /* Stack login container elements vertically */
+            .login-container {
+                flex-direction: column;
+                width: 90%; /* Use more screen width on mobile */
+                margin: 1rem;
+                padding: 1rem;
+            }
+
+            .login-form {
+                margin-top: 1rem; /* Reduce top margin for mobile */
+                padding: 0.5rem;
+            }
+
+            .login-form h1 {
+                font-size: 1.5rem; /* Smaller heading on mobile */
+            }
+
+            .login-form p {
+                font-size: 0.9rem;
+            }
+
+            .login-form input {
+                padding: 0.5rem; /* Slightly smaller input padding */
+                font-size: 0.9rem;
+            }
+
+            .login-form button {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .login-form a {
+                font-size: 0.8rem;
+            }
+
+            .login-image {
+                padding: 0.5rem;
+            }
+
+            .login-image img {
+                max-width: 80%; /* Reduce image size on mobile */
+            }
+
+            .footer-image {
+                width: 90%;
+                margin-top: 1rem;
+            }
+
+            .social-btns {
+                margin-top: 15px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .btn img {
+                width: 20px;
+                height: 20px;
+                margin-right: 8px;
+            }
+        }
+
+        /* For very small screens (e.g., < 576px) */
+        @media (max-width: 576px) {
+            header nav a {
+                margin: 0 5px;
+                font-size: 0.8rem;
+            }
+
+            .login-container {
+                width: 95%;
+                padding: 0.5rem;
+            }
+
+            .login-form h1 {
+                font-size: 1.2rem;
+            }
+
+            .login-form p {
+                font-size: 0.8rem;
+            }
+
+            .login-form input {
+                padding: 0.4rem;
+                font-size: 0.8rem;
+            }
+
+            .login-form button {
+                padding: 0.4rem;
+                font-size: 0.8rem;
+            }
+
+            .login-image img {
+                max-width: 100%;
+            }
+
+            .btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .btn img {
+                width: 18px;
+                height: 18px;
+                margin-right: 6px;
+            }
+        }
     </style>
 </head>
 <body>
     
-    
-        
-    
-    <header>
-        <nav class="nav-bar">
-            <img src="images/logo - Copy.png" alt="Sneakkish Logo" class="navbar-logo">
-            <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="#">About</a>
-                <a href="#">Contact</a>
-            </div>
-        </nav>
-    </header>
-    
 
+    <div class="login-container">
+        <div class="login-form">
+            <h1>Login</h1>
+            <p class="account-text">Do not have an account? <a href="/signup">Create a New One</a></p>
+            <form method="post" action="/login">
+                <label for="email">Enter Your Email:</label>
+                <input name="Email" type="email" id="email">
 
-    
-<div class="login-container">
-    <div class="login-form">
-        <h1>Login</h1>
-        <p class="account-text">Do not have an account? <a href="/signup">Create a New One</a></p>
-        <form  method="post" action="/login">
-            <label for="email">Enter Your Email:</label>
-            <input name="Email" type="email" id="email">
-
-            <label for="password">Enter Your Password:</label>
-            <input name="Password" type="password" id="password">
-            
-            <% if(typeof message !== 'undefined'){ %>
-                <p style="color: red; text-align: center;" ><%= message %></p>
-            <% } %>
-            
-            <div>  
-                <div class="social-btns">
-                    <a href="/auth/google" class="btn btn-outline-google">
-                      <img src="images/google-logo-search-new.svg" alt="Google Logo" />
-                      Sign in with Google
-                    </a>
-                  </div> 
-            </div>
+                <label for="password">Enter Your Password:</label>
+                <input name="Password" type="password" id="password">
+                
+                <% if(typeof message !== 'undefined'){ %>
+                    <p style="color: red; text-align: center;"><%= message %></p>
+                <% } %>
+                
+                <div>  
+                    <div class="social-btns">
+                        <a href="/auth/google" class="btn btn-outline-google">
+                            <img src="images/google-logo-search-new.svg" alt="Google Logo" />
+                            Sign in with Google
+                        </a>
+                    </div> 
+                </div>
+                <br>
+                <button type="submit">Login</button>
+            </form>
             <br>
-            <button type="submit">Login</button>
-        </form>
-        <br>
-        <a href="/forgot-password">Forgot Your Password?</a>
-    </div>
+            <a href="/forgot-password">Forgot Your Password?</a>
+        </div>
 
-    <div class="login-image">
-        <img src="images/SHOES/SHOE-6.png" alt="Sneaker">
+        <div class="login-image">
+            <img src="images/SHOES/SHOE-6.png" alt="Sneaker">
+        </div>
     </div>
-</div>
-
 </body>
 </html>

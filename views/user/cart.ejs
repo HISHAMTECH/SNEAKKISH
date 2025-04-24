@@ -185,6 +185,15 @@
             margin-top: 20px;
         }
 
+        /* Success Message */
+        .success-message {
+            text-align: center;
+            color: #28a745;
+            font-size: 16px;
+            margin-top: 20px;
+            display: none;
+        }
+
         /* Checkout Button */
         .checkout-btn {
             display: block;
@@ -414,6 +423,26 @@
             margin-bottom: 5px;
         }
 
+        /* AJAX Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 5px;
+            vertical-align: middle;
+            visibility: hidden;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         /* Responsive Design */
         @media (max-width: 991px) {
             .header__menu {
@@ -498,14 +527,6 @@
                 <ul>
                     <li><a href="/">Home</a></li>
                     <li><a href="/product-page">Shop</a></li>
-                    <li><a href="#">Brands</a>
-                        <ul class="dropdown">
-                            <li><a href="./about.html">Adidas</a></li>
-                            <li><a href="./shop-details.html">Nike</a></li>
-                            <li><a href="./shopping-cart.html">New Balance</a></li>
-                            <li><a href="./checkout.html">Reebok</a></li>
-                        </ul>
-                    </li>
                     <li><a href="./contact.html">Contacts</a></li>
                 </ul>
             </nav>
@@ -550,6 +571,12 @@
         <div class="container">
             <div class="cart-items">
                 <h1>Your Shopping Cart</h1>
+                <div id="success-message" class="success-message"></div>
+                <div id="error-message" class="error-message">
+                    <% if (typeof error !== 'undefined') { %>
+                        <%= error %>
+                    <% } %>
+                </div>
                 <% if (cart.Items.length === 0) { %>
                     <div class="cart-empty">
                         <p>Your cart is empty</p>
@@ -558,28 +585,31 @@
                 <% } else { %>
                     <ul class="cart-list">
                         <% cart.Items.forEach(item => { %>
-                            <li class="cart-item">
-                                <img src="/uploads/re-image/<%= item.ProductId.ProductImage[0] || 'default-image.jpg' %>" 
+                            <li class="cart-item" data-product-id="<%= item.ProductId._id %>" data-size="<%= item.Size %>">
+                                <img src="/Uploads/re-image/<%= item.ProductId.ProductImage[0] || 'default-image.jpg' %>" 
                                      alt="<%= item.ProductId.ProductName || 'Product Image' %>">
                                 <div class="cart-item-details">
                                     <h5><%= item.ProductId.ProductName || 'Unnamed Product' %> (Size: <%= item.Size %>)</h5>
-                                    <p>Price: $<%= item.Price.toFixed(2) %></p>
                                 </div>
                                 <div class="cart-item-actions">
-                                    <form action="/cart/decrement/<%= item.ProductId._id %>" method="POST">
-                                        <input type="hidden" name="size" value="<%= item.Size %>">
-                                        <button>-</button>
-                                    </form>
+                                    <button class="decrement-btn" data-product-id="<%= item.ProductId._id %>" data-size="<%= item.Size %>">-</button>
                                     <span class="quantity"><%= item.Quantity %></span>
-                                    <form action="/cart/increment/<%= item.ProductId._id %>" method="POST">
-                                        <input type="hidden" name="size" value="<%= item.Size %>">
-                                        <button <%= item.Quantity >= item.ProductId.Variants.find(v => v.Size === parseInt(item.Size)).Quantity || item.Quantity >= 7 ? 'disabled' : '' %>>+</button>
-                                    </form>
-                                    <span class="total-price">$<%= item.TotalPrice.toFixed(2) %></span>
-                                    <form action="/cart/remove/<%= item.ProductId._id %>" method="POST">
-                                        <input type="hidden" name="size" value="<%= item.Size %>">
-                                        <button>Remove</button>
-                                    </form>
+                                    <button class="increment-btn" 
+                                            data-product-id="<%= item.ProductId._id %>" 
+                                            data-size="<%= item.Size %>"
+                                            <%= item.Quantity >= item.ProductId.Variants.find(v => v.Size === parseInt(item.Size)).Quantity || item.Quantity >= 7 ? 'disabled' : '' %>>+</button>
+                                    <% 
+                                        // Calculate discounted price per unit
+                                        const unitPrice = item.ProductId.ProductOffer > 0 
+                                            ? Math.round((item.Price * (1 - item.ProductId.ProductOffer / 100)) + 
+                                                ((item.Price * (1 - item.ProductId.ProductOffer / 100)) % 1 > 0.5 ? 0.5 : -0.5))
+                                            : item.Price;
+                                        // Total price for the item (unit price * quantity)
+                                        const totalPrice = unitPrice * item.Quantity;
+                                    %>
+                                    <span class="total-price">₹<%= totalPrice %></span>
+                                    <button class="remove-btn" data-product-id="<%= item.ProductId._id %>" data-size="<%= item.Size %>">Remove</button>
+                                    <div class="spinner"></div>
                                     <% if (item.ProductId.Variants.find(v => v.Size === parseInt(item.Size)).Quantity <= 0) { %>
                                         <span class="out-of-stock">(Out of stock)</span>
                                     <% } %>
@@ -588,9 +618,6 @@
                         <% }) %>
                     </ul>
                     <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>
-                <% } %>
-                <% if (typeof error !== 'undefined') { %>
-                    <p class="error-message"><%= error %></p>
                 <% } %>
             </div>
         </div>
@@ -642,6 +669,173 @@
                 if (!$(e.target).closest('.dropdown').length) {
                     $('.dropdown').removeClass('active');
                 }
+            });
+
+            // AJAX for cart quantity increment
+            $('.increment-btn').click(function() {
+                if ($(this).prop('disabled')) return;
+                
+                const productId = $(this).data('product-id');
+                const size = $(this).data('size');
+                const cartItem = $(this).closest('.cart-item');
+                const quantitySpan = cartItem.find('.quantity');
+                const totalPriceSpan = cartItem.find('.total-price');
+                const spinner = cartItem.find('.spinner');
+                
+                spinner.css('visibility', 'visible');
+                
+                $.ajax({
+                    url: `/cart/increment/${productId}/ajax`,
+                    method: 'POST',
+                    data: { size: size },
+                    success: function(response) {
+                        spinner.css('visibility', 'hidden');
+                        
+                        if (response.success) {
+                            // Update quantity and price
+                            quantitySpan.text(response.quantity);
+                            totalPriceSpan.text('₹' + response.totalPrice);
+                            
+                            // Update header cart count if needed
+                            if (response.cartCount !== undefined) {
+                                $('.header__nav__option span').text(response.cartCount);
+                            }
+                            
+                            // Disable increment button if max quantity reached
+                            if (response.maxQuantityReached) {
+                                cartItem.find('.increment-btn').prop('disabled', true);
+                            }
+                            
+                            // Show success message
+                            $('#success-message').text('').fadeIn().delay(2000).fadeOut();
+                        } else {
+                            // Show error message
+                            $('#error-message').text(response.message).fadeIn().delay(3000).fadeOut();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        spinner.css('visibility', 'hidden');
+                        $('#error-message').text('Error updating quantity').fadeIn().delay(3000).fadeOut();
+                        console.error(error);
+                    }
+                });
+            });
+
+            // AJAX for cart quantity decrement
+            $('.decrement-btn').click(function() {
+                const productId = $(this).data('product-id');
+                const size = $(this).data('size');
+                const cartItem = $(this).closest('.cart-item');
+                const quantitySpan = cartItem.find('.quantity');
+                const totalPriceSpan = cartItem.find('.total-price');
+                const spinner = cartItem.find('.spinner');
+                
+                spinner.css('visibility', 'visible');
+                
+                $.ajax({
+                    url: `/cart/decrement/${productId}/ajax`,
+                    method: 'POST',
+                    data: { size: size },
+                    success: function(response) {
+                        spinner.css('visibility', 'hidden');
+                        
+                        if (response.success) {
+                            if (response.removed) {
+                                // If item was removed (quantity was 1), remove the element
+                                cartItem.fadeOut(300, function() {
+                                    $(this).remove();
+                                    
+                                    // If cart is now empty, show empty cart message
+                                    if (response.cartCount === 0) {
+                                        $('.cart-list').html('');
+                                        $('.cart-items').html(`
+                                            <h1>Your Shopping Cart</h1>
+                                            <div class="cart-empty">
+                                                <p>Your cart is empty</p>
+                                                <a href="/product-page" class="checkout-btn" style="background: #666;">Continue Shopping</a>
+                                            </div>
+                                        `);
+                                    }
+                                });
+                            } else {
+                                // Update quantity and price
+                                quantitySpan.text(response.quantity);
+                                totalPriceSpan.text('₹' + response.totalPrice);
+                                
+                                // Enable increment button if it was disabled
+                                cartItem.find('.increment-btn').prop('disabled', false);
+                            }
+                            
+                            // Update header cart count if needed
+                            if (response.cartCount !== undefined) {
+                                $('.header__nav__option span').text(response.cartCount);
+                            }
+                            
+                            // Show success message
+                            $('#success-message').text('').fadeIn().delay(2000).fadeOut();
+                        } else {
+                            // Show error message
+                            $('#error-message').text(response.message).fadeIn().delay(3000).fadeOut();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        spinner.css('visibility', 'hidden');
+                        $('#error-message').text('Error updating quantity').fadeIn().delay(3003).fadeOut();
+                        console.error(error);
+                    }
+                });
+            });
+
+            // AJAX for cart item removal
+            $('.remove-btn').click(function() {
+                const productId = $(this).data('product-id');
+                const size = $(this).data('size');
+                const cartItem = $(this).closest('.cart-item');
+                const spinner = cartItem.find('.spinner');
+                
+                spinner.css('visibility', 'visible');
+                
+                $.ajax({
+                    url: `/cart/remove/${productId}/ajax`,
+                    method: 'POST',
+                    data: { size: size },
+                    success: function(response) {
+                        spinner.css('visibility', 'hidden');
+                        
+                        if (response.success) {
+                            // Remove the cart item from DOM
+                            cartItem.fadeOut(300, function() {
+                                $(this).remove();
+                                
+                                // If cart is now empty, show empty cart message
+                                if (response.cartCount === 0) {
+                                    $('.cart-list').html('');
+                                    $('.cart-items').html(`
+                                        <h1>Your Shopping Cart</h1>
+                                        <div class="cart-empty">
+                                            <p>Your cart is empty</p>
+                                            <a href="/product-page" class="checkout-btn" style="background: #666;">Continue Shopping</a>
+                                        </div>
+                                    `);
+                                }
+                            });
+                            
+                            // Update header cart count
+                            $('.header__nav__option span').text(response.cartCount);
+                            
+                            // Show success message
+                            $('#success-message').text('').fadeIn().delay(2000).fadeOut();
+                        } else {
+                            // Show error message
+                            $('#error-message').text(response.message).fadeIn().delay(3000).fadeOut();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        spinner.css('visibility', 'hidden');
+                        $('#error-message').text('Error removing item').fadeIn().delay(3000).fadeOut();
+                        console.error(error);
+                    }
+                });
             });
         });
     </script>

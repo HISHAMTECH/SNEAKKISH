@@ -64,18 +64,6 @@
             color: #666;
         }
 
-        .shop__sidebar__search button {
-            background: none;
-            border: none;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 16px;
-            color: #666;
-        }
-
         .shop__sidebar__accordion .card {
             border: none;
             margin-bottom: 15px;
@@ -155,22 +143,18 @@
             cursor: pointer;
         }
 
-        /* Product Card Styling (Exact from Homepage) */
+        /* Product Card Styling (Copied from Homepage) */
         .product__item {
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: 15px auto;
+            margin: 10px;
             overflow: hidden;
             text-align: center;
             max-width: 300px;
-            position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .product__item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            height: 450px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .product__item__pic {
@@ -205,31 +189,42 @@
             font-size: 14px;
             color: #666;
             margin-bottom: 10px;
-            text-transform: uppercase;
         }
 
         .product__item__text .product-price {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .product__item__text .mrp {
-            text-decoration: line-through;
-            color: #999;
+            font-weight: bold;
+            color: #cc1010;
             font-size: 14px;
+            margin-top: 0px;
             margin-right: 10px;
         }
 
+        .product__item__text .sale-price1 {
+            color: #000000;
+            font-size: 18px;
+            font-weight: 700;
+        } 
         .product__item__text .sale-price {
-            color: #e74c3c;
+            text-decoration: line-through;
+            color: #000000;
             font-size: 18px;
             font-weight: 700;
         }
 
-        /* Wishlist Icon Animation */
+        .product__item__text .offer-price {
+            color: #000000;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
         .wishlist-icon {
             position: absolute;
-            left: -50px;
-            top: 10px;
+            left: 20px;
+            top: 20px;
             background: #fff;
             border: 1px solid #ddd;
             border-radius: 50%;
@@ -249,55 +244,7 @@
         }
 
         .product__item:hover .wishlist-icon {
-            left: 10px;
-        }
-
-        /* Sale Badge Styling */
-        .product__item__pic .sale {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #ff4444;
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        /* Pagination Styling */
-        .product__pagination {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px 0;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .product__pagination a,
-        .product__pagination span {
-            display: inline-block;
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-            height: 40px;
-            width: 40px;
-            line-height: 40px;
-            text-align: center;
-            border-radius: 50%;
-            margin: 0 5px;
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-
-        .product__pagination a:hover,
-        .product__pagination a.active {
-            background: #b0c2d4;
-            color: #fff;
-        }
-
-        .product__pagination span {
-            color: #999;
+            left: 20px;
         }
 
         /* Header Styles from Homepage */
@@ -601,6 +548,118 @@
                 font-size: 16px;
             }
         }
+
+        /* Footer Styles */
+        .footer {
+            background: #000000; /* Changed to black */
+            padding: 40px 0;
+        }
+
+        .footer .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .footer .row {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .footer .col-lg-3,
+        .footer .col-lg-2,
+        .footer .col-md-6,
+        .footer .col-md-3,
+        .footer .col-sm-6 {
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 30px;
+        }
+
+        .footer__about,
+        .footer__widget,
+        .footer__newslatter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer__logo {
+            margin-bottom: 20px;
+        }
+
+        .footer__widget h6,
+        .footer__about p,
+        .footer__newslatter p {
+            margin-bottom: 15px;
+            color: #ffffff; /* Changed text color to white for visibility on black background */
+        }
+
+        .footer__widget ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer__widget ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer__widget ul li a {
+            color: #ffffff; /* Changed link color to white for visibility */
+            text-decoration: none;
+        }
+
+        .footer__newslatter form {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .footer__newslatter input {
+            width: 70%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .footer__newslatter button {
+            padding: 8px 15px;
+            border: none;
+            background: #ffffff; /* Changed button background to white for contrast */
+            color: #000000; /* Changed button text to black */
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        .footer__copyright__text {
+            margin-top: 20px;
+        }
+
+        .footer__copyright__text p {
+            color: #ffffff; /* Changed copyright text to white for visibility */
+        }
+
+        @media (min-width: 768px) {
+            .footer .row {
+                flex-wrap: nowrap;
+                justify-content: space-around;
+            }
+            
+            .footer .col-lg-3,
+            .footer .col-lg-2,
+            .footer .col-md-6,
+            .footer .col-md-3 {
+                width: auto;
+                margin-bottom: 0;
+            }
+        }
     </style>
 </head>
 
@@ -613,21 +672,18 @@
             </div>
             <nav class="header__menu">
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li class="active"><a href="/product-page">Shop</a></li>
-                    <li><a href="#">Brands</a>
-                        <ul class="dropdown">
-                            <li><a href="./about.html">Adidas</a></li>
-                            <li><a href="./shop-details.html">Nike</a></li>
-                            <li><a href="./shopping-cart.html">New Balance</a></li>
-                            <li><a href="./checkout.html">Reebok</a></li>
-                        </ul>
-                    </li>
+                    <li ><a href="/">Home</a></li>
+                    <li class="active"><a href="/product-page">Shop</a></li>               
                     <li><a href="./contact.html">Contacts</a></li>
+                    <li><a href="./contact.html"></a></li>
+                    <li><a href="./contact.html"></a></li>
+                    <li><a href="./contact.html"></a></li>
+                    <li><a href="./contact.html"></a></li>
+                    <li><a href="./contact.html"></a></li>
+                    <li><a href="./contact.html"></a></li>
                 </ul>
             </nav>
             <div class="header__nav__option">
-                
                 <a href="/Wishlist"><img src="img/icon/heart.png" alt=""></a>
                 <a href="/cart"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
             </div>
@@ -685,7 +741,7 @@
                         <div class="shop__sidebar__search">
                             <form action="/product-page" method="GET">
                                 <input type="text" name="query" placeholder="Search products..." value="<%= query || '' %>">
-                                <button type="submit"></button>
+                                <button type="submit"><i class="fa fa-search"></i></button>
                             </form>
                         </div>
                         <div class="shop__sidebar__accordion">
@@ -768,21 +824,24 @@
                                 <div class="col-6 col-md-4 col-lg-4">
                                     <div class="product__item mix new-arrivals">
                                         <a href="/productDetails?id=<%= product._id %>">
-                                            <% if (product.isOnSale) { %>
-                                                <div class="sale">SALE</div>
-                                            <% } %>
                                             <div class="product__item__pic">
-                                                <img src="<%= product.ProductImage && product.ProductImage.length > 0 ? '/uploads/re-image/' + product.ProductImage[0] : '/img/default-product.jpg' %>" alt="<%= product.ProductName %>" class="product-image">
+                                                <img src="<%= product.ProductImage && product.ProductImage.length > 0 ? '/Uploads/re-image/' + product.ProductImage[0] : '/img/default-product.jpg' %>" alt="<%= product.ProductName %>" class="product-image">
                                             </div>
                                             <div class="product__item__text">
                                                 <h6 class="product-name"><%= product.ProductName || 'Unnamed Product' %></h6>
-                                                <p class="product-category"><%= product.Categorys.Name || 'Unnamed Product' %></p>
+                                                <p class="product-category"><%= product.Categorys.Name || 'Uncategorized' %></p>
+                                                <p class="product-category"><%= product.Brands || 'Unknown Brand' %></p>
                                                 <div class="product-price">
-                                                    <% if (product.isOnSale && product.RegularPrice) { %>
-                                                        <span class="mrp">MRP: ₹<%= product.RegularPrice %></span>
+                                                    <% if (product.appliedOffer > 0) { %>
+                                                        <span class="sale-price">₹<%= product.displayPrice %></span>
+                                                        <span class="offer-price">₹<%= product.offerPrice %></span>
+                                                    <% } else { %>
+                                                        <span class="sale-price1">MRP ₹<%= product.displayPrice %></span>
                                                     <% } %>
-                                                    <span class="sale-price">₹<%= product.SalePrice || 0 %></span>
                                                 </div>
+                                                <% if (product.appliedOffer > 0) { %>
+                                                    <p class="mrp"><%= product.appliedOffer %>% OFF</p>
+                                                <% } %>
                                             </div>
                                         </a>
                                         <div class="wishlist-icon">
@@ -819,7 +878,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-6">
                     <div class="footer__about">
                         <div class="footer__logo">
-                            <a href="#"><img src="img/footer-logo.png" alt=""></a>
+                            <a href="#"><img src="/images/SNEAKKISH-26-03-2025 (1).png" alt=""></a>
                         </div>
                         <p>The customer is at the heart of our unique business model, which includes design.</p>
                         <a href="#"><img src="img/payment.png" alt=""></a>

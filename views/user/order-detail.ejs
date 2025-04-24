@@ -462,12 +462,13 @@
                             <% order.OrderedItems.forEach(item => { %>
                                 <tr>
                                     <td data-label="Image">
-                                        <img src="<%= item.Product.Image || '/images/placeholder.jpg' %>" alt="<%= item.Product.ProductName || 'Product Image' %>">
+                                        <img src="/Uploads/re-image/<%= item.Product.ProductImage && item.Product.ProductImage.length > 0 ? item.Product.ProductImage[0] : 'default-image.jpg' %>"
+                                             alt="<%= item.Product.ProductName || 'Product Image' %>">
                                     </td>
                                     <td data-label="Name"><%= item.Product.ProductName || 'Unnamed Product' %></td>
                                     <td data-label="Size"><%= item.Size %></td>
-                                    <td data-label="Price">$<%= item.Price.toFixed(2) %> x <%= item.Quantity %></td>
-                                    <td data-label="Subtotal">$<%= (item.Price * item.Quantity).toFixed(2) %></td>
+                                    <td data-label="Price">₹<%= item.Price.toFixed(2) %> x <%= item.Quantity %></td>
+                                    <td data-label="Subtotal">₹<%= (item.Price * item.Quantity).toFixed(2) %></td>
                                 </tr>
                             <% }) %>
                         </tbody>
@@ -487,24 +488,24 @@
                         <tbody>
                             <tr>
                                 <td>Subtotal</td>
-                                <td><strong>$<%= order.TotalPrice.toFixed(2) %></strong></td>
+                                <td><strong>₹<%= order.TotalPrice.toFixed(2) %></strong></td>
                             </tr>
                             <tr>
                                 <td>Tax</td>
-                                <td><strong>$<%= order.Tax.toFixed(2) %></strong></td>
+                                <td><strong>₹<%= order.Tax.toFixed(2) %></strong></td>
                             </tr>
                             <tr>
                                 <td>Discount</td>
-                                <td><strong>$<%= order.Discount.toFixed(2) %></strong></td>
+                                <td><strong>₹<%= order.Discount.toFixed(2) %></strong></td>
                             </tr>
                             <tr>
                                 <td>Wallet Amount Used</td>
-                                <td><strong>$<%= order.WalletAmount.toFixed(2) %></strong></td>
+                                <td><strong>₹<%= order.WalletAmount.toFixed(2) %></strong></td>
                             </tr>
                             <% const calculatedFinalAmount = Math.max(0, order.TotalPrice + order.Tax - order.Discount - order.WalletAmount); %>
                             <tr>
                                 <td class="final-amount">Final Amount</td>
-                                <td class="final-amount"><strong>$<%= calculatedFinalAmount.toFixed(2) %></strong></td>
+                                <td class="final-amount"><strong>₹<%= calculatedFinalAmount.toFixed(2) %></strong></td>
                             </tr>
                         </tbody>
                     </table>

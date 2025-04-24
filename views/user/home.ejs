@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zxx">
-
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="Male_Fashion Template">
@@ -84,6 +83,7 @@
         }
 
         .header__menu ul li a {
+            
             font-size: 16px;
             color: #333;
             text-decoration: none;
@@ -176,14 +176,17 @@
         .dropdown-content a {
             color: black;
             padding: 10px 16px;
+            margin: 0px;
             text-decoration: none;
             display: block;
             transition: background-color 0.3s;
             cursor: pointer;
+            
         }
 
         .dropdown-content a:hover {
-            background-color: #f1f1f1;
+            background-color: #020202;
+            
         }
 
         .dropdown.active .dropdown-content {
@@ -354,6 +357,7 @@
             overflow: hidden;
             text-align: center;
             max-width: 300px;
+            height: 450px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -394,13 +398,14 @@
         }
 
         .product__item__text .product-price {
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
 
         .product__item__text .mrp {
             font-weight: bold;
             color: #cc1010;
             font-size: 14px;
+            margin-top: 0px;
             margin-right: 10px;
         }
 
@@ -553,9 +558,213 @@
             background: #007bff;
             color: #fff;
         }
+
+        /* Added CSS for Category_item and Category_items */
+        .Category_item {
+            position: relative;
+            margin-bottom: 20px;
+            text-align: center;
+            overflow: hidden;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .Category_item:hover {
+            transform: scale(1.02);
+        }
+
+        .Category_items {
+            position: relative;
+            width: 100%;
+            height: 400px; /* Adjust height based on your image proportions */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            
+            background: #f5f5f5; /* Light background for fallback */
+        }
+
+        .Category_items span {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .Category_items span img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image covers the container */
+            object-position: top; /* Focus on the top portion of the image */
+            display: block;
+        }
+
+        .Category_items a {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+        .Category_items h5 {
+            font-family: 'Nunito Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent background for readability */
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            transition: background 0.3s ease;
+        }
+        
+        .Category_items a:hover h5 {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Responsive adjustments for Category_items */
+        @media (max-width: 768px) {
+            .Category_items {
+                height: 300px;
+            }
+
+            .Category_items span img {
+                object-fit: cover; /* Ensure the image covers the container */
+                object-position: top; /* Focus on the top portion of the image */
+            }
+
+            .Category_items h5 {
+                font-size: 16px;
+                padding: 6px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .Category_items {
+                height: 200px;
+            }
+
+            .Category_items span img {
+                object-fit: cover; /* Ensure the image covers the container */
+                object-position: top; /* Focus on the top portion of the image */
+            }
+
+            .Category_items h5 {
+                font-size: 14px;
+                padding: 5px 10px;
+            }
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: #000000;
+            padding: 40px 0;
+        }
+
+        .footer .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .footer .row {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .footer .col-lg-3,
+        .footer .col-lg-2,
+        .footer .col-md-6,
+        .footer .col-md-3,
+        .footer .col-sm-6 {
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 30px;
+        }
+
+        .footer__about,
+        .footer__widget,
+        .footer__newslatter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer__logo {
+            margin-bottom: 20px;
+        }
+
+        .footer__widget h6,
+        .footer__about p,
+        .footer__newslatter p {
+            margin-bottom: 15px;
+        }
+
+        .footer__widget ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer__widget ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer__widget ul li a {
+            color: #d0c9c9;
+            text-decoration: none;
+        }
+
+        .footer__newslatter form {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .footer__newslatter input {
+            width: 70%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .footer__newslatter button {
+            padding: 8px 15px;
+            border: none;
+            background: #333;
+            color: #fff;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        .footer__copyright__text {
+            margin-top: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .footer .row {
+                flex-wrap: nowrap;
+                justify-content: space-around;
+            }
+            
+            .footer .col-lg-3,
+            .footer .col-lg-2,
+            .footer .col-md-6,
+            .footer .col-md-3 {
+                width: auto;
+                margin-bottom: 0;
+            }
+        }
     </style>
 </head>
-
 <body>
     <!-- Page Preloder -->
     <div id="preloder">
@@ -578,7 +787,6 @@
                                 <%if(locals.user){%>
                                     <div class="dropdown">
                                         <a class="dropdown-btn"><%=locals.user.FirstName%> <%=locals.user.LastName%></a>
-                            
                                         <div class="dropdown-content">
                                             <a href="/userProfile">Profile</a>
                                             <a href="/logout">Logout</a>
@@ -600,16 +808,14 @@
             <nav class="header__menu">
                 <ul>
                     <li class="active"><a href="/">Home</a></li>
-                    <li><a href="/product-page">Shop</a></li>
-                    <li><a href="#">Brands</a>
-                        <ul class="dropdown">
-                            <li><a href="./about.html">Adidas</a></li>
-                            <li><a href="./shop-details.html">Nike</a></li>
-                            <li><a href="./shopping-cart.html">New Balance</a></li>
-                            <li><a href="./checkout.html">Reebok</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="/product-page">Shop</a></li>               
                     <li><a href="./contact.html">Contacts</a></li>
+                    <li><a href="./contact.html"></a></li>
+                    <li><a href="./contact.html"></a></li>
+                    <li><a href="./contact.html"></a></li>
+                    <li><a href="./contact.html"></a></li>
+                    <li><a href="./contact.html"></a></li>
+                    <li><a href="./contact.html"></a></li>
                 </ul>
             </nav>
             <div class="header__nav__option">
@@ -623,9 +829,15 @@
         <div class="mobile-dropdown">
             <span class="close-btn">×</span>
             <ul>
-                <li><a href="/userProfile">Profile</a></li>
+                <%if(locals.user){%>
+                <li><a href="/userProfile"><%=locals.user.FirstName%> <%=locals.user.LastName%></a></li>
                 <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
                 <li><a href="/logout">Logout</a></li>
+                <%}else{%>
+                    <li><a href="/userProfile">Profile</a></li>
+                    <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
+                    <li><a href="/login">Login</a></li>
+                <%}%>
             </ul>
         </div>
     </header>
@@ -722,7 +934,7 @@
                                             <span class="sale-price">₹<%= product[i].SalePrice %></span>
                                             <span class="offer-price">₹<%= product[i].offerPrice %></span>
                                         </div>
-                                        <p class="mrp"><%= product[i].ProductOffer %>% OFF</p>
+                                        <p class="mrp"><%= product[i].appliedOffer %>% OFF</p>
                                     </div>
                                 </a>
                                 <div class="wishlist-icon">
@@ -736,6 +948,45 @@
         </div>
     </section>
     <!-- Product Section End -->
+
+    <!-- Latest category Section Begin -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <ul class="filter__controls">
+                    <li data-filter=".new-arrivals">Categories</li>
+                </ul>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="Category_item">
+                    <a href="#"></a>
+                    <div class="Category_items">
+                        <span><img src="/images/CATEGORIES/nike-just-do-it (2).jpg" alt=""></span>
+                        <a href=""><h5>MENS</h5></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="Category_item">
+                    <a href="#"></a>
+                    <div class="Category_items">
+                        <span><img src="/images/CATEGORIES/nike-just-do-it (3).jpg" alt=""></span>
+                        <a href=""><h5>WOMENS</h5></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="Category_item">
+                    <a href="#"></a>
+                    <div class="Category_items">
+                        <span><img src="/images/CATEGORIES/nike-just-do-it (4).jpg" alt=""></span>
+                        <a href=""><h5>KIDS</h5></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Latest category Section End -->
 
     <!-- Instagram Section Begin -->
     <section class="instagram spad">
@@ -763,52 +1014,7 @@
     </section>
     <!-- Instagram Section End -->
 
-    <!-- Latest Blog Section Begin -->
-    <section class="latest spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="section-title">
-                        <span>Latest News</span>
-                        <h2>Fashion New Trends</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-4 col-md-6 col-sm-6">
-                    <div class="blog__item">
-                        <div class="blog__item__pic set-bg" data-setbg="img/blog/blog-1.jpg"></div>
-                        <div class="blog__item__text">
-                            <span><img src="img/icon/calendar.png" alt=""> 16 February 2020</span>
-                            <h5>What Curling Irons Are The Best Ones</h5>
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-6">
-                    <div class="blog__item">
-                        <div class="blog__item__pic set-bg" data-setbg="img/blog/blog-2.jpg"></div>
-                        <div class="blog__item__text">
-                            <span><img src="img/icon/calendar.png" alt=""> 21 February 2020</span>
-                            <h5>Eternity Bands Do Last Forever</h5>
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-6">
-                    <div class="blog__item">
-                        <div class="blog__item__pic set-bg" data-setbg="img/blog/blog-3.jpg"></div>
-                        <div class="blog__item__text">
-                            <span><img src="img/icon/calendar.png" alt=""> 28 February 2020</span>
-                            <h5>The Health Benefits Of Sunglasses</h5>
-                            <a href="#">Read More</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Latest Blog Section End -->
+    <div><br></div>
 
     <!-- Footer Section Begin -->
     <footer class="footer">
@@ -817,7 +1023,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-6">
                     <div class="footer__about">
                         <div class="footer__logo">
-                            <a href="#"><img src="" alt=""></a>
+                            <a href="#"><img src="/images/SNEAKKISH-26-03-2025 (1).png" alt=""></a>
                         </div>
                         <p>The customer is at the heart of our unique business model, which includes design.</p>
                         <a href="#"><img src="img/payment.png" alt=""></a>
@@ -836,7 +1042,7 @@
                 </div>
                 <div class="col-lg-2 col-md-3 col-sm-6">
                     <div class="footer__widget">
-                        <h6>Shopping</h6>
+                        <h6>INFOS</h6>
                         <ul>
                             <li><a href="#">Contact Us</a></li>
                             <li><a href="#">Payment Methods</a></li>
@@ -862,9 +1068,7 @@
                 <div class="col-lg-12 text-center">
                     <div class="footer__copyright__text">
                         <p>Copyright ©
-                            <script>
-                                document.write(new Date().getFullYear());
-                            </script>2020
+                            <script>document.write(new Date().getFullYear());</script>2020
                             All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
                         </p>
                     </div>
@@ -911,7 +1115,6 @@
                 }
             });
 
-            // Mobile menu toggle
             $('.mobile-menu-btn').click(function() {
                 $('.mobile-dropdown').addClass('active');
             });
@@ -920,13 +1123,11 @@
                 $('.mobile-dropdown').removeClass('active');
             });
 
-            // Desktop dropdown
             $('.dropdown-btn').click(function(e) {
                 e.preventDefault();
                 $(this).parent('.dropdown').toggleClass('active');
             });
 
-            // Close desktop dropdown when clicking outside
             $(document).click(function(e) {
                 if (!$(e.target).closest('.dropdown').length) {
                     $('.dropdown').removeClass('active');
@@ -971,5 +1172,4 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 </body>
-
 </html>

@@ -484,35 +484,7 @@
 
 <body>
     <!-- Header Section Begin -->
-    <header class="header">
-        <div class="header__top">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 col-md-7">
-                        <div class="header__top__left">
-                            <p>Free shipping, 30-day return or refund guarantee.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-5">
-                        <div class="header__top__right">
-                            <div class="header__top__links">
-                                <% if (locals.user) { %>
-                                    <div class="dropdown">
-                                        <a class="dropdown-btn"><%= locals.user.FirstName %> <%= locals.user.LastName %></a>
-                                        <div class="dropdown-content">
-                                            <a href="/userProfile">Profile</a>
-                                            <a href="/logout">Logout</a>
-                                        </div>
-                                    </div>
-                                <% } else { %>
-                                    <a href="/login">Login</a>
-                                <% } %>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <header class="header">  
         <div class="header__main">
             <div class="header__logo">
                 <a href="/"><img src="/images/SNEAKKISH-26-03-.png" alt="SNEAKKISH Logo"></a>
@@ -521,14 +493,6 @@
                 <ul>
                     <li><a href="/">Home</a></li>
                     <li><a href="/product-page">Shop</a></li>
-                    <li><a href="#">Brands</a>
-                        <ul class="dropdown">
-                            <li><a href="#">Adidas</a></li>
-                            <li><a href="#">Nike</a></li>
-                            <li><a href="#">New Balance</a></li>
-                            <li><a href="#">Reebok</a></li>
-                        </ul>
-                    </li>
                     <li><a href="#">Contacts</a></li>
                 </ul>
             </nav>
@@ -590,6 +554,7 @@
                             <tr>
                                 <th>Image</th>
                                 <th>OrderId</th>
+                                <th>Date</th>
                                 <th>Status</th>
                                 <th>Total</th>
                                 <th>Actions</th>
@@ -607,8 +572,10 @@
                                         <% } %>
                                     </td>
                                     <td>#<%= order.OrderId || order._id %></td>
+                                    <td><%= order.InvoiceDate ? new Date(order.InvoiceDate).toISOString().split('T')[0] : order._id %></td>
+
                                     <td class="status-<%= order.Status.toLowerCase() %>"><%= order.Status %></td>
-                                    <td>₹<%= order.TotalPrice ? order.TotalPrice.toFixed(2) : 'N/A' %></td>
+                                    <td>₹<%= order.FinalAmount ? order.FinalAmount.toFixed(2) : 'N/A' %></td>
                                     <td>
                                         <div class="order-actions">
                                             <a href="/orders/<%= order.OrderId || order._id %>" class="view-btn">View</a>

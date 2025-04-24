@@ -146,6 +146,39 @@ const getOrderHistory = async (req, res) => {
 //     }
 // };
 
+// const getOrderDetails = async (req, res) => {
+//     try {
+//         const order = await Order.findOne({ OrderId: req.params.orderId })
+//             .populate({
+//                 path: 'OrderedItems.Product',
+//                 model: 'Product'
+//             });
+
+//         // Filter out items with missing or invalid Product references
+//         order.OrderedItems = order.OrderedItems.filter(item => item.Product !== null);
+
+//         console.log("ORD", order.OrderedItems); // Verify populated data
+//         console.log("Order Discount in getOrderDetails:", order.Discount); // Log the discount value
+
+//         if (!order) {
+//             return res.status(404).render('error', { message: 'Order not found' });
+//         }
+//         console.log("dsd", order.OrderedItems);
+
+//         // Ensure all required fields are present (default to 0 if missing)
+//         order.TotalPrice = order.TotalPrice || 0;
+//         order.Tax = order.Tax || 0;
+//         order.Discount = order.Discount || 0;
+//         order.WalletAmount = order.WalletAmount || 0;
+//         order.FinalAmount = order.FinalAmount || 0;
+
+//         res.render('order-detail', { order });
+//     } catch (error) {
+//         console.error('Error in getOrderDetails:', error);
+//         res.status(500).render('error', { message: 'Error loading order details' });
+//     }
+// };
+
 const getOrderDetails = async (req, res) => {
     try {
         const order = await Order.findOne({ OrderId: req.params.orderId })
@@ -157,7 +190,11 @@ const getOrderDetails = async (req, res) => {
         // Filter out items with missing or invalid Product references
         order.OrderedItems = order.OrderedItems.filter(item => item.Product !== null);
 
-        console.log("ORD", order.OrderedItems); // Verify populated data
+        // Debug: Log the Image field for each product
+        console.log("ORD", order.OrderedItems.map(item => ({
+            ProductName: item.Product.ProductName,
+            Image: item.Product.Image
+        })));
         console.log("Order Discount in getOrderDetails:", order.Discount); // Log the discount value
 
         if (!order) {
@@ -213,7 +250,7 @@ const cancelOrder = async (req, res) => {
             wallet = new Wallet({ userId, balance: 0 });
         }
 
-        const refundAmount = order.WalletAmount + (order.PaymentMethod === 'cod' || order.PaymentMethod === 'mixed' ? order.FinalAmount : 0);
+        const refundAmount = order.WalletAmount + (order.PaymentMethod === 'cod' || order.PaymentMethod === 'mixed' || order.PaymentMethod === 'razorpay' ? order.FinalAmount : 0);
         if (refundAmount > 0) {
             wallet.balance += refundAmount;
             await wallet.save();
@@ -271,7 +308,7 @@ const returnOrder = async (req, res) => {
             wallet = new Wallet({ userId, balance: 0 });
         }
 
-        const refundAmount = order.WalletAmount + (order.PaymentMethod === 'cod' || order.PaymentMethod === 'mixed' ? order.FinalAmount : 0);
+        const refundAmount = order.WalletAmount + (order.PaymentMethod === 'cod' || order.PaymentMethod === 'mixed' || order.PaymentMethod === 'razorpay'  ? order.FinalAmount : 0);
         if (refundAmount > 0) {
             wallet.balance += refundAmount;
             await wallet.save();
@@ -297,23 +334,121 @@ const returnOrder = async (req, res) => {
 
 const downloadInvoice = async (req, res) => {
     try {
-        const order = await Order.findOne({ OrderId: req.params.orderId }).populate('OrderedItems.Product');
-        const doc = new PDFDocument();
-        res.setHeader('Content-disposition', `attachment; filename=invoice-${order.OrderId}.pdf`);
+        // Fetch order from database
+        const order = await Order.findOne({ OrderId: req.params.orderId })
+            .populate('OrderedItems.Product')
+            .exec();
+
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        // Create a new PDF document
+        const doc = new PDFDocument({
+            size: 'A4',
+            margin: 50,
+            info: {
+                Title: `Invoice #${order.OrderId || order._id} from SNEAKKISH`,
+                Author: 'SNEAKKISH',
+                Subject: `Invoice for Order #${order.OrderId || order._id}`,
+                Creator: 'SNEAKKISH E-Commerce'
+            }
+        });
+
+        // Set response headers to trigger download
+        res.setHeader('Content-disposition', `attachment; filename=invoice-${order.OrderId || order._id}.pdf`);
         res.setHeader('Content-type', 'application/pdf');
+
+        // Pipe the PDF to the response
         doc.pipe(res);
 
-        doc.text(`Order ID: ${order.OrderId}`);
-        doc.text(`Date: ${order.InvoiceDate}`);
-        order.OrderedItems.forEach(item => {
-            doc.text(`${item.Product.name} - ${item.Quantity} x $${item.Price}`);
+        // Company Details
+        const companyDetails = {
+            name: 'SNEAKKISH',
+            address: '123 Fashion Street, Style City, FC 12345',
+            email: 'support@malefashion.com',
+            phone: '(123) 456-7890'
+        };
+
+        // Header: Company Details
+        doc.font('Helvetica-Bold').fontSize(20).text(companyDetails.name, 50, 50);
+        doc.font('Helvetica').fontSize(12);
+        doc.text(companyDetails.address, 50, 75);
+        doc.text(`Email: ${companyDetails.email}`, 50, 90);
+        doc.text(`Phone: ${companyDetails.phone}`, 50, 105);
+
+        // Invoice Title and Details
+        doc.font('Helvetica-Bold').fontSize(16).text(`Invoice #${order.OrderId || order._id}`, 50, 140);
+        doc.font('Helvetica').fontSize(12);
+        doc.text(`Date: ${order.InvoiceDate ? new Date(order.InvoiceDate).toISOString().split('T')[0] : 'N/A'}`, 50, 160);
+        doc.text(`Status: ${order.Status}`, 50, 175);
+        doc.text(`Payment Method: ${order.PaymentMethod || 'N/A'}`, 50, 190);
+
+        // Customer Address
+        if (order.Address) {
+            doc.font('Helvetica-Bold').fontSize(14).text('Delivery Address', 50, 220);
+            doc.font('Helvetica').fontSize(12);
+            doc.text(`${order.Address.addressType || ''}`, 50, 240);
+            doc.text(`City: ${order.Address.City}`, 50, 255);
+            doc.text(`State: ${order.Address.State}`, 50, 270);
+            doc.text(`Pincode: ${order.Address.Pincode}`, 50, 285);
+        }
+
+        // Ordered Items Table
+        doc.font('Helvetica-Bold').fontSize(14).text('Ordered Items', 50, 320);
+        const tableTop = 340;
+        const descriptionX = 50;
+        const sizeX = 250;
+        const quantityX = 300;
+        const priceX = 350;
+        const subtotalX = 400;
+
+        // Table Headers
+        doc.font('Helvetica-Bold').fontSize(12);
+        doc.text('Product Name', descriptionX, tableTop);
+        doc.text('Size', sizeX, tableTop);
+        doc.text('Qty', quantityX, tableTop);
+        doc.text('Price', priceX, tableTop);
+        doc.text('Subtotal', subtotalX, tableTop);
+
+        // Table Header Underline
+        doc.moveTo(descriptionX, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+
+        // Table Rows
+        let y = tableTop + 30;
+        order.OrderedItems.forEach((item) => {
+            doc.font('Helvetica').fontSize(10);
+            doc.text(item.Product.ProductName || 'Unnamed Product', descriptionX, y, { width: 190 });
+            doc.text(item.Size, sizeX, y);
+            doc.text(item.Quantity, quantityX, y);
+            doc.text(`₹${item.Price.toFixed(2)}`, priceX, y);
+            doc.text(`₹${(item.Price * item.Quantity).toFixed(2)}`, subtotalX, y);
+            y += 20;
         });
-        doc.text(`Total: $${order.FinalAmount}`);
+
+        // Totals Section
+        const totalsTop = y + 20;
+        doc.font('Helvetica-Bold').fontSize(14).text('Order Summary', 50, totalsTop);
+        doc.font('Helvetica').fontSize(12);
+        doc.text(`Subtotal: ₹${order.TotalPrice.toFixed(2)}`, 400, totalsTop + 20);
+        doc.text(`Tax: ₹${order.Tax.toFixed(2)}`, 400, totalsTop + 35);
+        doc.text(`Discount: ₹${order.Discount.toFixed(2)}`, 400, totalsTop + 50);
+        doc.text(`Wallet Amount Used: ₹${order.WalletAmount.toFixed(2)}`, 400, totalsTop + 65);
+        const finalAmount = Math.max(0, order.TotalPrice + order.Tax - order.Discount - order.WalletAmount);
+        doc.font('Helvetica-Bold').fontSize(14).text(`Final Amount: ₹${finalAmount.toFixed(2)}`, 400, totalsTop + 80);
+
+        // Footer
+        doc.font('Helvetica').fontSize(10).text('Thank you for shopping with SNEAKKISH!', 50, totalsTop + 120, { align: 'center' });
+        doc.text('For any queries, contact us at support@malefashion.com', 50, totalsTop + 135, { align: 'center' });
+
+        // Finalize the PDF
         doc.end();
     } catch (error) {
+        console.error('Error generating invoice:', error);
         res.status(500).send('Error generating invoice');
     }
 };
+
 module.exports={
     getOrders,
     getOrderDetails,

@@ -121,9 +121,9 @@ router.get('/product-page', userAuth, productController.productPage);
 //CART MANAGEMENT
 router.get('/cart', userAuth, cartController.getCart);
 router.post('/cart/add/:productId', userAuth, cartController.addToCart);
-router.post('/cart/increment/:productId', userAuth, cartController.incrementQuantity);
-router.post('/cart/decrement/:productId', userAuth, cartController.decrementQuantity);
-router.post('/cart/remove/:productId', userAuth, cartController.removeFromCart);
+router.post('/cart/increment/:productId/ajax', userAuth, cartController.incrementQuantity);
+router.post('/cart/decrement/:productId/ajax', userAuth, cartController.decrementQuantity);
+router.post('/cart/remove/:productId/ajax', userAuth, cartController.removeFromCart);
 router.get('/checkout', userAuth, cartController.getCheckout);
 router.post('/checkout/place-order', userAuth, cartController.placeOrder);
 router.get('/order-success',userAuth,cartController.orderSuccess)
