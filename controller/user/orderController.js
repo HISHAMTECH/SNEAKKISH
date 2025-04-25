@@ -6,76 +6,6 @@ const Wallet = require('../../models/walletSchema')
 const Transaction = require('../../models/walletTransactionSchema')
 const PDFDocument = require('pdfkit');
 
-
-
-// const getOrders = async (req, res) => {
-//     try {
-//         const userId = req.session.User?._id;
-//         if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-//             return res.redirect('/orders?error=Invalid user session');
-//         }
-
-//         const orders = await Order.find({ userId: userId }).populate('OrderedItems.Product');
-//         console.log("userId", userId);
-//         console.log("orders", orders);
-//         console.log("fdf",orders.OrderedItems);
-        
-    
-        
-
-//         res.render('orders', { orders });
-//     } catch (error) {
-//         console.error('Error in getOrders:', error);
-//         res.status(500).send('Error fetching orders');
-//     }
-// };
-
-// const getOrderHistory = async (req, res) => {
-//     try {
-//         const userId = req.session.User?._id;
-//         const orders = await Order.find({ userId }).populate('OrderedItems.Product');
-        
-        
-//         res.render('orders', { orders });
-//     } catch (error) {
-//         console.error('Error in getOrderHistory:', error);
-//         res.render('orders', { orders: [], error: 'Error loading orders' });
-//     }
-// };
-
-// const getOrderDetails = async (req, res) => {
-//     try {
-//         const order = await Order.findOne({ OrderId: req.params.orderId })
-//             .populate({
-//                 path: 'OrderedItems.Product',
-//                 model: 'Product'
-//             });
-
-//         // Filter out items with missing or invalid Product references
-//         order.OrderedItems = order.OrderedItems.filter(item => item.Product !== null);
-
-//         console.log("ORD", order.OrderedItems); // Verify populated data
-
-//         if (!order) {
-//             return res.status(404).render('error', { message: 'Order not found' });
-//         }
-//         console.log(order);
-        
-
-//         // Ensure all required fields are present (default to 0 if missing)
-//         order.TotalPrice = order.TotalPrice || 0;
-//         order.Tax = order.Tax || 0;
-//         order.Discount = order.Discount || 0;
-//         order.WalletAmount = order.WalletAmount || 0;
-//         order.FinalAmount = order.FinalAmount || 0;
-
-//         res.render('order-detail', { order });
-//     } catch (error) {
-//         console.error('Error in getOrderDetails:', error);
-//         res.status(500).render('error', { message: 'Error loading order details' });
-//     }
-// };
-
 const getOrders = async (req, res) => {
     try {
         const userId = req.session.User?._id;
@@ -83,10 +13,10 @@ const getOrders = async (req, res) => {
             return res.redirect('/orders?error=Invalid user session');
         }
 
-        // Sort orders by InvoiceDate in descending order (newest first)
+        // Fetch all orders including those with "Payment Failed" status, sorted by InvoiceDate
         const orders = await Order.find({ userId: userId })
             .populate('OrderedItems.Product')
-            .sort({ InvoiceDate: -1 }); // Added sorting
+            .sort({ InvoiceDate: -1 }); // Sort by newest first
 
         console.log("userId", userId);
         console.log("orders", orders);
@@ -102,10 +32,10 @@ const getOrders = async (req, res) => {
 const getOrderHistory = async (req, res) => {
     try {
         const userId = req.session.User?._id;
-        // Sort orders by InvoiceDate in descending order (newest first)
+        // Fetch all orders including those with "Payment Failed" status, sorted by InvoiceDate
         const orders = await Order.find({ userId })
             .populate('OrderedItems.Product')
-            .sort({ InvoiceDate: -1 }); // Added sorting
+            .sort({ InvoiceDate: -1 }); // Sort by newest first
 
         res.render('orders', { orders });
     } catch (error) {
@@ -125,43 +55,15 @@ const getOrderHistory = async (req, res) => {
 //         // Filter out items with missing or invalid Product references
 //         order.OrderedItems = order.OrderedItems.filter(item => item.Product !== null);
 
-//         console.log("ORD", order.OrderedItems); // Verify populated data
-
-//         if (!order) {
-//             return res.status(404).render('error', { message: 'Order not found' });
-//         }
-//         console.log("dsd",order.OrderedItems);
-
-//         // Ensure all required fields are present (default to 0 if missing)
-//         order.TotalPrice = order.TotalPrice || 0;
-//         order.Tax = order.Tax || 0;
-//         order.Discount = order.Discount || 0;
-//         order.WalletAmount = order.WalletAmount || 0;
-//         order.FinalAmount = order.FinalAmount || 0;
-
-//         res.render('order-detail', { order });
-//     } catch (error) {
-//         console.error('Error in getOrderDetails:', error);
-//         res.status(500).render('error', { message: 'Error loading order details' });
-//     }
-// };
-
-// const getOrderDetails = async (req, res) => {
-//     try {
-//         const order = await Order.findOne({ OrderId: req.params.orderId })
-//             .populate({
-//                 path: 'OrderedItems.Product',
-//                 model: 'Product'
-//             });
-
-//         // Filter out items with missing or invalid Product references
-//         order.OrderedItems = order.OrderedItems.filter(item => item.Product !== null);
-
-//         console.log("ORD", order.OrderedItems); // Verify populated data
+//         // Debug: Log the Image field for each product
+//         console.log("ORD", order.OrderedItems.map(item => ({
+//             ProductName: item.Product.ProductName,
+//             Image: item.Product.Image
+//         })));
 //         console.log("Order Discount in getOrderDetails:", order.Discount); // Log the discount value
 
 //         if (!order) {
-//             return res.status(404).render('error', { message: 'Order not found' });
+//             return res.redirect('/orders?error=Order not found');
 //         }
 //         console.log("dsd", order.OrderedItems);
 
@@ -175,44 +77,107 @@ const getOrderHistory = async (req, res) => {
 //         res.render('order-detail', { order });
 //     } catch (error) {
 //         console.error('Error in getOrderDetails:', error);
-//         res.status(500).render('error', { message: 'Error loading order details' });
+//         res.redirect('/orders?error=Error loading order details');
 //     }
 // };
 
 const getOrderDetails = async (req, res) => {
     try {
+        // Populate OrderedItems.Product and userId
         const order = await Order.findOne({ OrderId: req.params.orderId })
             .populate({
                 path: 'OrderedItems.Product',
-                model: 'Product'
+                model: 'Product',
+                select: 'ProductName Image Price' // Select specific fields to optimize query
+            })
+            .populate({
+                path: 'userId',
+                model: 'User',
+                select: 'FirstName LastName Email PhoneNumber Address Wallet' // Select relevant user fields
             });
+
+        if (!order) {
+            return res.redirect('/orders?error=Order not found');
+        }
 
         // Filter out items with missing or invalid Product references
         order.OrderedItems = order.OrderedItems.filter(item => item.Product !== null);
 
-        // Debug: Log the Image field for each product
-        console.log("ORD", order.OrderedItems.map(item => ({
-            ProductName: item.Product.ProductName,
-            Image: item.Product.Image
+        // Debug: Log the Product and Image fields for each ordered item
+        console.log("Ordered Items:", order.OrderedItems.map(item => ({
+            ProductName: item.Product?.ProductName,
+            Image: item.Product?.Image,
+            Quantity: item.Quantity,
+            Price: item.Price,
+            Size: item.Size
         })));
-        console.log("Order Discount in getOrderDetails:", order.Discount); // Log the discount value
 
-        if (!order) {
-            return res.status(404).render('error', { message: 'Order not found' });
-        }
-        console.log("dsd", order.OrderedItems);
+        // Debug: Log user details
+        console.log("User Details:", {
+            FirstName: order.userId?.FirstName,
+            LastName: order.userId?.LastName,
+            Email: order.userId?.Email,
+            PhoneNumber: order.userId?.PhoneNumber,
+            Wallet: order.userId?.Wallet
+        });
 
-        // Ensure all required fields are present (default to 0 if missing)
+        // Debug: Log key order details
+        console.log("Order Details:", {
+            OrderId: order.OrderId,
+            Discount: order.Discount,
+            WalletAmount: order.WalletAmount,
+            TotalPrice: order.TotalPrice,
+            Tax: order.Tax,
+            FinalAmount: order.FinalAmount,
+            PaymentMethod: order.PaymentMethod,
+            Status: order.Status,
+            InvoiceDate: order.InvoiceDate,
+            CancellationReason: order.CancellationReason,
+            ReturnReason: order.ReturnReason,
+            Address: order.Address
+        });
+
+        // Ensure all required fields are present (default to 0 or appropriate value if missing)
         order.TotalPrice = order.TotalPrice || 0;
         order.Tax = order.Tax || 0;
         order.Discount = order.Discount || 0;
         order.WalletAmount = order.WalletAmount || 0;
         order.FinalAmount = order.FinalAmount || 0;
+        order.Status = order.Status || 'Pending';
+        order.PaymentMethod = order.PaymentMethod || 'cod';
+        order.CancellationReason = order.CancellationReason || 'none';
+        order.ReturnReason = order.ReturnReason || '';
 
+        // Ensure Address field is populated correctly
+        order.Address = order.Address || {
+            addressType: 'N/A',
+            City: 'N/A',
+            State: 'N/A',
+            Pincode: 'N/A',
+            _id: order.Address?._id || null
+        };
+
+        // Optionally, cross-reference with user's addresses if needed
+        // Example: If order.Address._id matches a user address, fetch additional details
+        if (order.Address._id && order.userId?.Address) {
+            const matchingAddress = order.userId.Address.find(addr => addr._id.equals(order.Address._id));
+            if (matchingAddress) {
+                order.Address = {
+                    ...order.Address,
+                    Name: matchingAddress.Name,
+                    Landmark: matchingAddress.Landmark,
+                    Phone: matchingAddress.Phone,
+                    AltPhone: matchingAddress.AltPhone,
+                    isDefault: matchingAddress.isDefault
+                };
+            }
+        }
+
+        // Render the order details page with the populated order data
         res.render('order-detail', { order });
     } catch (error) {
         console.error('Error in getOrderDetails:', error);
-        res.status(500).render('error', { message: 'Error loading order details' });
+        res.redirect('/orders?error=Error loading order details');
     }
 };
 
@@ -322,15 +287,12 @@ const returnOrder = async (req, res) => {
             await transaction.save();
         }
 
-
         res.json({ success: true, message: 'Return request submitted' });
     } catch (error) {
         console.error('Error in returnOrder:', error);
         res.json({ success: false, message: 'Error requesting return' });
     }
 };
-
-
 
 const downloadInvoice = async (req, res) => {
     try {
@@ -455,6 +417,4 @@ module.exports={
     cancelOrder,
     returnOrder,
     downloadInvoice
-
-
 }

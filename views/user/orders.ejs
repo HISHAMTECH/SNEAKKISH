@@ -399,6 +399,11 @@
             font-weight: 600;
         }
 
+        .status-payment-failed {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
         .order-actions {
             display: flex;
             gap: 10px;
@@ -565,21 +570,21 @@
                                 <tr>
                                     <td>
                                         <% if (order.OrderedItems && order.OrderedItems.length > 0 && order.OrderedItems[0].Product && order.OrderedItems[0].Product.ProductImage && order.OrderedItems[0].Product.ProductImage.length > 0) { %>
-                                            <img src="/uploads/re-image/<%= order.OrderedItems[0].Product.ProductImage[0] %>" 
+                                            <img src="/Uploads/re-image/<%= order.OrderedItems[0].Product.ProductImage[0] %>" 
                                                  alt="<%= order.OrderedItems[0].Product.ProductName || 'Product Image' %>">
                                         <% } else { %>
-                                            <img src="/uploads/re-image/default-image.jpg" alt="Default Image">
+                                            <img src="/Uploads/re-image/default-image.jpg" alt="Default Image">
                                         <% } %>
                                     </td>
                                     <td>#<%= order.OrderId || order._id %></td>
                                     <td><%= order.InvoiceDate ? new Date(order.InvoiceDate).toISOString().split('T')[0] : order._id %></td>
-
-                                    <td class="status-<%= order.Status.toLowerCase() %>"><%= order.Status %></td>
+                                    <td class="status-<%= order.Status.toLowerCase().replace(/\s+/g, '-') %>">
+                                        <%= order.Status %>
+                                    </td>
                                     <td>₹<%= order.FinalAmount ? order.FinalAmount.toFixed(2) : 'N/A' %></td>
                                     <td>
                                         <div class="order-actions">
                                             <a href="/orders/<%= order.OrderId || order._id %>" class="view-btn">View</a>
-                                            
                                         </div>
                                     </td>
                                 </tr>

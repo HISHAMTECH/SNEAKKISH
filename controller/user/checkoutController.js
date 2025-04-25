@@ -55,6 +55,8 @@ const applyCoupon = async (req, res) => {
     try {
         const { couponId } = req.body;
         const userId = req.session.User;
+        console.log(couponId);
+        
 
         const coupon = await Coupon.findById(couponId);
         console.log("sas", coupon);
@@ -78,6 +80,8 @@ const applyCoupon = async (req, res) => {
         const discountPercentage = coupon.OfferPrice; // e.g., 30 for 30%
         const discountAmount = (subtotal * discountPercentage) / 100;
         const finalDiscount = Math.min(discountAmount, subtotal); // Cap discount at subtotal
+        console.log(finalDiscount);
+        
 
         // Store the coupon and discount in session
         req.session.appliedCoupon = {
@@ -92,7 +96,10 @@ const applyCoupon = async (req, res) => {
             message: 'Coupon applied', 
             discount: finalDiscount 
         });
+        console.log("response sent");
+        
     } catch (error) {
+        console.log("response sent error");
         console.error('Error applying coupon:', error);
         res.json({ success: false, message: 'Error applying coupon' });
     }
@@ -156,12 +163,17 @@ const createRazorpayOrder = async (req, res) => {
 // Place order
 const placeOrder = async (req, res) => {
     try {
+        console.log("evide keriii");
+        
         const userId = req.session.user._id;
         const { addressId, paymentMethod, walletAmount, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
 
         let finalAmount = parseFloat(req.body['final-total'] || 0);
         const appliedWalletAmount = parseFloat(walletAmount) || 0;
         const coupon = req.session.appliedCoupon;
+
+        console.log(appliedWalletAmount);
+        
 
         // Calculate totals
         const cart = await Cart.findOne({ UserId: userId }).populate('Items.ProductId');
@@ -174,6 +186,7 @@ const placeOrder = async (req, res) => {
                 discount = coupon.OfferPrice > subtotal ? subtotal : coupon.OfferPrice;
             }
         }
+
 
         finalAmount = subtotal + tax - discount - appliedWalletAmount;
 
@@ -197,6 +210,8 @@ const placeOrder = async (req, res) => {
             Status: paymentMethod === 'razorpay' ? 'Pending' : 'Placed',
             OrderId: `ORD-${Date.now()}`
         });
+
+
 
         if (paymentMethod === 'razorpay') {
             order.RazorpayOrderId = razorpayOrderId;
@@ -222,7 +237,7 @@ const placeOrder = async (req, res) => {
         // Deduct wallet amount if used
         if (appliedWalletAmount > 0) {
             const wallet = await Wallet.findOne({ UserId: userId });
-            wallet.balance -= appliedWalletAmount;
+            wallet.balance = appliedWalletAmount;
             await wallet.save();
         }
 
@@ -231,6 +246,8 @@ const placeOrder = async (req, res) => {
         req.session.appliedCoupon = null;
 
         await order.save();
+        console.log("order",order);
+        
         res.redirect(`/order-success/${order.OrderId}`);
     } catch (error) {
         console.error('Error placing order:', error);

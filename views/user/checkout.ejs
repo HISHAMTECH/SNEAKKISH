@@ -7,7 +7,7 @@
     <meta name="keywords" content="Male_Fashion, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Male-Fashion | Checkout</title>
+    <title>Sneakkish | Checkout</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
@@ -381,7 +381,7 @@
             cursor: pointer;
         }
 
-        #max-amount-btn:hover {
+        .max-amount-btn:hover {
             background: #333;
         }
 
@@ -596,7 +596,7 @@
                             <ul class="order-list">
                                 <% cart.Items.forEach(item => { %>
                                     <li class="order-item">
-                                        <img src="/uploads/re-image/<%= item.ProductId.ProductImage[0] || 'default-image.jpg' %>" 
+                                        <img src="/Uploads/re-image/<%= item.ProductId.ProductImage[0] || 'default-image.jpg' %>" 
                                              alt="<%= item.ProductId.ProductName || 'Product Image' %>">
                                         <span><%= item.ProductId.ProductName || 'Unnamed Product' %> (Size: <%= item.Size %>)</span>
                                         <span class="quantity">x<%= item.Quantity %></span>
@@ -820,7 +820,7 @@
                 $('#coupon-select').niceSelect('update'); // Update Nice Select UI
             } else {
                 // Enable coupon selection if wallet doesn't cover the full amount
-                couponSelect.disabled = false;
+                couponSelect.disabled = false; // Corrected typo: couponشانselect → couponSelect
                 if (!appliedCouponId) {
                     applyBtn.style.display = 'inline-block';
                     removeBtn.style.display = 'none';
@@ -1035,7 +1035,7 @@
                     rzp.open();
 
                     rzp.on('payment.failed', function(response) {
-                        Swal.fire('Error', 'Payment failed: ' + response.error.description, 'error');
+                        window.location.href = `/order-failure/${data.order.id}`;
                     });
                 } catch (error) {
                     console.error('Error:', error);
