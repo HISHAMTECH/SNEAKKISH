@@ -366,375 +366,437 @@
 <body>
     <!-- Breadcrumb Section -->
     <section class="breadcrumb-option">
-        <div class="container py-4">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h2>Order Details</h2>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item"><a href="/orders">My Orders</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Order #<%= order.OrderId %></li>
-                        </ol>
-                    </nav>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Order Details</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <a href="/orders">Orders</a>
+                            <span>Order <%= order.OrderId || order._id %></span>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
     </section>
 
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">Order #<%= order.OrderId %></h4>
-                            <p class="text-muted mb-0">Placed on: <%= new Date(order.InvoiceDate).toLocaleDateString() %></p>
-                        </div>
-                        <div>
-                            <% if(order.Status === 'Payment Failed') { %>
-                                <span class="badge bg-danger px-3 py-2">Payment Failed</span>
-                            <% } else if(order.Status === 'Pending') { %>
-                                <span class="badge bg-warning px-3 py-2">Pending</span>
-                            <% } else if(order.Status === 'Placed') { %>
-                                <span class="badge bg-info px-3 py-2">Placed</span>
-                            <% } else if(order.Status === 'Shipped') { %>
-                                <span class="badge bg-primary px-3 py-2">Shipped</span>
-                            <% } else if(order.Status === 'Delivered') { %>
-                                <span class="badge bg-success px-3 py-2">Delivered</span>
-                            <% } else if(order.Status === 'Cancelled') { %>
-                                <span class="badge bg-danger px-3 py-2">Cancelled</span>
-                            <% } else if(order.Status === 'Return Requested') { %>
-                                <span class="badge bg-secondary px-3 py-2">Return Requested</span>
-                            <% } else if(order.Status === 'Returned') { %>
-                                <span class="badge bg-dark px-3 py-2">Returned</span>
+    <!-- Order Details Section -->
+    <section class="order-details-section">
+        <div class="container">
+            <div class="order-details-container">
+                <h1>Order Details - <%= order.OrderId || order._id %></h1>
+
+                <!-- Order Information -->
+                <div class="order-info">
+                    <h2>Order Information</h2>
+                    <table class="order-table">
+                        <thead>
+                            <tr>
+                                <th>Detail</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Status</td>
+                                <td><strong class="highlight"><%= order.Status %></strong></td>
+                            </tr>
+                            <tr>
+                                <td>Date</td>
+                                <td><strong><%= order.InvoiceDate ? new Date(order.InvoiceDate).toLocaleDateString() : 'N/A' %></strong></td>
+                            </tr>
+                            <tr>
+                                <td>Payment Method</td>
+                                <td><strong><%= order.PaymentMethod || 'N/A' %></strong></td>
+                            </tr>
+                            <% if (order.CancellationReason && order.CancellationReason !== 'Not specified') { %>
+                                <tr>
+                                    <td>Cancel Reason</td>
+                                    <td><strong><%= order.CancellationReason %></strong></td>
+                                </tr>
                             <% } %>
-                        </div>
+                            <% if (order.ReturnReason) { %>
+                                <tr>
+                                    <td>Return Reason</td>
+                                    <td><strong><%= order.ReturnReason %></strong></td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Delivery Address -->
+                <% if (order.Address) { %>
+                    <div class="delivery-address">
+                        <h2>Delivery Address</h2>
+                        <table class="address-table">
+                            <thead>
+                                <tr>
+                                    <th>Detail</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Type</td>
+                                    <td><strong><%= order.Address.addressType %></strong></td>
+                                </tr>
+                                <tr>
+                                    <td>City</td>
+                                    <td><strong><%= order.Address.City %></strong></td>
+                                </tr>
+                                <tr>
+                                    <td>State</td>
+                                    <td><strong><%= order.Address.State %></strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Pincode</td>
+                                    <td><strong><%= order.Address.Pincode %></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                <% } %>
 
-    <% if(order.Status === 'Payment Failed') { %>
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="alert alert-danger">
-                <h5>Payment Failed Information</h5>
-                <p>Your payment could not be processed due to: <%= order.PaymentFailureReason %></p>
-                <p>You can try ordering these items again from your cart.</p>
-            </div>
-        </div>
-    </div>
-    <% } %>
-
-    <!-- Order Items -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Ordered Items</h5>
-                </div>
-                <div class="card-body">
-                    <% order.OrderedItems.forEach((item, index) => { %>
-                        <div class="row mb-3 py-3 border-bottom">
-                            <div class="col-md-2">
-                                <% if(item.Product && item.Product.ProductImage) { %>
-                                    <img src="<%= item.Product.ProductImage[0] %>" class="img-fluid rounded" alt="<%= item.Product.ProductName %>">
-                                <% } else { %>
-                                    <div class="bg-light rounded p-3 text-center">No Image</div>
+                <!-- Ordered Items -->
+                <div class="ordered-items">
+                    <h2>Ordered Items</h2>
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>Subtotal</th>
+                                <% if (order.Status === 'Delivered' && order.OrderedItems.length > 1) { %>
+                                    <th>Action</th>
                                 <% } %>
-                            </div>
-                            <div class="col-md-6">
-                                <h6><%= item.Product ? item.Product.ProductName : 'Product Unavailable' %></h6>
-                                <p class="text-muted mb-1">Size: <%= item.Size %></p>
-                                <p class="text-muted mb-1">Quantity: <%= item.Quantity %></p>
-                                <p class="mb-0">₹<%= item.Price %></p>
-                            </div>
-                            <div class="col-md-4 text-end">
-                                <% if(order.Status === 'Delivered' && item.ReturnStatus === 'None') { %>
-                                    <button class="btn btn-sm btn-outline-danger return-item-btn" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#returnItemModal" 
-                                            data-index="<%= index %>">
-                                        Request Return
-                                    </button>
-                                <% } else if(item.ReturnStatus !== 'None') { %>
-                                    <span class="badge bg-secondary"><%= item.ReturnStatus %></span>
-                                    <% if(item.ItemReturnReason) { %>
-                                        <small class="d-block mt-1">Reason: <%= item.ItemReturnReason %></small>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% order.OrderedItems.forEach((item, index) => { %>
+                                <tr>
+                                    <td data-label="Image">
+                                        <img src="/Uploads/re-image/<%= item.Product.ProductImage && item.Product.ProductImage.length > 0 ? item.Product.ProductImage[0] : 'default-image.jpg' %>"
+                                             alt="<%= item.Product.ProductName || 'Product Image' %>">
+                                    </td>
+                                    <td data-label="Name"><%= item.Product.ProductName || 'Unnamed Product' %></td>
+                                    <td data-label="Size"><%= item.Size %></td>
+                                    <td data-label="Price">₹<%= item.Price.toFixed(2) %> x <%= item.Quantity %></td>
+                                    <td data-label="Subtotal">₹<%= (item.Price * item.Quantity).toFixed(2) %></td>
+                                    <% if (order.Status === 'Delivered' && order.OrderedItems.length > 1 && item.ReturnStatus === 'None') { %>
+                                        <td data-label="Action">
+                                            <button class="item-return-btn" onclick="openItemReturnModal('<%= order.OrderId %>', '<%= index %>', '<%= item.Product.ProductName %>')">Return Item</button>
+                                        </td>
+                                    <% } else if (item.ReturnStatus !== 'None') { %>
+                                        <td data-label="Action">
+                                            <strong><%= item.ReturnStatus %></strong>
+                                            <% if (item.ItemReturnReason) { %>
+                                                <br><span><%= item.ItemReturnReason %></span>
+                                            <% } %>
+                                        </td>
                                     <% } %>
-                                <% } %>
-                            </div>
-                        </div>
-                    <% }); %>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
                 </div>
+
+                <!-- Totals -->
+                <div class="totals">
+                    <h2>Order Summary</h2>
+                    <table class="totals-table">
+                        <thead>
+                            <tr>
+                                <th>Detail</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Subtotal</td>
+                                <td><strong>₹<%= order.TotalPrice.toFixed(2) %></strong></td>
+                            </tr>
+                            <tr>
+                                <td>Tax</td>
+                                <td><strong>₹<%= order.Tax.toFixed(2) %></strong></td>
+                            </tr>
+                            <tr>
+                                <td>Discount</td>
+                                <td><strong>₹<%= order.Discount.toFixed(2) %></strong></td>
+                            </tr>
+                            <tr>
+                                <td>Wallet Amount Used</td>
+                                <td><strong>₹<%= order.WalletAmount.toFixed(2) %></strong></td>
+                            </tr>
+                            <% const calculatedFinalAmount = Math.max(0, order.TotalPrice + order.Tax - order.Discount - order.WalletAmount); %>
+                            <tr>
+                                <td class="final-amount">Final Amount</td>
+                                <td class="final-amount"><strong>₹<%= calculatedFinalAmount.toFixed(2) %></strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <% if (order.Status === 'Pending') { %>
+                    <div class="action-buttons">
+                        <button class="cancel-btn" onclick="openModal('cancelModal')">Cancel Order</button>
+                        <button><a href="/orders/invoice/<%= order.OrderId || order._id %>" class="download-btn">Download Invoice</a></button>
+                    </div>
+                <% } else if (order.Status === 'Delivered') { %>
+                    <div class="action-buttons">
+                        <button class="return-btn" onclick="openModal('returnModal')">Request Return</button>
+                        <button><a href="/orders/invoice/<%= order.OrderId || order._id %>" class="download-btn">Download Invoice</a></button>
+                    </div>
+                <% } else { %>
+                    <div class="action-buttons">
+                        <button><a href="/orders/invoice/<%= order.OrderId || order._id %>" class="download-btn">Download Invoice</a></button>
+                    </div>
+                <% } %>
             </div>
         </div>
+    </section>
 
-        <!-- Order Summary and Delivery Address -->
-        <div class="col-md-4">
-            <!-- Order Summary -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Order Summary</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal:</span>
-                        <span>₹<%= order.TotalPrice.toFixed(2) %></span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Tax:</span>
-                        <span>₹<%= order.Tax.toFixed(2) %></span>
-                    </div>
-                    <% if(order.Discount > 0) { %>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Discount:</span>
-                            <span>-₹<%= order.Discount.toFixed(2) %></span>
-                        </div>
-                    <% } %>
-                    <% if(order.WalletAmount > 0) { %>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Wallet Amount:</span>
-                            <span>-₹<%= order.WalletAmount.toFixed(2) %></span>
-                        </div>
-                    <% } %>
-                    <hr>
-                    <div class="d-flex justify-content-between fw-bold">
-                        <span>Total:</span>
-                        <span>₹<%= order.FinalAmount.toFixed(2) %></span>
-                    </div>
-                    <div class="mt-3">
-                        <span class="text-muted">Payment Method: </span>
-                        <span><%= order.PaymentMethod %></span>
-                    </div>
-                    
-                    <% if(order.Status !== 'Payment Failed' && order.Status !== 'Cancelled') { %>
-                        <div class="mt-3">
-                            <a href="/orders/invoice/<%= order.OrderId %>" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-download me-1"></i> Download Invoice
-                            </a>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-
-            <!-- Delivery Address -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Delivery Address</h5>
-                </div>
-                <div class="card-body">
-                    <p class="mb-1"><%= order.Address.addressType || 'Address' %></p>
-                    <% if(order.Address.Name) { %><p class="mb-1"><%= order.Address.Name %></p><% } %>
-                    <p class="mb-1"><%= order.Address.City %>, <%= order.Address.State %></p>
-                    <p class="mb-0">Pincode: <%= order.Address.Pincode %></p>
-                    <% if(order.Address.Phone) { %><p class="mb-0">Phone: <%= order.Address.Phone %></p><% } %>
-                </div>
-            </div>
-
-            <!-- Order Actions -->
-            <% if(order.Status === 'Pending') { %>
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Order Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <button class="btn btn-danger btn-block w-100" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
-                            Cancel Order
-                        </button>
-                    </div>
-                </div>
-            <% } else if(order.Status === 'Delivered' && !order.OrderedItems.some(item => item.ReturnStatus !== 'None')) { %>
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Order Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <button class="btn btn-warning btn-block w-100" data-bs-toggle="modal" data-bs-target="#returnOrderModal">
-                            Return Order
-                        </button>
-                    </div>
-                </div>
-            <% } %>
-        </div>
-    </div>
-</div>
-
-<!-- Cancel Order Modal -->
-<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <!-- Cancel Order Modal -->
+    <div class="modal" id="cancelModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Cancel Order</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to cancel this order?</p>
+            <h2>Cancel Order</h2>
+            <form id="cancelForm" action="/orders/cancel/<%= order.OrderId %>" method="POST">
                 <div class="form-group">
-                    <label for="cancelReason">Reason for cancellation:</label>
-                    <select class="form-select" id="cancelReason">
-                        <option value="Changed my mind">Changed my mind</option>
-                        <option value="Found a better deal">Found a better deal</option>
-                        <option value="Ordered by mistake">Ordered by mistake</option>
-                        <option value="Other">Other</option>
-                    </select>
+                    <label for="cancelReason">Reason for Cancellation</label>
+                    <textarea id="cancelReason" name="reason" rows="4" placeholder="Enter your reason (optional)"></textarea>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" id="confirmCancelOrder">Confirm Cancel</button>
-            </div>
+                <div class="form-actions">
+                    <button type="button" class="modal-cancel-btn" onclick="closeModal('cancelModal')">Cancel</button>
+                    <button type="submit" class="save-btn">Submit</button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<!-- Return Order Modal -->
-<div class="modal fade" id="returnOrderModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <!-- Return Order Modal -->
+    <div class="modal" id="returnModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Return Order</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to return this entire order?</p>
+            <h2>Request Return</h2>
+            <form id="returnForm" action="/orders/return/<%= order.OrderId %>" method="POST">
                 <div class="form-group">
-                    <label for="returnReason">Reason for return:</label>
-                    <select class="form-select" id="returnReason">
-                        <option value="Damaged product">Damaged product</option>
-                        <option value="Wrong item received">Wrong item received</option>
-                        <option value="Quality not as expected">Quality not as expected</option>
-                        <option value="Size does not fit">Size does not fit</option>
-                        <option value="Other">Other</option>
-                    </select>
+                    <label for="returnReason">Reason for Return</label>
+                    <textarea id="returnReason" name="reason" rows="4" required placeholder="Enter your reason"></textarea>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-warning" id="confirmReturnOrder">Confirm Return</button>
-            </div>
+                <div class="form-actions">
+                    <button type="button" class="modal-cancel-btn" onclick="closeModal('returnModal')">Cancel</button>
+                    <button type="submit" class="save-btn">Submit</button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<!-- Return Individual Item Modal -->
-<div class="modal fade" id="returnItemModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <!-- Single Item Return Modal -->
+    <div class="modal" id="itemReturnModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Return Item</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Request return for this item?</p>
+            <h2>Request Item Return</h2>
+            <form id="itemReturnForm" method="POST">
+                <input type="hidden" id="itemOrderId" name="orderId">
+                <input type="hidden" id="itemIndex" name="itemIndex">
                 <div class="form-group">
-                    <label for="itemReturnReason">Reason for return:</label>
-                    <select class="form-select" id="itemReturnReason">
-                        <option value="Damaged product">Damaged product</option>
-                        <option value="Wrong item received">Wrong item received</option>
-                        <option value="Quality not as expected">Quality not as expected</option>
-                        <option value="Size does not fit">Size does not fit</option>
-                        <option value="Other">Other</option>
-                    </select>
+                    <label for="itemReturnReason">Product</label>
+                    <p id="itemProductName"></p>
                 </div>
-                <input type="hidden" id="returnItemIndex" value="">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-warning" id="confirmReturnItem">Confirm Return</button>
-            </div>
+                <div class="form-group">
+                    <label for="itemReturnReason">Reason for Return</label>
+                    <textarea id="itemReturnReason" name="reason" rows="4" required placeholder="Enter your reason"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="modal-cancel-btn" onclick="closeModal('itemReturnModal')">Cancel</button>
+                    <button type="submit" class="save-btn">Submit</button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Cancel Order
-        document.getElementById('confirmCancelOrder')?.addEventListener('click', function() {
-            const reason = document.getElementById('cancelReason').value;
-            
-            fetch('/orders/cancel/<%= order.OrderId %>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ reason }),
-            })
-            .then(response => response.json())
-            .then(data => {
+    <!-- Js Plugins -->
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.nice-select.min.js"></script>
+    <script src="/js/jquery.nicescroll.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/jquery.countdown.min.js"></script>
+    <script src="/js/jquery.slicknav.js"></script>
+    <script src="/js/mixitup.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openItemReturnModal(orderId, itemIndex, productName) {
+            document.getElementById('itemOrderId').value = orderId;
+            document.getElementById('itemIndex').value = itemIndex;
+            document.getElementById('itemProductName').textContent = productName;
+            document.getElementById('itemReturnReason').value = '';
+            document.getElementById('itemReturnForm').action = `/orders/return-item/${orderId}`;
+            openModal('itemReturnModal');
+        }
+
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                closeModal('cancelModal');
+                closeModal('returnModal');
+                closeModal('itemReturnModal');
+            }
+        });
+
+        document.getElementById('cancelForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = this;
+            const reason = document.getElementById('cancelReason').value.trim();
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+
+                const data = await response.json();
                 if (data.success) {
-                    alert('Order cancelled successfully');
-                    location.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to cancel order',
+                        confirmButtonText: 'OK'
+                    });
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while cancelling the order');
-            });
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred: ' + error.message,
+                    confirmButtonText: 'OK'
+                });
+            }
         });
 
-        // Return Order
-        document.getElementById('confirmReturnOrder')?.addEventListener('click', function() {
-            const reason = document.getElementById('returnReason').value;
-            
-            fetch('/orders/return/<%= order.OrderId %>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ reason }),
-            })
-            .then(response => response.json())
-            .then(data => {
+        document.getElementById('returnForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = this;
+            const reason = document.getElementById('returnReason').value.trim();
+
+            if (!reason) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please provide a return reason',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+
+                const data = await response.json();
                 if (data.success) {
-                    alert('Return request submitted successfully');
-                    location.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to request return',
+                        confirmButtonText: 'OK'
+                    });
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while submitting return request');
-            });
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred: ' + error.message,
+                    confirmButtonText: 'OK'
+                });
+            }
         });
 
-        // Return Individual Item
-        document.querySelectorAll('.return-item-btn')?.forEach(button => {
-            button.addEventListener('click', function() {
-                document.getElementById('returnItemIndex').value = this.getAttribute('data-index');
-            });
-        });
+        document.getElementById('itemReturnForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = this;
+            const orderId = document.getElementById('itemOrderId').value;
+            const itemIndex = document.getElementById('itemIndex').value;
+            const reason = document.getElementById('itemReturnReason').value.trim();
 
-        document.getElementById('confirmReturnItem')?.addEventListener('click', function() {
-            const itemIndex = document.getElementById('returnItemIndex').value;
-            const reason = document.getElementById('itemReturnReason').value;
-            
-            fetch('/orders/return-item/<%= order.OrderId %>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ itemIndex, reason }),
-            })
-            .then(response => response.json())
-            .then(data => {
+            if (!reason) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please provide a return reason',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itemIndex, reason })
+                });
+
+                const data = await response.json();
                 if (data.success) {
-                    alert('Item return request submitted successfully');
-                    location.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 } else {
-                    alert('Error: ' + data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to request item return',
+                        confirmButtonText: 'OK'
+                    });
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while submitting item return request');
-            });
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred: ' + error.message,
+                    confirmButtonText: 'OK'
+                });
+            }
         });
-    });
-</script>
+    </script>
 </body>
 </html>
