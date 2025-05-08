@@ -49,7 +49,9 @@ app.use('/admin',adminRoute)
 app.set("view engine","ejs")
 app.set("views",[path.join(__dirname,'views/user'),path.join(__dirname,'views/admin'),path.join(__dirname, 'views')])
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use('/Uploads/re-image', express.static(path.join(__dirname, 'public/uploads/re-image')));
+
 
 // 404 Middleware
 const { pageNotFound } = require('./controller/errorController');
