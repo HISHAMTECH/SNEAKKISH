@@ -371,7 +371,7 @@ const editProduct = async (req, res) => {
         });
 
         if (existingProduct) {
-            return res.status(400).json({ error: "Product With This Name Already Exists. Please Try With Another Name" });
+            return res.status(400).json({ message: 'NAME already exists' });
         }
 
         // Handle Product Images Update
