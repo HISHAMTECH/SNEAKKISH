@@ -101,6 +101,22 @@ const orderSchema = new Schema({
     ReturnReason: {
         type: String,
         default: ''
+    },
+    PaymentFailureReason: {
+        type: String,
+        default: ''
+    },
+    RazorpayOrderId: {
+        type: String,
+        default: ''
+    },
+    RazorpayPaymentId: {
+        type: String,
+        default: ''
+    },
+    RazorpaySignature: {
+        type: String,
+        default: ''
     }
 });
 

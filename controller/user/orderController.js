@@ -46,6 +46,94 @@ const getOrderHistory = async (req, res) => {
     }
 };
 
+// const getOrderDetails = async (req, res) => {
+//     try {
+//         const orderId = req.params.orderId;
+        
+//         // Populate OrderedItems.Product and userId
+//         const order = await Order.findOne({ OrderId: orderId })
+//             .populate({
+//                 path: 'OrderedItems.Product',
+//                 model: 'Product',
+//                 select: 'ProductName ProductImage Price'
+//             })
+//             .populate({
+//                 path: 'userId',
+//                 model: 'User',
+//                 select: 'FirstName LastName Email PhoneNumber Address Wallet'
+//             });
+
+//         if (!order) {
+//             return res.redirect('/orders?error=Order not found');
+//         }
+
+//         // Filter out items with missing or invalid Product references
+//         order.OrderedItems = order.OrderedItems.filter(item => item.Product !== null);
+
+//         // Debug: Log the Product and ProductImage fields for each ordered item
+//         console.log("Ordered Items:", order.OrderedItems.map(item => ({
+//             ProductName: item.Product?.ProductName,
+//             ProductImage: item.Product?.ProductImage,
+//             Quantity: item.Quantity,
+//             Price: item.Price,
+//             Size: item.Size
+//         })));
+
+//         // Check if this is a payment failed order
+//         const isPaymentFailed = order.Status === 'Payment Failed';
+
+//         // Ensure all required fields are present (default to 0 or appropriate value if missing)
+//         order.TotalPrice = order.TotalPrice || 0;
+//         order.Tax = order.Tax || 0;
+//         order.Discount = order.Discount || 0;
+//         order.WalletAmount = order.WalletAmount || 0;
+//         order.FinalAmount = order.FinalAmount || 0;
+//         order.Status = order.Status || 'Pending';
+//         order.PaymentMethod = order.PaymentMethod || 'cod';
+//         order.CancellationReason = order.CancellationReason || 'none';
+//         order.ReturnReason = order.ReturnReason || '';
+//         order.PaymentFailureReason = order.PaymentFailureReason || 'Transaction could not be completed';
+
+//         // Ensure Address field is populated correctly
+//         order.Address = order.Address || {
+//             addressType: 'N/A',
+//             City: 'N/A',
+//             State: 'N/A',
+//             Pincode: 'N/A',
+//             _id: order.Address?._id || null
+//         };
+
+//         // Optionally, cross-reference with user's addresses if needed
+//         if (order.Address._id && order.userId?.Address) {
+//             const matchingAddress = order.userId.Address.find(addr => addr._id.equals(order.Address._id));
+//             if (matchingAddress) {
+//                 order.Address = {
+//                     ...order.Address,
+//                     Name: matchingAddress.Name,
+//                     Landmark: matchingAddress.Landmark,
+//                     Phone: matchingAddress.Phone,
+//                     AltPhone: matchingAddress.AltPhone,
+//                     isDefault: matchingAddress.isDefault
+//                 };
+//             }
+//         }
+
+//         // If payment failed, render a specific template
+//         if (isPaymentFailed) {
+//             return res.render('order-payment-failed', { 
+//                 order,
+//                 orderId: order.OrderId || order._id
+//             });
+//         }
+
+//         // Render the standard order details page
+//         res.render('order-detail', { order });
+//     } catch (error) {
+//         console.error('Error in getOrderDetails:', error);
+//         res.redirect('/orders?error=Error loading order details');
+//     }
+// };
+
 const getOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.orderId;
@@ -69,18 +157,6 @@ const getOrderDetails = async (req, res) => {
 
         // Filter out items with missing or invalid Product references
         order.OrderedItems = order.OrderedItems.filter(item => item.Product !== null);
-
-        // Debug: Log the Product and ProductImage fields for each ordered item
-        console.log("Ordered Items:", order.OrderedItems.map(item => ({
-            ProductName: item.Product?.ProductName,
-            ProductImage: item.Product?.ProductImage,
-            Quantity: item.Quantity,
-            Price: item.Price,
-            Size: item.Size
-        })));
-
-        // Check if this is a payment failed order
-        const isPaymentFailed = order.Status === 'Payment Failed';
 
         // Ensure all required fields are present (default to 0 or appropriate value if missing)
         order.TotalPrice = order.TotalPrice || 0;
@@ -118,15 +194,7 @@ const getOrderDetails = async (req, res) => {
             }
         }
 
-        // If payment failed, render a specific template
-        if (isPaymentFailed) {
-            return res.render('order-payment-failed', { 
-                order,
-                orderId: order.OrderId || order._id
-            });
-        }
-
-        // Render the standard order details page
+        // Render the order details page for all order types including payment failed
         res.render('order-detail', { order });
     } catch (error) {
         console.error('Error in getOrderDetails:', error);
@@ -413,6 +481,64 @@ const downloadInvoice = async (req, res) => {
     }
 };
 
+// const handlePaymentFailure = async (req, res) => {
+//     try {
+//         const { orderId, reason } = req.body;
+        
+//         if (!orderId) {
+//             return res.status(400).json({ success: false, message: 'Order ID is required' });
+//         }
+
+//         // Update order status to Payment Failed
+//         await Order.updateOne(
+//             { OrderId: orderId },
+//             {
+//                 $set: {
+//                     Status: 'Payment Failed',
+//                     PaymentFailureReason: reason || 'Transaction could not be completed'
+//                 }
+//             }
+//         );
+
+//         // Return the products to inventory
+//         const order = await Order.findOne({ OrderId: orderId });
+//         if (order && order.OrderedItems) {
+//             for (let item of order.OrderedItems) {
+//                 const numericSize = parseInt(item.Size);
+//                 await Product.updateOne(
+//                     { _id: item.Product, 'Variants.Size': numericSize },
+//                     { $inc: { 'Variants.$.Quantity': item.Quantity } }
+//                 );
+//             }
+//         }
+
+//         // If wallet amount was used, refund it
+//         if (order && order.WalletAmount > 0) {
+//             const userId = order.userId;
+//             let wallet = await Wallet.findOne({ userId });
+//             if (!wallet) {
+//                 wallet = new Wallet({ userId, balance: 0 });
+//             }
+            
+//             wallet.balance += order.WalletAmount;
+//             await wallet.save();
+
+//             const transaction = new Transaction({
+//                 userId,
+//                 type: 'credit',
+//                 amount: order.WalletAmount,
+//                 description: `Refund for failed payment on order ${orderId}`
+//             });
+//             await transaction.save();
+//         }
+
+//         res.render('order-payment-failed', { orderId });
+//     } catch (error) {
+//         console.error('Error handling payment failure:', error);
+//         res.status(500).json({ success: false, message: 'Error handling payment failure' });
+//     }
+// };
+
 const handlePaymentFailure = async (req, res) => {
     try {
         const { orderId, reason } = req.body;
@@ -464,7 +590,10 @@ const handlePaymentFailure = async (req, res) => {
             await transaction.save();
         }
 
-        res.render('order-payment-failed', { orderId });
+        res.render('order-payment-failed', { 
+            orderId,
+            user: req.session.User || req.user
+        });
     } catch (error) {
         console.error('Error handling payment failure:', error);
         res.status(500).json({ success: false, message: 'Error handling payment failure' });
