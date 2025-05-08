@@ -22,17 +22,24 @@ function generateReferralCode(baseString, length = 8) {
     return referralCode;
 }
 
+// Determine the environment and set callback URL
+const env = process.env.NODE_ENV || 'development'; // Default to development if NODE_ENV is not set
+console.log('Environment (NODE_ENV):', env);
+const callbackURL = env === 'production' 
+    ? 'https://sneakkish.shop/auth/google/callback' 
+    : 'http://localhost:5501/auth/google/callback';
+console.log('Google OAuth Callback URL:', callbackURL);
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.NODE_ENV === 'production' 
-        ? 'https://sneakkish.shop/auth/google/callback' 
-        : 'http://localhost:5501/auth/google/callback'
+    callbackURL: callbackURL
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ GoogleId: profile.id });
         
         if (user) {
+            console.log('Existing user found:', user.Email);
             return done(null, user);
         } else {
             const referralCode = generateReferralCode(profile.emails[0].value);
@@ -46,9 +53,11 @@ passport.use(new GoogleStrategy({
                 isVerified: true
             });
             await user.save();
+            console.log('New user created:', user.Email);
             return done(null, user);
         }
     } catch (error) {
+        console.error('Error in GoogleStrategy:', error);
         return done(error, null);
     }
 }));
