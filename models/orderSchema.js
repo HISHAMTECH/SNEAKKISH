@@ -8,9 +8,9 @@ const orderSchema = new Schema({
         unique: true
     },
     userId: {
-        type: mongoose.Schema.Types.ObjectId, // Ensure this is an ObjectId
-        ref: 'User', // Reference to the User model
-        required: true // Optional, depending on your use case
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     OrderedItems: [{
         Product: {
@@ -29,6 +29,15 @@ const orderSchema = new Schema({
         Size: {
             type: String,
             required: true
+        },
+        ReturnStatus: {
+            type: String,
+            enum: ['None', 'Return Requested', 'Returned', 'Denied'],
+            default: 'None'
+        },
+        ItemReturnReason: {
+            type: String,
+            default: ''
         }
     }],
     TotalPrice: {
@@ -37,7 +46,6 @@ const orderSchema = new Schema({
     },
     Tax: {
         type: Number,
-        
     },
     Discount: {
         type: Number,
@@ -83,10 +91,9 @@ const orderSchema = new Schema({
     },
     PaymentMethod: {
         type: String,
-        enum: ['cod', 'wallet', 'mixed','razorpay'],
+        enum: ['cod', 'wallet', 'mixed', 'razorpay'],
         default: 'cod'
     },
-    // Add missing fields
     CancellationReason: {
         type: String,
         default: 'none'

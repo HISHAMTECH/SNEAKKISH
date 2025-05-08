@@ -470,7 +470,7 @@
                   </div>
                   <div class="coupon-details">
                     <p><strong>Discount:</strong> <%= coupon.OfferPrice %>%</p>
-                    <p><strong>Minimum Purchase:</strong> $<%= coupon.MinimumPrice %></p>
+                    <p><strong>Minimum Purchase:</strong> ₹<%= coupon.MinimumPrice %></p>
                     <p><strong>Start Date:</strong> <%= new Date(coupon.CreatedOn).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) %></p>
                     <p><strong>Expiry:</strong> <%= new Date(coupon.ExpiryOn).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) %></p>
                     <p><strong>Type:</strong> 
@@ -530,7 +530,7 @@
 
         if (result.isConfirmed) {
           try {
-            const response = await fetch(`/remove-coupon/${couponId}`, {
+            const response = await fetch(`/remove-coupon/₹{couponId}`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'

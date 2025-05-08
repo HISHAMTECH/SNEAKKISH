@@ -219,8 +219,8 @@
                             <% orders.forEach(function(order) { %>
                                 <tr>
                                     <td><%= order.OrderId || order._id %></td>
-                                    <td><%= new Date(order.InvoiceDate).toLocaleDateString() %></td>
-                                    <td>$<%= order.TotalPrice ? order.TotalPrice.toFixed(2) : '0.00' %></td>
+                                    <td><%= new Date(order.CreatedOn || order.InvoiceDate).toLocaleDateString() %></td>
+                                    <td>₹<%= order.TotalPrice ? order.TotalPrice.toFixed(2) : '0.00' %></td>
                                     <td>
                                         <span class="status <%= order.Status ? order.Status.toLowerCase().replace(/\s+/g, '-') : 'pending' %>">
                                             <%= order.Status || 'Pending' %>
@@ -306,7 +306,8 @@
             } else {
                 orders.forEach(order => {
                     const orderId = order.OrderId || order._id || 'Unknown';
-                    const orderDate = order.CreatedOn ? new Date(order.CreatedOn).toLocaleDateString() : 'Unknown';
+                    const orderDate = order.CreatedOn ? new Date(order.CreatedOn).toLocaleDateString() : 
+                                      order.InvoiceDate ? new Date(order.InvoiceDate).toLocaleDateString() : 'Unknown';
                     const totalPrice = order.TotalPrice ? parseFloat(order.TotalPrice).toFixed(2) : '0.00';
                     const status = order.Status || 'Pending';
                     const statusClass = status.toLowerCase().replace(/\s+/g, '-');

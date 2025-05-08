@@ -5,6 +5,7 @@ const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema');
 const Coupon = require('../../models/couponSchma');
 const Wallet = require('../../models/walletSchema');
+const Product = require('../../models/productSchema'); // Assuming you have a Product model
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
@@ -50,20 +51,89 @@ const renderCheckout = async (req, res) => {
     }
 };
 
+// Validate stock before placing order
+const validateStock = async (req, res) => {
+    try {
+        const userId = req.session.User._id;
+        const cart = await Cart.findOne({ UserId: userId }).populate('Items.ProductId');
+        console.log("USERID", userId);
+
+        if (!cart || cart.Items.length === 0) {
+            return res.json({ success: false, message: 'Cart is empty' });
+        }
+
+        for (const item of cart.Items) {
+            const product = item.ProductId;
+            const size = item.Size.toString(); // Convert to string for consistent comparison
+            const quantity = item.Quantity;
+
+            // Find the variant in the product's Variants array that matches the size
+            const variant = product.Variants.find(v => v.Size.toString() === size);
+            if (!variant || variant.Quantity < quantity) {
+                return res.json({
+                    success: false,
+                    message: `Insufficient stock for ${product.ProductName} (Size: ${size}). Available: ${variant ? variant.Quantity : 0}, Requested: ${quantity}`
+                });
+            }
+        }
+
+        res.json({ success: true, message: 'Stock is sufficient' });
+    } catch (error) {
+        console.error('Error validating stock:', error);
+        res.json({ success: false, message: 'Error validating stock' });
+    }
+};
+
+
+
+
+// const validateStock = async (req, res) => {
+//     try {
+//         const userId = req.session.User._id;
+//         const cart = await Cart.findOne({ UserId: userId }).populate('Items.ProductId');
+//         console.log("USERIF",userId);
+        
+//         if (!cart || cart.Items.length === 0) {
+//             return res.json({ success: false, message: 'Cart is empty' });
+//         }
+
+//         for (const item of cart.Items) {
+//             const product = item.ProductId;
+//             const size = item.Size;
+//             const quantity = item.Quantity;
+
+//             // Assuming Product schema has a field `Stock` as an array of objects with `Size` and `Quantity`
+//             const sizeStock = product.Stock.find(s => s.Size === size);
+//             if (!sizeStock || sizeStock.Quantity < quantity) {
+//                 return res.json({
+//                     success: false,
+//                     message: `Insufficient stock for ${product.ProductName} (Size: ${size}). Available: ${sizeStock ? sizeStock.Quantity : 0}, Requested: ${quantity}`
+//                 });
+//             }
+//         }
+
+//         res.json({ success: true, message: 'Stock is sufficient' });
+//     } catch (error) {
+//         console.error('Error validating stock:', error);
+//         res.json({ success: false, message: 'Error validating stock' });
+//     }
+// };
+
+
 // Apply coupon
+
+
 const applyCoupon = async (req, res) => {
     try {
         const { couponId } = req.body;
-        const userId = req.session.User;
-        console.log(couponId);
-        
+        const userId = req.session.User._id;
 
         const coupon = await Coupon.findById(couponId);
-        console.log("sas", coupon);
-
-        if (!coupon || !coupon.isListed) {
-            return res.json({ success: false, message: 'Invalid or inactive coupon' });
-        }
+        console.log("coupon",coupon);
+        
+        // if (!coupon || !coupon.IsActive) {
+        //     return res.json({ success: false, message: 'Invalid or inactive coupon' });
+        // }
 
         const cart = await Cart.findOne({ UserId: userId });
         if (!cart) {
@@ -80,8 +150,6 @@ const applyCoupon = async (req, res) => {
         const discountPercentage = coupon.OfferPrice; // e.g., 30 for 30%
         const discountAmount = (subtotal * discountPercentage) / 100;
         const finalDiscount = Math.min(discountAmount, subtotal); // Cap discount at subtotal
-        console.log(finalDiscount);
-        
 
         // Store the coupon and discount in session
         req.session.appliedCoupon = {
@@ -89,17 +157,12 @@ const applyCoupon = async (req, res) => {
             discount: finalDiscount
         };
 
-        console.log("ASSSS", coupon);
-
         res.json({ 
             success: true, 
             message: 'Coupon applied', 
             discount: finalDiscount 
         });
-        console.log("response sent");
-        
     } catch (error) {
-        console.log("response sent error");
         console.error('Error applying coupon:', error);
         res.json({ success: false, message: 'Error applying coupon' });
     }
@@ -109,8 +172,6 @@ const applyCoupon = async (req, res) => {
 const removeCoupon = async (req, res) => {
     try {
         const { couponId } = req.body;
-
-        console.log("dsdd", req.session.appliedCoupon);
 
         if (req.session.appliedCoupon && req.session.appliedCoupon._id.toString() === couponId) {
             // Clear the applied coupon and discount
@@ -128,11 +189,12 @@ const removeCoupon = async (req, res) => {
         res.json({ success: false, message: 'Error removing coupon' });
     }
 };
+
 // Create Razorpay order
 const createRazorpayOrder = async (req, res) => {
     try {
         const { amount, addressId, walletAmount, couponId } = req.body;
-        const userId = req.session.User;
+        const userId = req.session.User._id;
 
         const options = {
             amount: amount, // Amount in paise
@@ -163,17 +225,12 @@ const createRazorpayOrder = async (req, res) => {
 // Place order
 const placeOrder = async (req, res) => {
     try {
-        console.log("evide keriii");
-        
-        const userId = req.session.user._id;
+        const userId = req.session.User._id;
         const { addressId, paymentMethod, walletAmount, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
 
         let finalAmount = parseFloat(req.body['final-total'] || 0);
         const appliedWalletAmount = parseFloat(walletAmount) || 0;
         const coupon = req.session.appliedCoupon;
-
-        console.log(appliedWalletAmount);
-        
 
         // Calculate totals
         const cart = await Cart.findOne({ UserId: userId }).populate('Items.ProductId');
@@ -186,7 +243,6 @@ const placeOrder = async (req, res) => {
                 discount = coupon.OfferPrice > subtotal ? subtotal : coupon.OfferPrice;
             }
         }
-
 
         finalAmount = subtotal + tax - discount - appliedWalletAmount;
 
@@ -210,8 +266,6 @@ const placeOrder = async (req, res) => {
             Status: paymentMethod === 'razorpay' ? 'Pending' : 'Placed',
             OrderId: `ORD-${Date.now()}`
         });
-
-
 
         if (paymentMethod === 'razorpay') {
             order.RazorpayOrderId = razorpayOrderId;
@@ -246,7 +300,6 @@ const placeOrder = async (req, res) => {
         req.session.appliedCoupon = null;
 
         await order.save();
-        console.log("order",order);
         
         res.redirect(`/order-success/${order.OrderId}`);
     } catch (error) {
@@ -319,32 +372,34 @@ const verifyPayment = async (req, res) => {
     }
 };
 
-const orderFailure = async(req,res)=>{
+const orderFailure = async(req, res) => {
     try {
         res.render('order-failure', { 
             orderId: req.params.orderId,
-            user: req.session.user || req.user,
+            user: req.session.User || req.user,
             userAddress: req.session.userAddress 
         });
     } catch (error) {
-        console.error('Error in Order  payment:', error);
+        console.error('Error in Order payment:', error);
         res.status(500).send('Error verifying payment');
     }
-}
-const orderSuccess = async(req,res)=>{
+};
+
+const orderSuccess = async(req, res) => {
     try {
-        
-        res.render('order-success', { orderId: req.params.orderId ,
-            user:user
+        res.render('order-success', { 
+            orderId: req.params.orderId,
+            user: req.session.User || req.user
         });
     } catch (error) {
         console.error('Error in Success Page:', error);
         res.status(500).send('Error verifying payment');
     }
-}
+};
 
 module.exports = {
     renderCheckout,
+    validateStock,
     applyCoupon,
     removeCoupon,
     createRazorpayOrder,

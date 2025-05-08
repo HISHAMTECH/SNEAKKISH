@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Male_Fashion Template">
-    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="description" content="Sneakkish Template">
+    <meta name="keywords" content="Sneakkish, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>SNEAKKISH | Your Orders</title>
@@ -514,7 +514,7 @@
             <ul>
                 <li><a href="/userProfile">Profile</a></li>
                 <li><a href="/Wishlist"><i class="fa fa-heart"></i> Wishlist</a></li>
-                <li><a href="/logout">Logout</a></li>
+                <li><a href="/acylogout">Logout</a></li>
             </ul>
         </div>
     </header>
@@ -557,7 +557,7 @@
                     <table class="order-table">
                         <thead>
                             <tr>
-                                <th>Image</th>
+                                
                                 <th>OrderId</th>
                                 <th>Date</th>
                                 <th>Status</th>
@@ -568,20 +568,13 @@
                         <tbody>
                             <% orders.forEach(order => { %>
                                 <tr>
-                                    <td>
-                                        <% if (order.OrderedItems && order.OrderedItems.length > 0 && order.OrderedItems[0].Product && order.OrderedItems[0].Product.ProductImage && order.OrderedItems[0].Product.ProductImage.length > 0) { %>
-                                            <img src="/Uploads/re-image/<%= order.OrderedItems[0].Product.ProductImage[0] %>" 
-                                                 alt="<%= order.OrderedItems[0].Product.ProductName || 'Product Image' %>">
-                                        <% } else { %>
-                                            <img src="/Uploads/re-image/default-image.jpg" alt="Default Image">
-                                        <% } %>
-                                    </td>
+                    
                                     <td>#<%= order.OrderId || order._id %></td>
                                     <td><%= order.InvoiceDate ? new Date(order.InvoiceDate).toISOString().split('T')[0] : order._id %></td>
                                     <td class="status-<%= order.Status.toLowerCase().replace(/\s+/g, '-') %>">
                                         <%= order.Status %>
                                     </td>
-                                    <td>₹<%= order.FinalAmount ? order.FinalAmount.toFixed(2) : 'N/A' %></td>
+                                    <td>₹<%= ((order.TotalPrice || 0) + (order.Tax || 0) - (order.Discount || 0)).toFixed(2) %></td>
                                     <td>
                                         <div class="order-actions">
                                             <a href="/orders/<%= order.OrderId || order._id %>" class="view-btn">View</a>

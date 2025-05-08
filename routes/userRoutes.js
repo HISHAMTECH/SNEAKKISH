@@ -16,8 +16,8 @@ const passport = require('passport')
 
 
 // Existing Routes
-router.get('/pageNotFound', userController.pageNotFound);
-router.get('/', userController.loadHome);
+// router.get('/pageNotFound', userController.pageNotFound);
+router.get('/',userAuth,userController.loadHome);
 router.get('/login', userController.loadLogin);
 router.post('/login', userController.login);
 router.get('/signup', userController.loadSignup);
@@ -130,12 +130,12 @@ router.get('/order-success',userAuth,cartController.orderSuccess)
 
 
 // ORDER MANAGEMENT
-router.get('/orders',userAuth,orderController.getOrders);
+router.get('/orders', userAuth, orderController.getOrders);
 router.get('/orders/:orderId', userAuth, orderController.getOrderDetails);
 router.post('/orders/cancel/:orderId', userAuth, orderController.cancelOrder);
 router.post('/orders/return/:orderId', userAuth, orderController.returnOrder);
+router.post('/orders/return-item/:orderId', userAuth, orderController.returnItem);
 router.get('/orders/invoice/:orderId', userAuth, orderController.downloadInvoice);
-
 
 //COUPON MANAGEMENT
 router.get('/coupon',userAuth,couponController.loadCoupon)
@@ -155,14 +155,16 @@ router.get('/wallet/transactions', userAuth, walletController.getAllTransactions
 //CHECKOUT MANAGEMENT
 
 router.get('/checkout', userAuth, checkoutController.renderCheckout);
+router.post('/checkout/validate-stock', userAuth, checkoutController.validateStock);
 router.post('/checkout/apply-coupon', userAuth, checkoutController.applyCoupon);
 router.post('/checkout/remove-coupon', userAuth, checkoutController.removeCoupon);
 router.post('/checkout/create-razorpay-order', userAuth, checkoutController.createRazorpayOrder);
 router.post('/checkout/place-order', userAuth, checkoutController.placeOrder);
 router.post('/checkout/retry-razorpay-payment', userAuth, checkoutController.retryRazorpayPayment);
 router.get('/checkout/verify-payment', userAuth, checkoutController.verifyPayment);
-router.get('/order-failure/:orderId', userAuth,checkoutController.orderFailure );
-router.get('/order-success/:orderId', userAuth,checkoutController.orderSuccess);
+router.get('/order-failure/:orderId', userAuth, checkoutController.orderFailure);
+router.get('/order-success/:orderId', userAuth, checkoutController.orderSuccess);
+
 
 
 module.exports = router;

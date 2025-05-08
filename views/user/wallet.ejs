@@ -634,7 +634,7 @@
           <!-- Wallet Balance -->
           <div class="wallet-balance">
             <h3>Current Balance</h3>
-            <p>$<%= wallet ? wallet.balance.toFixed(2) : '0.00' %></p>
+            <p>₹<%= wallet ? wallet.balance.toFixed(2) : '0.00' %></p>
           </div>
 
           <!-- Transaction History -->
@@ -645,7 +645,7 @@
                   <div class="transaction-details">
                     <p><strong>Date:</strong> <%= new Date(transaction.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) %></p>
                     <p><strong>Type:</strong> <span class="transaction-type <%= transaction.type === 'credit' ? 'credit' : 'debit' %>"><%= transaction.type %></span></p>
-                    <p><strong>Amount:</strong> $<%= transaction.amount.toFixed(2) %></p>
+                    <p><strong>Amount:</strong> ₹<%= transaction.amount.toFixed(2) %></p>
                     <p><strong>Description:</strong> <%= transaction.description %></p>
                   </div>
                 </div>

@@ -1,16 +1,15 @@
-// controller/user/orderController.js
 const mongoose = require('mongoose');
 const Product = require('../../models/productSchema');
 const Order = require('../../models/orderSchema');
-const Wallet = require('../../models/walletSchema')
-const Transaction = require('../../models/walletTransactionSchema')
+const Wallet = require('../../models/walletSchema');
+const Transaction = require('../../models/walletTransactionSchema');
 const PDFDocument = require('pdfkit');
 
 const getOrders = async (req, res) => {
     try {
         const userId = req.session.User?._id;
         if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-            return res.redirect('/orders?error=Invalid user session');
+            return res.redirect('/login?redirectTo=/orders');
         }
 
         // Fetch all orders including those with "Payment Failed" status, sorted by InvoiceDate
@@ -18,20 +17,23 @@ const getOrders = async (req, res) => {
             .populate('OrderedItems.Product')
             .sort({ InvoiceDate: -1 }); // Sort by newest first
 
-        console.log("userId", userId);
-        console.log("orders", orders);
-        console.log("fdf", orders.OrderedItems);
+        // Pass any error messages from query parameters
+        const error = req.query.error || null;
 
-        res.render('orders', { orders });
+        res.render('orders', { orders, error });
     } catch (error) {
         console.error('Error in getOrders:', error);
-        res.status(500).send('Error fetching orders');
+        res.render('orders', { orders: [], error: 'Error loading orders' });
     }
 };
 
 const getOrderHistory = async (req, res) => {
     try {
         const userId = req.session.User?._id;
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.redirect('/login?redirectTo=/orders');
+        }
+        
         // Fetch all orders including those with "Payment Failed" status, sorted by InvoiceDate
         const orders = await Order.find({ userId })
             .populate('OrderedItems.Product')
@@ -44,56 +46,21 @@ const getOrderHistory = async (req, res) => {
     }
 };
 
-// const getOrderDetails = async (req, res) => {
-//     try {
-//         const order = await Order.findOne({ OrderId: req.params.orderId })
-//             .populate({
-//                 path: 'OrderedItems.Product',
-//                 model: 'Product'
-//             });
-
-//         // Filter out items with missing or invalid Product references
-//         order.OrderedItems = order.OrderedItems.filter(item => item.Product !== null);
-
-//         // Debug: Log the Image field for each product
-//         console.log("ORD", order.OrderedItems.map(item => ({
-//             ProductName: item.Product.ProductName,
-//             Image: item.Product.Image
-//         })));
-//         console.log("Order Discount in getOrderDetails:", order.Discount); // Log the discount value
-
-//         if (!order) {
-//             return res.redirect('/orders?error=Order not found');
-//         }
-//         console.log("dsd", order.OrderedItems);
-
-//         // Ensure all required fields are present (default to 0 if missing)
-//         order.TotalPrice = order.TotalPrice || 0;
-//         order.Tax = order.Tax || 0;
-//         order.Discount = order.Discount || 0;
-//         order.WalletAmount = order.WalletAmount || 0;
-//         order.FinalAmount = order.FinalAmount || 0;
-
-//         res.render('order-detail', { order });
-//     } catch (error) {
-//         console.error('Error in getOrderDetails:', error);
-//         res.redirect('/orders?error=Error loading order details');
-//     }
-// };
-
 const getOrderDetails = async (req, res) => {
     try {
+        const orderId = req.params.orderId;
+        
         // Populate OrderedItems.Product and userId
-        const order = await Order.findOne({ OrderId: req.params.orderId })
+        const order = await Order.findOne({ OrderId: orderId })
             .populate({
                 path: 'OrderedItems.Product',
                 model: 'Product',
-                select: 'ProductName Image Price' // Select specific fields to optimize query
+                select: 'ProductName ProductImage Price'
             })
             .populate({
                 path: 'userId',
                 model: 'User',
-                select: 'FirstName LastName Email PhoneNumber Address Wallet' // Select relevant user fields
+                select: 'FirstName LastName Email PhoneNumber Address Wallet'
             });
 
         if (!order) {
@@ -103,39 +70,17 @@ const getOrderDetails = async (req, res) => {
         // Filter out items with missing or invalid Product references
         order.OrderedItems = order.OrderedItems.filter(item => item.Product !== null);
 
-        // Debug: Log the Product and Image fields for each ordered item
+        // Debug: Log the Product and ProductImage fields for each ordered item
         console.log("Ordered Items:", order.OrderedItems.map(item => ({
             ProductName: item.Product?.ProductName,
-            Image: item.Product?.Image,
+            ProductImage: item.Product?.ProductImage,
             Quantity: item.Quantity,
             Price: item.Price,
             Size: item.Size
         })));
 
-        // Debug: Log user details
-        console.log("User Details:", {
-            FirstName: order.userId?.FirstName,
-            LastName: order.userId?.LastName,
-            Email: order.userId?.Email,
-            PhoneNumber: order.userId?.PhoneNumber,
-            Wallet: order.userId?.Wallet
-        });
-
-        // Debug: Log key order details
-        console.log("Order Details:", {
-            OrderId: order.OrderId,
-            Discount: order.Discount,
-            WalletAmount: order.WalletAmount,
-            TotalPrice: order.TotalPrice,
-            Tax: order.Tax,
-            FinalAmount: order.FinalAmount,
-            PaymentMethod: order.PaymentMethod,
-            Status: order.Status,
-            InvoiceDate: order.InvoiceDate,
-            CancellationReason: order.CancellationReason,
-            ReturnReason: order.ReturnReason,
-            Address: order.Address
-        });
+        // Check if this is a payment failed order
+        const isPaymentFailed = order.Status === 'Payment Failed';
 
         // Ensure all required fields are present (default to 0 or appropriate value if missing)
         order.TotalPrice = order.TotalPrice || 0;
@@ -147,6 +92,7 @@ const getOrderDetails = async (req, res) => {
         order.PaymentMethod = order.PaymentMethod || 'cod';
         order.CancellationReason = order.CancellationReason || 'none';
         order.ReturnReason = order.ReturnReason || '';
+        order.PaymentFailureReason = order.PaymentFailureReason || 'Transaction could not be completed';
 
         // Ensure Address field is populated correctly
         order.Address = order.Address || {
@@ -158,7 +104,6 @@ const getOrderDetails = async (req, res) => {
         };
 
         // Optionally, cross-reference with user's addresses if needed
-        // Example: If order.Address._id matches a user address, fetch additional details
         if (order.Address._id && order.userId?.Address) {
             const matchingAddress = order.userId.Address.find(addr => addr._id.equals(order.Address._id));
             if (matchingAddress) {
@@ -173,7 +118,15 @@ const getOrderDetails = async (req, res) => {
             }
         }
 
-        // Render the order details page with the populated order data
+        // If payment failed, render a specific template
+        if (isPaymentFailed) {
+            return res.render('order-payment-failed', { 
+                order,
+                orderId: order.OrderId || order._id
+            });
+        }
+
+        // Render the standard order details page
         res.render('order-detail', { order });
     } catch (error) {
         console.error('Error in getOrderDetails:', error);
@@ -273,7 +226,7 @@ const returnOrder = async (req, res) => {
             wallet = new Wallet({ userId, balance: 0 });
         }
 
-        const refundAmount = order.WalletAmount + (order.PaymentMethod === 'cod' || order.PaymentMethod === 'mixed' || order.PaymentMethod === 'razorpay'  ? order.FinalAmount : 0);
+        const refundAmount = order.WalletAmount + (order.PaymentMethod === 'cod' || order.PaymentMethod === 'mixed' || order.PaymentMethod === 'razorpay' ? order.FinalAmount : 0);
         if (refundAmount > 0) {
             wallet.balance += refundAmount;
             await wallet.save();
@@ -294,6 +247,50 @@ const returnOrder = async (req, res) => {
     }
 };
 
+const returnItem = async (req, res) => {
+    try {
+        const userId = req.session.User?._id;
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(401).json({ success: false, message: 'Unauthorized: Please log in' });
+        }
+
+        const orderId = req.params.orderId;
+        const { itemIndex, reason } = req.body;
+
+        if (!reason) {
+            return res.json({ success: false, message: 'Return reason required' });
+        }
+
+        const order = await Order.findOne({ OrderId: orderId, userId });
+        if (!order) {
+            return res.json({ success: false, message: 'Order not found' });
+        }
+
+        if (order.Status !== 'Delivered') {
+            return res.json({ success: false, message: 'Cannot return item - order not Delivered' });
+        }
+
+        const item = order.OrderedItems[itemIndex];
+        if (!item) {
+            return res.json({ success: false, message: 'Item not found in order' });
+        }
+
+        if (item.ReturnStatus !== 'None') {
+            return res.json({ success: false, message: 'Item return already requested or processed' });
+        }
+
+        // Update item return status and reason
+        order.OrderedItems[itemIndex].ReturnStatus = 'Return Requested';
+        order.OrderedItems[itemIndex].ItemReturnReason = reason;
+        await order.save();
+
+        res.json({ success: true, message: 'Item return request submitted' });
+    } catch (error) {
+        console.error('Error in returnItem:', error);
+        res.json({ success: false, message: 'Error requesting item return' });
+    }
+};
+
 const downloadInvoice = async (req, res) => {
     try {
         // Fetch order from database
@@ -303,6 +300,11 @@ const downloadInvoice = async (req, res) => {
 
         if (!order) {
             return res.status(404).send('Order not found');
+        }
+
+        // Don't generate invoice for payment failed orders
+        if (order.Status === 'Payment Failed') {
+            return res.status(400).send('Cannot generate invoice for failed payments');
         }
 
         // Create a new PDF document
@@ -328,7 +330,7 @@ const downloadInvoice = async (req, res) => {
         const companyDetails = {
             name: 'SNEAKKISH',
             address: '123 Fashion Street, Style City, FC 12345',
-            email: 'support@malefashion.com',
+            email: 'support@sneakkish.com',
             phone: '(123) 456-7890'
         };
 
@@ -401,7 +403,7 @@ const downloadInvoice = async (req, res) => {
 
         // Footer
         doc.font('Helvetica').fontSize(10).text('Thank you for shopping with SNEAKKISH!', 50, totalsTop + 120, { align: 'center' });
-        doc.text('For any queries, contact us at support@malefashion.com', 50, totalsTop + 135, { align: 'center' });
+        doc.text('For any queries, contact us at support@sneakkish.com', 50, totalsTop + 135, { align: 'center' });
 
         // Finalize the PDF
         doc.end();
@@ -411,10 +413,71 @@ const downloadInvoice = async (req, res) => {
     }
 };
 
-module.exports={
+const handlePaymentFailure = async (req, res) => {
+    try {
+        const { orderId, reason } = req.body;
+        
+        if (!orderId) {
+            return res.status(400).json({ success: false, message: 'Order ID is required' });
+        }
+
+        // Update order status to Payment Failed
+        await Order.updateOne(
+            { OrderId: orderId },
+            {
+                $set: {
+                    Status: 'Payment Failed',
+                    PaymentFailureReason: reason || 'Transaction could not be completed'
+                }
+            }
+        );
+
+        // Return the products to inventory
+        const order = await Order.findOne({ OrderId: orderId });
+        if (order && order.OrderedItems) {
+            for (let item of order.OrderedItems) {
+                const numericSize = parseInt(item.Size);
+                await Product.updateOne(
+                    { _id: item.Product, 'Variants.Size': numericSize },
+                    { $inc: { 'Variants.$.Quantity': item.Quantity } }
+                );
+            }
+        }
+
+        // If wallet amount was used, refund it
+        if (order && order.WalletAmount > 0) {
+            const userId = order.userId;
+            let wallet = await Wallet.findOne({ userId });
+            if (!wallet) {
+                wallet = new Wallet({ userId, balance: 0 });
+            }
+            
+            wallet.balance += order.WalletAmount;
+            await wallet.save();
+
+            const transaction = new Transaction({
+                userId,
+                type: 'credit',
+                amount: order.WalletAmount,
+                description: `Refund for failed payment on order ${orderId}`
+            });
+            await transaction.save();
+        }
+
+        res.render('order-payment-failed', { orderId });
+    } catch (error) {
+        console.error('Error handling payment failure:', error);
+        res.status(500).json({ success: false, message: 'Error handling payment failure' });
+    }
+};
+
+module.exports = {
     getOrders,
+    getOrderHistory,
     getOrderDetails,
     cancelOrder,
     returnOrder,
-    downloadInvoice
-}
+    returnItem,
+    downloadInvoice,
+    handlePaymentFailure
+};

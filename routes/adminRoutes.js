@@ -61,6 +61,7 @@ router.get('/orders', adminAuth, orderController.getOrders);
 router.get('/orders/:orderId', adminAuth, orderController.getOrderDetails); 
 router.post('/orders/:orderId/status', adminAuth, orderController.updateOrderStatus); 
 router.post('/orders/:orderId/return', adminAuth, orderController.handleReturnRequest);
+router.post('/orders/:orderId/return-item', adminAuth, orderController.handleItemReturnRequest);
 router.get('/orders/paginate', adminAuth, orderController.paginate);
 
 

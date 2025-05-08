@@ -299,8 +299,8 @@
                             <th>Order ID</th>
                             <th>Date</th>
                             <th>Customer Name</th>
-                            <th>Order Status</th>
-                            <th>Discount Amount</th>
+                           
+                            
                             <th>Amount</th>
                         </tr>
                     </thead>
@@ -311,8 +311,6 @@
                                     <td><%= order.OrderId %></td>
                                     <td><%= order.InvoiceDate ? order.InvoiceDate.toLocaleDateString() : 'N/A' %></td>
                                     <td><%= order.userId && order.userId.FirstName ? order.userId.FirstName : 'N/A' %></td>
-                                    <td><span class="status-delivered"><%= order.Status || 'Pending' %></span></td>
-                                    <td><%= order.Discount || 0 %></td>
                                     <td><%= (order.TotalPrice + order.Tax - order.Discount).toFixed(2) %></td>
                                 </tr>
                             <% }) %>

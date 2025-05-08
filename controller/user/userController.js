@@ -31,14 +31,14 @@ function generateReferralCode(baseString, length = 8) {
 
 
 
-const pageNotFound=async (req,res)=>{
-    try {
-        res.render("page-404")
-    } catch (error) {
-        res.redirect('/pageNotFound')
-    }
+// const pageNotFound=async (req,res)=>{
+//     try {
+//         res.render("page-404")
+//     } catch (error) {
+//         res.redirect('/pageNotFound')
+//     }
 
-}
+// }
 
 
 const loadLogin = async (req, res) => {
@@ -580,7 +580,7 @@ const loadHome = async (req, res) => {
 
 
 module.exports={
-    pageNotFound,
+    // pageNotFound,
     loadLogin,
     loadSignup,
     signUp,

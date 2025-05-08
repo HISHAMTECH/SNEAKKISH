@@ -40,7 +40,7 @@
 
         .container {
             max-width: 900px;
-            width: calc(100% - 40px); /* Adjust for padding and sidebar */
+            width: calc(100% - 40px);
             padding: 0 20px;
         }
 
@@ -120,6 +120,21 @@
 
         .return-btn:hover {
             background: #cc3333;
+        }
+
+        .item-return-btn {
+            background: var(--warning-color);
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .item-return-btn:hover {
+            background: #d69e00;
         }
 
         .modal {
@@ -228,7 +243,7 @@
             background: #555;
         }
 
-        #returnReasonError {
+        #returnReasonError, #itemReturnReasonError {
             margin-top: 5px;
             color: var(--danger-color);
             font-size: 12px;
@@ -260,7 +275,6 @@
                                 <option value="Shipped" <%= order.Status === 'Shipped' ? 'selected' : '' %> <%= ['Delivered', 'Cancelled', 'Returned'].includes(order.Status) ? 'disabled' : '' %>>Shipped</option>
                                 <option value="Out for Delivery" <%= order.Status === 'Out for Delivery' ? 'selected' : '' %> <%= ['Delivered', 'Cancelled', 'Returned'].includes(order.Status) ? 'disabled' : '' %>>Out for Delivery</option>
                                 <option value="Delivered" <%= order.Status === 'Delivered' ? 'selected' : '' %> <%= ['Returned'].includes(order.Status) ? 'disabled' : '' %>>Delivered</option>
-                               
                             </select>
                         <% } %>
                     </p>
@@ -275,8 +289,19 @@
                 <div class="order-section">
                     <h3>Ordered Items</h3>
                     <% if (order.OrderedItems && order.OrderedItems.length > 0) { %>
-                        <% order.OrderedItems.forEach(item => { %>
-                            <p><strong>Product:</strong> <%= (item.Product && item.Product.ProductName) ? item.Product.ProductName : 'N/A' %> (Size: <%= item.Size || 'N/A' %>) - <%= item.Quantity || 'N/A' %> x $<%= (item.Price || 0).toFixed(2) %></p>
+                        <% order.OrderedItems.forEach((item, index) => { %>
+                            <p>
+                                <strong>Product:</strong> <%= (item.Product && item.Product.ProductName) ? item.Product.ProductName : 'N/A' %> 
+                                (Size: <%= item.Size || 'N/A' %>) - <%= item.Quantity || 'N/A' %> x ₹<%= (item.Price || 0).toFixed(2) %>
+                                <% if (item.ReturnStatus === 'Return Requested') { %>
+                                    <button class="item-return-btn" onclick="handleItemReturnRequest('<%= order.OrderId || order._id %>', '<%= index %>')">Handle Item Return</button>
+                                <% } else if (item.ReturnStatus !== 'None') { %>
+                                    <span> - Return Status: <%= item.ReturnStatus %></span>
+                                    <% if (item.ItemReturnReason) { %>
+                                        <span> (<%= item.ItemReturnReason %>)</span>
+                                    <% } %>
+                                <% } %>
+                            </p>
                         <% }) %>
                     <% } else { %>
                         <p>No items found.</p>
@@ -285,8 +310,8 @@
 
                 <div class="order-section">
                     <h3>Totals</h3>
-                    <p><strong>Total:</strong> $<%= (order.TotalPrice || 0).toFixed(2) %></p>
-                    <p><strong>Final Amount:</strong> $<%= (order.FinalAmount || order.TotalPrice || 0).toFixed(2) %></p>
+                    <p><strong>Total:</strong> ₹<%= (order.TotalPrice || 0).toFixed(2) %></p>
+                    <p><strong>Final Amount:</strong> ₹<%= (order.FinalAmount || order.TotalPrice || 0).toFixed(2) %></p>
                 </div>
             </div>
         </div>
@@ -312,7 +337,35 @@
                     <span id="returnReasonError">Please provide a reason for denying the return.</span>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="modal-cancel-btn" onclick="closeModal()">Cancel</button>
+                    <button type="button" class="modal-cancel-btn" onclick="closeModal('returnModal')">Cancel</button>
+                    <button type="submit" class="accept-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="itemReturnModal">
+        <div class="modal-content">
+            <h2>Handle Item Return Request</h2>
+            <form id="itemReturnForm">
+                <input type="hidden" id="itemReturnOrderId" name="orderId">
+                <input type="hidden" id="itemReturnIndex" name="itemIndex">
+                <div class="form-group">
+                    <label>Action</label>
+                    <div>
+                        <input type="radio" id="itemAcceptAction" name="action" value="accept" required>
+                        <label for="itemAcceptAction" class="radio-label">Accept</label>
+                        <input type="radio" id="itemDenyAction" name="action" value="deny">
+                        <label for="itemDenyAction" class="radio-label">Deny</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="itemReturnReason">Reason (Required for Deny)</label>
+                    <textarea id="itemReturnReason" name="reason" rows="4" placeholder="Enter your reason (optional for Accept, required for Deny)"></textarea>
+                    <span id="itemReturnReasonError">Please provide a reason for denying the return.</span>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="modal-cancel-btn" onclick="closeModal('itemReturnModal')">Cancel</button>
                     <button type="submit" class="accept-btn">Submit</button>
                 </div>
             </form>
@@ -324,174 +377,250 @@
     <script src="/js/jquery-3.3.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
-       function updateStatus(orderId) {
-        const currentStatus = '<%= order.Status || "Pending" %>';
-        const newStatus = document.getElementById('orderStatus').value;
+        function updateStatus(orderId) {
+            const currentStatus = '<%= order.Status || "Pending" %>';
+            const newStatus = document.getElementById('orderStatus').value;
 
-        const statusHierarchy = {
-            'Pending': ['Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
-            'Shipped': ['Out for Delivery', 'Delivered', 'Cancelled'],
-            'Out for Delivery': ['Delivered', 'Cancelled'],
-            'Delivered': ['Return Request', 'Cancelled'],
-            'Return Request': [], // Locked until handled
-            'Cancelled': [],
-            'Returned': []
-        };
+            const statusHierarchy = {
+                'Pending': ['Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
+                'Shipped': ['Out for Delivery', 'Delivered', 'Cancelled'],
+                'Out for Delivery': ['Delivered', 'Cancelled'],
+                'Delivered': ['Return Request', 'Cancelled'],
+                'Return Request': [],
+                'Cancelled': [],
+                'Returned': []
+            };
 
-        if (currentStatus === 'Return Request') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Action',
-                text: 'Status cannot be changed directly while in Return Request. Use Handle Return Request.',
-                confirmButtonColor: '#6366f1'
-            });
-            document.getElementById('orderStatus').value = currentStatus;
-            return;
-        }
-
-        if (!statusHierarchy[currentStatus].includes(newStatus)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Transition',
-                text: `Cannot change status from ${currentStatus} to ${newStatus}. Valid: ${JSON.stringify(statusHierarchy[currentStatus] || [])}`,
-                confirmButtonColor: '#6366f1'
-            });
-            document.getElementById('orderStatus').value = currentStatus;
-            return;
-        }
-
-        fetch(`/admin/orders/${orderId}/status`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Bearer ' + localStorage.getItem('adminToken') || '',
-                'Cookie': document.cookie
-            },
-            body: `status=${encodeURIComponent(newStatus)}`,
-            credentials: 'include'
-        })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
+            if (currentStatus === 'Return Request') {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: data.message,
+                    icon: 'error',
+                    title: 'Invalid Action',
+                    text: 'Status cannot be changed directly while in Return Request. Use Handle Return Request.',
                     confirmButtonColor: '#6366f1'
-                }).then(() => window.location.reload());
-            } else {
-                throw new Error(data.message || 'Failed to update order status.');
+                });
+                document.getElementById('orderStatus').value = currentStatus;
+                return;
             }
-        })
-        .catch(error => {
-            console.error('Error updating status:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: `An error occurred while updating the status. Please try again. Details: ${error.message}`,
-                confirmButtonColor: '#6366f1'
-            });
-            document.getElementById('orderStatus').value = currentStatus;
-        });
-    }
 
-    function handleReturnRequest(orderId) {
-        document.getElementById('returnOrderId').value = orderId;
-        document.querySelector('input[name="action"]:checked')?.removeAttribute('checked');
-        document.getElementById('returnReason').value = '';
-        document.getElementById('returnReasonError').style.display = 'none';
-        document.getElementById('returnModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('returnModal').style.display = 'none';
-    }
-
-    window.addEventListener('click', (e) => {
-        if (e.target === document.getElementById('returnModal')) closeModal();
-    });
-
-    document.querySelectorAll('input[name="action"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            const returnReason = document.getElementById('returnReason');
-            const returnReasonError = document.getElementById('returnReasonError');
-            if (this.value === 'deny') {
-                returnReason.setAttribute('required', 'required');
-                returnReason.placeholder = 'Enter your reason (required for Deny)';
-            } else {
-                returnReason.removeAttribute('required');
-                returnReason.placeholder = 'Enter your reason (optional for Accept)';
-                returnReasonError.style.display = 'none';
+            if (!statusHierarchy[currentStatus].includes(newStatus)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Transition',
+                    text: `Cannot change status from ${currentStatus} to ${newStatus}. Valid: ${JSON.stringify(statusHierarchy[currentStatus] || [])}`,
+                    confirmButtonColor: '#6366f1'
+                });
+                document.getElementById('orderStatus').value = currentStatus;
+                return;
             }
-        });
-    });
 
-    document.getElementById('returnForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const orderId = document.getElementById('returnOrderId').value;
-        const action = document.querySelector('input[name="action"]:checked')?.value;
-        const reason = document.getElementById('returnReason').value.trim();
-        const newStatus = action === 'accept' ? 'Returned' : 'Delivered';
-
-        if (!action) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Please select an action (Accept or Deny).',
-                confirmButtonColor: '#6366f1'
-            });
-            return;
-        }
-
-        if (action === 'deny' && !reason) {
-            document.getElementById('returnReasonError').style.display = 'block';
-            return;
-        }
-
-        try {
-            const response = await fetch(`/admin/orders/${orderId}/return`, {
+            fetch(`/admin/orders/${orderId}/status`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization': 'Bearer ' + localStorage.getItem('adminToken') || '',
                     'Cookie': document.cookie
                 },
-                body: `action=${encodeURIComponent(action)}&reason=${encodeURIComponent(reason || '')}&status=${encodeURIComponent(newStatus)}`,
+                body: `status=${encodeURIComponent(newStatus)}`,
                 credentials: 'include'
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-            }
-
-            const data = await response.json();
-            if (data.success) {
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        confirmButtonColor: '#6366f1'
+                    }).then(() => window.location.reload());
+                } else {
+                    throw new Error(data.message || 'Failed to update order status.');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating status:', error);
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: data.message,
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: `An error occurred while updating the status. Please try again. Details: ${error.message}`,
                     confirmButtonColor: '#6366f1'
-                }).then(() => {
-                    closeModal();
-                    window.location.reload();
                 });
-            } else {
-                throw new Error(data.message || 'Failed to process return request.');
-            }
-        } catch (error) {
-            console.error('Error processing return request:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: `An error occurred while processing the return. Please try again. Details: ${error.message}`,
-                confirmButtonColor: '#6366f1'
+                document.getElementById('orderStatus').value = currentStatus;
             });
         }
-    });
+
+        function handleReturnRequest(orderId) {
+            document.getElementById('returnOrderId').value = orderId;
+            document.querySelector('input[name="action"]:checked')?.removeAttribute('checked');
+            document.getElementById('returnReason').value = '';
+            document.getElementById('returnReasonError').style.display = 'none';
+            document.getElementById('returnModal').style.display = 'flex';
+        }
+
+        function handleItemReturnRequest(orderId, itemIndex) {
+            document.getElementById('itemReturnOrderId').value = orderId;
+            document.getElementById('itemReturnIndex').value = itemIndex;
+            document.querySelector('input[name="action"]:checked')?.removeAttribute('checked');
+            document.getElementById('itemReturnReason').value = '';
+            document.getElementById('itemReturnReasonError').style.display = 'none';
+            document.getElementById('itemReturnModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('returnModal') || e.target === document.getElementById('itemReturnModal')) {
+                closeModal('returnModal');
+                closeModal('itemReturnModal');
+            }
+        });
+
+        document.querySelectorAll('input[name="action"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const returnReason = document.getElementById(this.name === 'action' ? 'returnReason' : 'itemReturnReason');
+                const returnReasonError = document.getElementById(this.name === 'action' ? 'returnReasonError' : 'itemReturnReasonError');
+                if (this.value === 'deny') {
+                    returnReason.setAttribute('required', 'required');
+                    returnReason.placeholder = 'Enter your reason (required for Deny)';
+                } else {
+                    returnReason.removeAttribute('required');
+                    returnReason.placeholder = 'Enter your reason (optional for Accept)';
+                    returnReasonError.style.display = 'none';
+                }
+            });
+        });
+
+        document.getElementById('returnForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const orderId = document.getElementById('returnOrderId').value;
+            const action = document.querySelector('input[name="action"]:checked')?.value;
+            const reason = document.getElementById('returnReason').value.trim();
+            const newStatus = action === 'accept' ? 'Returned' : 'Delivered';
+
+            if (!action) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select an action (Accept or Deny).',
+                    confirmButtonColor: '#6366f1'
+                });
+                return;
+            }
+
+            if (action === 'deny' && !reason) {
+                document.getElementById('returnReasonError').style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/orders/${orderId}/return`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': 'Bearer ' + localStorage.getItem('adminToken') || '',
+                        'Cookie': document.cookie
+                    },
+                    body: `action=${encodeURIComponent(action)}&reason=${encodeURIComponent(reason || '')}&status=${encodeURIComponent(newStatus)}`,
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        confirmButtonColor: '#6366f1'
+                    }).then(() => {
+                        closeModal('returnModal');
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to process return request.');
+                }
+            } catch (error) {
+                console.error('Error processing return request:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: `An error occurred while processing the return. Please try again. Details: ${error.message}`,
+                    confirmButtonColor: '#6366f1'
+                });
+            }
+        });
+
+        document.getElementById('itemReturnForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const orderId = document.getElementById('itemReturnOrderId').value;
+            const itemIndex = document.getElementById('itemReturnIndex').value;
+            const action = document.querySelector('input[name="action"]:checked')?.value;
+            const reason = document.getElementById('itemReturnReason').value.trim();
+
+            if (!action) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select an action (Accept or Deny).',
+                    confirmButtonColor: '#6366f1'
+                });
+                return;
+            }
+
+            if (action === 'deny' && !reason) {
+                document.getElementById('itemReturnReasonError').style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/orders/${orderId}/return-item`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': 'Bearer ' + localStorage.getItem('adminToken') || '',
+                        'Cookie': document.cookie
+                    },
+                    body: `action=${encodeURIComponent(action)}&reason=${encodeURIComponent(reason || '')}&itemIndex=${encodeURIComponent(itemIndex)}`,
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        confirmButtonColor: '#6366f1'
+                    }).then(() => {
+                        closeModal('itemReturnModal');
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to process item return request.');
+                }
+            } catch (error) {
+                console.error('Error processing item return request:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: `An error occurred while processing the item return. Please try again. Details: ${error.message}`,
+                    confirmButtonColor: '#6366f1'
+                });
+            }
+        });
     </script>
 </body>
 </html>

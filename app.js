@@ -47,11 +47,17 @@ app.use('/admin',adminRoute)
 
 //viewengine
 app.set("view engine","ejs")
-app.set("views",[path.join(__dirname,'views/user'),path.join(__dirname,'views/admin')])
+app.set("views",[path.join(__dirname,'views/user'),path.join(__dirname,'views/admin'),path.join(__dirname, 'views')])
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+// 404 Middleware
+const { pageNotFound } = require('./controller/errorController');
+app.use(pageNotFound); // Catches unmatched routes
 
+// Error Handler
+const { errorHandler } = require('./controller/errorController');
+app.use(errorHandler);
 
 
 

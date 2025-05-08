@@ -270,7 +270,6 @@
             color: #000;
         }
 
-        /* Add styling for the Remove Wallet Money button */
         .totals .wallet-amount-container {
             position: relative;
         }
@@ -713,16 +712,14 @@
         let appliedWalletAmount = 0;
         let appliedCouponId = null;
         let currentDiscount = <%= discount %>;
-        const COD_MAXIMUM_AMOUNT = 9000; // Maximum amount for COD eligibility
+        const COD_MAXIMUM_AMOUNT = 9000;
 
-        // Initialize Nice Select on page load
         $(document).ready(function() {
             $('#coupon-select').niceSelect();
             $('#payment-method').niceSelect();
-            updatePaymentMethodOptions(); // Update payment methods based on initial total
-            toggleCouponSection(); // Check initial wallet state
+            updatePaymentMethodOptions();
+            toggleCouponSection();
 
-            // Add event listener for Remove Wallet Money button
             $('#remove-wallet-btn').on('click', function(e) {
                 e.preventDefault();
                 appliedWalletAmount = 0;
@@ -730,6 +727,7 @@
                 document.getElementById('wallet-amount').textContent = appliedWalletAmount.toFixed(2);
                 document.getElementById('remove-wallet-btn').style.display = 'none';
                 updateFinalTotal();
+                console.log('Wallet amount removed, walletAmount set to:', appliedWalletAmount);
             });
         });
 
@@ -748,6 +746,7 @@
                                           currentDiscount;
             const maxAmount = Math.min(walletBalance, finalTotalBeforeWallet);
             document.getElementById('wallet-amount-input').value = maxAmount.toFixed(2);
+            console.log('Set max wallet amount to:', maxAmount);
         }
 
         function handlePaymentMethodChange(method) {
@@ -758,14 +757,14 @@
             if (method === 'wallet') {
                 openModal();
             } else {
-                // When switching to COD or Razorpay, retain the appliedWalletAmount
                 if (appliedWalletAmount > finalTotalBeforeWallet) {
-                    appliedWalletAmount = finalTotalBeforeWallet; // Cap at remaining amount
+                    appliedWalletAmount = finalTotalBeforeWallet;
                 }
                 document.getElementById('walletAmount').value = appliedWalletAmount;
                 document.getElementById('wallet-amount').textContent = appliedWalletAmount.toFixed(2);
                 updateFinalTotal();
-                toggleCouponSection(); // Re-evaluate coupon section state
+                toggleCouponSection();
+                console.log('Payment method changed to:', method, 'walletAmount set to:', appliedWalletAmount);
             }
         }
 
@@ -777,14 +776,14 @@
             document.getElementById('final-total').textContent = finalTotal.toFixed(2);
             document.getElementById('wallet-amount').textContent = walletAmount.toFixed(2);
             document.getElementById('discount').textContent = discount.toFixed(2);
-            // Show or hide the Remove Wallet Money button based on applied amount
             if (appliedWalletAmount > 0) {
                 document.getElementById('remove-wallet-btn').style.display = 'inline';
             } else {
                 document.getElementById('remove-wallet-btn').style.display = 'none';
             }
-            updatePaymentMethodOptions(); // Update payment methods whenever the total changes
-            toggleCouponSection(); // Check if coupon should be disabled after wallet update
+            updatePaymentMethodOptions();
+            toggleCouponSection();
+            console.log('Updated final total:', finalTotal, 'with discount:', discount, 'and walletAmount:', walletAmount);
         }
 
         function updatePaymentMethodOptions() {
@@ -813,14 +812,12 @@
             const removeBtn = document.getElementById('remove-coupon-btn');
 
             if (appliedWalletAmount >= initialTotal && initialTotal > 0) {
-                // Disable coupon selection if wallet covers the full amount
                 couponSelect.disabled = true;
                 applyBtn.style.display = 'none';
                 removeBtn.style.display = 'none';
-                $('#coupon-select').niceSelect('update'); // Update Nice Select UI
+                $('#coupon-select').niceSelect('update');
             } else {
-                // Enable coupon selection if wallet doesn't cover the full amount
-                couponSelect.disabled = false; // Corrected typo: couponشانselect → couponSelect
+                couponSelect.disabled = false;
                 if (!appliedCouponId) {
                     applyBtn.style.display = 'inline-block';
                     removeBtn.style.display = 'none';
@@ -828,7 +825,7 @@
                     applyBtn.style.display = 'none';
                     removeBtn.style.display = 'inline-block';
                 }
-                $('#coupon-select').niceSelect('update'); // Update Nice Select UI
+                $('#coupon-select').niceSelect('update');
             }
         }
 
@@ -850,7 +847,6 @@
                 return;
             }
 
-            // Prevent selecting more than the order total
             if (walletAmountInput > finalTotalBeforeWallet) {
                 Swal.fire('Error', `You cannot apply more than the order total of $${finalTotalBeforeWallet.toFixed(2)}`, 'error');
                 return;
@@ -860,6 +856,7 @@
             document.getElementById('walletAmount').value = appliedWalletAmount;
             updateFinalTotal();
             closeModal();
+            console.log('Wallet amount applied:', appliedWalletAmount);
         });
 
         document.getElementById('apply-coupon-btn').addEventListener('click', function() {
@@ -874,7 +871,6 @@
                 return;
             }
 
-            // Calculate remaining amount after wallet
             const initialTotal = subtotal + parseFloat(document.getElementById('tax').textContent) - currentDiscount;
             const remainingAmount = Math.max(0, initialTotal - appliedWalletAmount);
             const potentialDiscount = (subtotal * offerPercentage) / 100;
@@ -900,7 +896,8 @@
                     Swal.fire('Success', 'Coupon applied successfully!', 'success');
                     document.getElementById('apply-coupon-btn').style.display = 'none';
                     document.getElementById('remove-coupon-btn').style.display = 'inline-block';
-                    toggleCouponSection(); // Re-evaluate coupon section state after applying
+                    toggleCouponSection();
+                    console.log('Coupon applied, discount:', currentDiscount);
                 }
             })
             .catch(error => {
@@ -935,7 +932,8 @@
                     updateFinalTotal(currentDiscount);
                     document.getElementById('apply-coupon-btn').style.display = 'inline-block';
                     document.getElementById('remove-coupon-btn').style.display = 'none';
-                    toggleCouponSection(); // Re-evaluate coupon section state after removing
+                    toggleCouponSection();
+                    console.log('Coupon removed, discount reset to:', currentDiscount);
                 } else {
                     Swal.fire('Error', data.message || 'Failed to remove coupon', 'error');
                 }
@@ -947,102 +945,131 @@
         });
 
         document.getElementById('checkout-form').addEventListener('submit', async function(e) {
+            console.log('Submitting form with walletAmount:', document.getElementById('walletAmount').value);
             e.preventDefault();
 
-            // Check if an address is selected or if addresses exist
-            const addressSelected = document.querySelector('input[name="addressId"]:checked');
-            const hasAddresses = <%= userAddress && Array.isArray(userAddress.Address) && userAddress.Address.length > 0 ? 'true' : 'false' %>;
-
-            if (!hasAddresses || !addressSelected) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Please add or select an address to proceed.',
-                    icon: 'error',
-                    confirmButtonText: 'Add Address',
-                    allowOutsideClick: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '/checkout';
-                    }
+            try {
+                const response = await fetch('/checkout/validate-stock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
                 });
-                return;
-            }
+                const stockData = await response.json();
 
-            const paymentMethod = document.getElementById('payment-method').value;
-            const finalTotal = parseFloat(document.getElementById('final-total').textContent);
-            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
-            const tax = parseFloat(document.getElementById('tax').textContent);
-            const initialTotal = subtotal + tax - currentDiscount;
-
-            if (paymentMethod === 'cod' && finalTotal >= COD_MAXIMUM_AMOUNT) {
-                Swal.fire('Error', `Cash on Delivery is only available for orders less than $${COD_MAXIMUM_AMOUNT}. Your current total is $${finalTotal.toFixed(2)}.`, 'error');
-                return;
-            }
-
-            if (paymentMethod === 'wallet' && appliedWalletAmount <= 0) {
-                Swal.fire('Error', 'Please apply a wallet amount to proceed', 'error');
-                return;
-            }
-
-            if (paymentMethod === 'wallet' && appliedWalletAmount < initialTotal) {
-                Swal.fire('Error', 'Please use the full wallet amount or select another payment method for the remaining amount.', 'error');
-                return;
-            }
-
-            if (paymentMethod === 'razorpay') {
-                try {
-                    const response = await fetch('/checkout/create-razorpay-order', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            amount: finalTotal * 100,
-                            addressId: document.querySelector('input[name="addressId"]:checked')?.value,
-                            walletAmount: appliedWalletAmount,
-                            couponId: appliedCouponId
-                        })
-                    });
-
-                    const data = await response.json();
-                    if (!data.success) {
-                        Swal.fire('Error', data.message || 'Failed to create Razorpay order', 'error');
-                        return;
-                    }
-
-                    const options = {
-                        key: '<%= process.env.RAZORPAY_KEY_ID %>',
-                        amount: data.order.amount,
-                        currency: data.order.currency,
-                        name: 'SNEAKKISH',
-                        description: 'Order Payment',
-                        order_id: data.order.id,
-                        handler: async function(response) {
-                            document.getElementById('razorpayOrderId').value = response.razorpay_order_id;
-                            document.getElementById('razorpayPaymentId').value = response.razorpay_payment_id;
-                            document.getElementById('razorpaySignature').value = response.razorpay_signature;
-                            document.getElementById('checkout-form').submit();
-                        },
-                        prefill: {
-                            name: '<%= user.FirstName %> <%= user.LastName %>',
-                            email: '<%= user.Email %>',
-                            contact: '<%= user.Address[0]?.Phone || "" %>'
-                        },
-                        theme: {
-                            color: '#007bff'
+                if (!stockData.success) {
+                    Swal.fire({
+                        title: 'Stock Issue',
+                        text: stockData.message || 'Some items in your cart are out of stock or have insufficient quantity. Please review your cart.',
+                        icon: 'error',
+                        confirmButtonText: 'Go to Cart',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/cart';
                         }
-                    };
-
-                    const rzp = new Razorpay(options);
-                    rzp.open();
-
-                    rzp.on('payment.failed', function(response) {
-                        window.location.href = `/order-failure/${data.order.id}`;
                     });
-                } catch (error) {
-                    console.error('Error:', error);
-                    Swal.fire('Error', 'An unexpected error occurred while initiating payment', 'error');
+                    return;
                 }
-            } else {
-                document.getElementById('checkout-form').submit();
+
+                const addressSelected = document.querySelector('input[name="addressId"]:checked');
+                const hasAddresses = <%= userAddress && Array.isArray(userAddress.Address) && userAddress.Address.length > 0 ? 'true' : 'false' %>;
+
+                if (!hasAddresses || !addressSelected) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Please add or select an address to proceed.',
+                        icon: 'error',
+                        confirmButtonText: 'Add Address',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/checkout';
+                        }
+                    });
+                    return;
+                }
+
+                const paymentMethod = document.getElementById('payment-method').value;
+                const finalTotal = parseFloat(document.getElementById('final-total').textContent);
+                const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+                const tax = parseFloat(document.getElementById('tax').textContent);
+                const initialTotal = subtotal + tax - currentDiscount;
+
+                if (paymentMethod === 'cod' && finalTotal >= COD_MAXIMUM_AMOUNT) {
+                    Swal.fire('Error', `Cash on Delivery is only available for orders less than $${COD_MAXIMUM_AMOUNT}. Your current total is $${finalTotal.toFixed(2)}.`, 'error');
+                    return;
+                }
+
+                if (paymentMethod === 'wallet' && appliedWalletAmount <= 0) {
+                    Swal.fire('Error', 'Please apply a wallet amount to proceed', 'error');
+                    return;
+                }
+
+                if (paymentMethod === 'wallet' && appliedWalletAmount < initialTotal) {
+                    Swal.fire('Error', 'Please use the full wallet amount or select another payment method for the remaining amount.', 'error');
+                    return;
+                }
+
+                if (paymentMethod === 'razorpay') {
+                    try {
+                        const response = await fetch('/checkout/create-razorpay-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                amount: finalTotal * 100,
+                                addressId: document.querySelector('input[name="addressId"]:checked')?.value,
+                                walletAmount: appliedWalletAmount,
+                                couponId: appliedCouponId
+                            })
+                        });
+
+                        const data = await response.json();
+                        if (!data.success) {
+                            Swal.fire('Error', data.message || 'Failed to create Razorpay order', 'error');
+                            return;
+                        }
+
+                        const options = {
+                            key: '<%= process.env.RAZORPAY_KEY_ID %>',
+                            amount: data.order.amount,
+                            currency: data.order.currency,
+                            name: 'SNEAKKISH',
+                            description: 'Order Payment',
+                            order_id: data.order.id,
+                            handler: async function(response) {
+                                document.getElementById('razorpayOrderId').value = response.razorpay_order_id;
+                                document.getElementById('razorpayPaymentId').value = response.razorpay_payment_id;
+                                document.getElementById('razorpaySignature').value = response.razorpay_signature;
+                                console.log('Submitting form after Razorpay with walletAmount:', document.getElementById('walletAmount').value);
+                                document.getElementById('checkout-form').submit();
+                            },
+                            prefill: {
+                                name: '<%= user.FirstName %> <%= user.LastName %>',
+                                email: '<%= user.Email %>',
+                                contact: '<%= user.Address[0]?.Phone || "" %>'
+                            },
+                            theme: {
+                                color: '#007bff'
+                            }
+                        };
+
+                        const rzp = new Razorpay(options);
+                        rzp.open();
+
+                        rzp.on('payment.failed', function(response) {
+                            window.location.href = `/order-failure/${data.order.id}`;
+                        });
+                    } catch (error) {
+                        console.error('Error:', error);
+                        Swal.fire('Error', 'An unexpected error occurred while initiating payment', 'error');
+                    }
+                } else {
+                    console.log('Direct form submission with walletAmount:', document.getElementById('walletAmount').value);
+                    document.getElementById('checkout-form').submit();
+                }
+            } catch (error) {
+                console.error('Error validating stock:', error);
+                Swal.fire('Error', 'An unexpected error occurred while validating stock', 'error');
             }
         });
 

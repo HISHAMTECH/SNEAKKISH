@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Male_Fashion Template">
-    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="description" content="Sneakkish Template">
+    <meta name="keywords" content="Sneakkish, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Male-Fashion | Order Details - <%= order.OrderId || order._id %></title>
+    <title>Sneakkish | Order Details - <%= order.OrderId || order._id %></title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
@@ -179,6 +179,21 @@
 
         .return-btn:hover {
             background: #e0a800;
+        }
+
+        .item-return-btn {
+            background: #ff851b;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: none;
+        }
+
+        .item-return-btn:hover {
+            background: #e07017;
         }
 
         .download-btn {
@@ -456,10 +471,13 @@
                                 <th>Size</th>
                                 <th>Price</th>
                                 <th>Subtotal</th>
+                                <% if (order.Status === 'Delivered' && order.OrderedItems.length > 1) { %>
+                                    <th>Action</th>
+                                <% } %>
                             </tr>
                         </thead>
                         <tbody>
-                            <% order.OrderedItems.forEach(item => { %>
+                            <% order.OrderedItems.forEach((item, index) => { %>
                                 <tr>
                                     <td data-label="Image">
                                         <img src="/Uploads/re-image/<%= item.Product.ProductImage && item.Product.ProductImage.length > 0 ? item.Product.ProductImage[0] : 'default-image.jpg' %>"
@@ -469,6 +487,18 @@
                                     <td data-label="Size"><%= item.Size %></td>
                                     <td data-label="Price">₹<%= item.Price.toFixed(2) %> x <%= item.Quantity %></td>
                                     <td data-label="Subtotal">₹<%= (item.Price * item.Quantity).toFixed(2) %></td>
+                                    <% if (order.Status === 'Delivered' && order.OrderedItems.length > 1 && item.ReturnStatus === 'None') { %>
+                                        <td data-label="Action">
+                                            <button class="item-return-btn" onclick="openItemReturnModal('<%= order.OrderId %>', '<%= index %>', '<%= item.Product.ProductName %>')">Return Item</button>
+                                        </td>
+                                    <% } else if (item.ReturnStatus !== 'None') { %>
+                                        <td data-label="Action">
+                                            <strong><%= item.ReturnStatus %></strong>
+                                            <% if (item.ItemReturnReason) { %>
+                                                <br><span><%= item.ItemReturnReason %></span>
+                                            <% } %>
+                                        </td>
+                                    <% } %>
                                 </tr>
                             <% }) %>
                         </tbody>
@@ -564,6 +594,29 @@
         </div>
     </div>
 
+    <!-- Single Item Return Modal -->
+    <div class="modal" id="itemReturnModal">
+        <div class="modal-content">
+            <h2>Request Item Return</h2>
+            <form id="itemReturnForm" method="POST">
+                <input type="hidden" id="itemOrderId" name="orderId">
+                <input type="hidden" id="itemIndex" name="itemIndex">
+                <div class="form-group">
+                    <label for="itemReturnReason">Product</label>
+                    <p id="itemProductName"></p>
+                </div>
+                <div class="form-group">
+                    <label for="itemReturnReason">Reason for Return</label>
+                    <textarea id="itemReturnReason" name="reason" rows="4" required placeholder="Enter your reason"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="modal-cancel-btn" onclick="closeModal('itemReturnModal')">Cancel</button>
+                    <button type="submit" class="save-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Js Plugins -->
     <script src="/js/jquery-3.3.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
@@ -586,10 +639,20 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
+        function openItemReturnModal(orderId, itemIndex, productName) {
+            document.getElementById('itemOrderId').value = orderId;
+            document.getElementById('itemIndex').value = itemIndex;
+            document.getElementById('itemProductName').textContent = productName;
+            document.getElementById('itemReturnReason').value = '';
+            document.getElementById('itemReturnForm').action = `/orders/return-item/${orderId}`;
+            openModal('itemReturnModal');
+        }
+
         window.addEventListener('click', function(e) {
             if (e.target.classList.contains('modal')) {
                 closeModal('cancelModal');
                 closeModal('returnModal');
+                closeModal('itemReturnModal');
             }
         });
 
@@ -670,6 +733,58 @@
                         icon: 'error',
                         title: 'Error',
                         text: data.message || 'Failed to request return',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred: ' + error.message,
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+
+        document.getElementById('itemReturnForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = this;
+            const orderId = document.getElementById('itemOrderId').value;
+            const itemIndex = document.getElementById('itemIndex').value;
+            const reason = document.getElementById('itemReturnReason').value.trim();
+
+            if (!reason) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please provide a return reason',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itemIndex, reason })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to request item return',
                         confirmButtonText: 'OK'
                     });
                 }

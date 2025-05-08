@@ -14,8 +14,6 @@ try {
     process.exit(1)
 }
 
-console.log('db end');
-
 }
 
 module.exports=connectDB

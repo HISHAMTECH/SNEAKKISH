@@ -71,7 +71,7 @@
                 <i class="fas fa-chart-line"></i>
             </div>
             <div class="stat-details">
-                <h3>$<%= totalRevenue.toFixed(2) %></h3>
+                <h3>₹<%= totalRevenue.toFixed(2) %></h3>
                 <p>Total Revenue</p>
             </div>
         </div>
@@ -183,11 +183,11 @@
                     <% recentOrders.forEach(order => { %>
                         <% order.OrderedItems.forEach(item => { %>
                             <tr>
-                                <td>#<%= order.OrderId || `ORD-${order._id.toString().slice(-6)}` %></td>
+                                <td>#<%= order.OrderId || `ORD-₹{order._id.toString().slice(-6)}` %></td>
                                 <td><%= order.userId?.FirstName || 'Unknown' %></td>
                                 <td><%= item.Product?.ProductName || item.Product?.name || 'Unknown Product' %></td>
                                 <td><%= new Date(order.InvoiceDate).toLocaleDateString() %></td>
-                                <td>$<%= order.FinalAmount.toFixed(2) %></td>
+                                <td>₹<%= order.FinalAmount.toFixed(2) %></td>
                                 <td><span class="status <%= order.Status === 'Completed' ? 'completed' : order.Status === 'Pending' ? 'pending' : 'cancelled' %>"><%= order.Status %></span></td>
                             </tr>
                         <% }) %>

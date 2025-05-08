@@ -195,7 +195,6 @@
                     <th>Sale Price</th>
                     <th>Offer Price</th>
                     <th>Offer</th>
-                    <th>Quantity</th>
                     <th>Action</th>
                     <th>Edit</th>
                 </tr>
@@ -215,7 +214,7 @@
                             <button class="action-btn btn-remove-offer" onclick="removeOffer('<%= data[i]._id %>')">Remove</button>
                         <% } %>
                     </td>
-                    <td><%= data[i].Quantity %></td>
+                    
                     <td>
                         <% if (!data[i].isBlocked) { %>
                             <a href="/admin/blockProduct?id=<%= data[i]._id %>" class="action-btn btn-block">Block</a>
