@@ -647,7 +647,6 @@
                                      alt="">
                                 <div class="wishlist-item-details">
                                     <h5><%=product.ProductName || 'Unnamed Product' %></h5>
-                                    <p>Price: ₹<%=product.SalePrice%></p>
                                     <% if (product.Variants.every(v => v.Quantity <= 0)) { %>
                                         <span class="out-of-stock">(Out of stock)</span>
                                     <% } %>

@@ -20,7 +20,6 @@
         flex-direction: column;
         align-items: center;
         padding: 20px;
-       
         border-radius: 15px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     }
@@ -30,50 +29,50 @@
         margin-bottom: 60px;
     }
     .search-bar {
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding-bottom: 30px;
-}
+        width: 100%;
+        max-width: 600px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding-bottom: 30px;
+    }
 
-.search-bar input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-}
+    .search-bar input {
+        flex: 1;
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+    }
 
-.search-bar button {
-    padding: 10px 15px;
-    background: black;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    white-space: nowrap;
-    font-weight: bold;
-    transition: 0.3s;
-}
+    .search-bar button {
+        padding: 10px 15px;
+        background: black;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        white-space: nowrap;
+        font-weight: bold;
+        transition: 0.3s;
+    }
 
-.search-bar button:hover {
-    background: #e64a2e;
-}
+    .search-bar button:hover {
+        background: #e64a2e;
+    }
 
-/* Style for the image button */
-.icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
+    /* Style for the image button */
+    .icon-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+    }
 
-.icon-btn img {
-    width: 30px; /* Adjust size */
-    height: auto;
-}
+    .icon-btn img {
+        width: 30px; /* Adjust size */
+        height: auto;
+    }
 
     .table-container {
         width: 100%;
@@ -106,8 +105,8 @@
         color: #ddd;
     }
 
-     /* Pagination Styling */
-     .pagination {
+    /* Pagination Styling */
+    .pagination {
         display: flex;
         justify-content: center;
         margin-top: 20px;
@@ -185,6 +184,7 @@
                     <th>Last Name</th>
                     <th>Email</th>
                     <th>Phone No</th>
+                    <th>Joining Date</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -195,6 +195,7 @@
                     <td><%= data[i].LastName %></td>
                     <td><%= data[i].Email %></td>
                     <td><%= data[i].PhoneNumber %></td>
+                    <td><%= new Date(data[i].CreatedOn).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
                     <td>
                         <% if (!data[i].isBlocked) { %>
                             <a href="/admin/blockCustomer?id=<%= data[i]._id %>&page=<%= currentPage %>" 
@@ -215,13 +216,13 @@
             <a href="?page=<%= i %>" class="<%= (i == currentPage) ? 'active' : '' %>"><%= i %></a>
         <% } %>
     </div>
+</div>
 
-    <script>
-         //reset search
+<script>
+    // Reset search
     document.getElementById('reset-search').addEventListener('click', function() {
         window.location.href = window.location.pathname; // Reload the page without search query
     });
-
-    </script>
+</script>
 
 <%- include("../../views/partials/admin/footer") %>

@@ -1,7 +1,7 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/userSchema');
-const env = require("dotenv").config();
+require('dotenv').config();
 
 function generateReferralCode(baseString, length = 8) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -25,9 +25,10 @@ function generateReferralCode(baseString, length = 8) {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://localhost:5501/auth/google/callback'
-},
-async (accessToken, refreshToken, profile, done) => {
+    callbackURL: process.env.NODE_ENV === 'production' 
+        ? 'https://sneakkish.shop/auth/google/callback' 
+        : 'http://localhost:5501/auth/google/callback'
+}, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ GoogleId: profile.id });
         
@@ -56,14 +57,13 @@ passport.serializeUser((user, done) => {
     done(null, user.id);
 });
 
-passport.deserializeUser((id, done) => {
-    User.findById(id)
-        .then((user) => {
-            done(null, user);
-        })
-        .catch((err) => {
-            done(err, null);
-        });
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (error) {
+        done(error, null);
+    }
 });
 
 module.exports = passport;
