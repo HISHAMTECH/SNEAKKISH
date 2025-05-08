@@ -22,12 +22,8 @@ function generateReferralCode(baseString, length = 8) {
     return referralCode;
 }
 
-// Determine the environment and set callback URL
-const env = process.env.NODE_ENV || 'development'; // Default to development if NODE_ENV is not set
-console.log('Environment (NODE_ENV):', env);
-const callbackURL = env === 'production' 
-    ? 'https://sneakkish.shop/auth/google/callback' 
-    : 'http://localhost:5501/auth/google/callback';
+// Use only the live server callback URL
+const callbackURL = 'https://sneakkish.shop/auth/google/callback';
 console.log('Google OAuth Callback URL:', callbackURL);
 
 passport.use(new GoogleStrategy({
